@@ -557,12 +557,15 @@ var Server = IgeClass.extend({
 
 						try {
 							var registry = new (require('./training/PolicyRegistry').PolicyRegistry)();
-							if (process.env.BATTLEFIGHT_DEMO_POLICY && !(ige.training && ige.training.isTrainingMode)) {
+							if (!(ige.training && ige.training.isTrainingMode)) {
 								var demo = require('./training/DemoRuntime');
-								ige.trainingPolicy = demo.resolveDemoPolicy(registry, process.env.BATTLEFIGHT_DEMO_POLICY);
+								var requestedPolicy = process.env.BATTLEFIGHT_DEMO_POLICY || 'latest';
+								ige.trainingPolicy = demo.resolveDemoPolicy(registry, requestedPolicy);
 								demo.installDemo(ige, ige.trainingPolicy);
-								console.log('BattleFight exhibition: 3v3, policy ' + ige.trainingPolicy.version);
-							} else ige.trainingPolicy = registry.policyForNewMatch();
+								console.log('BattleFight active neural exhibition: 3v3, policy ' + ige.trainingPolicy.version);
+							} else {
+								ige.trainingPolicy = registry.policyForNewMatch();
+							}
 						} catch (error) {
 							if (process.env.BATTLEFIGHT_DEMO_POLICY) throw error;
 							console.warn('Training policy unavailable; battle bots will use baseline tactics:', error.message);
