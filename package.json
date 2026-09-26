@@ -46,7 +46,7 @@
     "express": "^4.18.1",
     "helmet": "^5.1.0",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.18.1",
     "lz-string": "^1.4.4",
     "msgpack-lite": "^0.1.26",
     "phaser": "^3.55.2",
