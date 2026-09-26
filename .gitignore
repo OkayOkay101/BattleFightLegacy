@@ -11,6 +11,7 @@ deployment/
 sslcert/
 training-data/
 training-data-backup-legacy/
+training-data-archive/
 training-python/.venv/
 training-python/__pycache__/
 

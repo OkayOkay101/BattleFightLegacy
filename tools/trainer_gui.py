@@ -114,7 +114,7 @@ class BattleFightTrainerApp(tk.Tk):
         worker_box.pack(side="left", padx=5)
         ttk.Label(worker_box, text="⚡ ควบคุม Worker (1-8):", font=("Segoe UI", 9, "bold"), background="#1e293b", foreground="#94a3b8").pack(side="left", padx=(0, 6))
 
-        self.worker_var = tk.IntVar(value=2)
+        self.worker_var = tk.IntVar(value=4)
         btn_w_minus = tk.Button(worker_box, text=" - ", font=("Segoe UI", 9, "bold"), bg="#475569", fg="#ffffff", relief="flat", padx=6, pady=2, cursor="hand2", command=lambda: self.change_worker_delta(-1))
         btn_w_minus.pack(side="left", padx=2)
 

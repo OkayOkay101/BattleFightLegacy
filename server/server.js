@@ -355,7 +355,7 @@ var Server = IgeClass.extend({
 
 		app.post('/api/training/start', async (req, res) => {
 			try {
-				const workers = req.body && req.body.workers ? Number(req.body.workers) : 2;
+				const workers = req.body && req.body.workers ? Number(req.body.workers) : 4;
 				const neural = req.body && req.body.neural === false ? 'off' : 'on';
 				const speed = req.body && req.body.speed ? req.body.speed : 'max';
 				const result = await trainingCli.start({
