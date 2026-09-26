@@ -96,6 +96,7 @@ var VariableComponent = IgeEntity.extend({
 		}
 
 		// if boolean, string, undefined, etc... return.
+		if (text === null) return null;
 		if (typeof text !== 'object') {
 			returnValue = text;
 		} else if (text && text.function == undefined && text.x != undefined && text.y != undefined) // if point! (x, y)
@@ -112,6 +113,33 @@ var VariableComponent = IgeEntity.extend({
 			var entity = self.getValue(text.entity, vars);
 
 			switch (text.function) {
+				case 'thisEntity':
+					return vars && vars.thisEntity;
+				case 'entityName':
+					return entity && entity._stats && entity._stats.name;
+				case 'getPlayerSelectedUnit': {
+					var selectedPlayer = self.getValue(text.player, vars);
+					return selectedPlayer && ige.$(selectedPlayer._stats.selectedUnitId);
+				}
+				case 'playerIsCreator': {
+					var creatorPlayer = self.getValue(text.player, vars);
+					var creatorId = ige.game.data.defaultData && ige.game.data.defaultData.owner;
+					return !!(creatorPlayer && creatorPlayer._stats.userId && creatorId && creatorPlayer._stats.userId == creatorId);
+				}
+				case 'stringIsANumber': {
+					var numericText = self.getValue(text.string, vars);
+					return typeof numericText === 'string' && numericText.trim() !== '' && Number.isFinite(Number(numericText));
+				}
+				case 'getPositionInFrontOfPosition': {
+					var origin = self.getValue(text.position, vars);
+					var distance = self.getValue(text.distance, vars);
+					var heading = self.getValue(text.angle, vars);
+					// Modd angles are radians, with zero pointing up (as in angleBetweenPositions).
+					if (origin && Number.isFinite(Number(distance)) && Number.isFinite(Number(heading))) {
+						return { x: origin.x + Math.sin(heading) * distance, y: origin.y - Math.cos(heading) * distance };
+					}
+					return undefined;
+				}
 				/* boolean */
 
 				case 'playersAreHostile':
@@ -128,7 +156,7 @@ var VariableComponent = IgeEntity.extend({
 					var playerB = self.getValue(text.playerB, vars);
 
 					if (playerA && playerB) {
-						returnValue = playerA.isFriendlyTo(playerB);
+						returnValue = (playerA === playerB) || Boolean(playerA.isFriendlyTo && playerA.isFriendlyTo(playerB));
 					}
 					break;
 
@@ -231,6 +259,13 @@ var VariableComponent = IgeEntity.extend({
 					var player = self.getValue(text.player, vars);
 					returnValue = player && player._stats.controlledBy == 'human';
 					break;
+
+				case 'playerIsMatchParticipant': {
+					var participant = self.getValue(text.player, vars);
+					returnValue = !!(participant && participant._category === 'player' && participant._stats.playerJoined && !participant._stats.isSpectator &&
+						(participant._stats.controlledBy === 'human' || participant._stats.isBattleBot === true));
+					break;
+				}
 
 				case 'isPlayerLoggedIn':
 					var player = self.getValue(text.player, vars);
@@ -699,7 +734,8 @@ var VariableComponent = IgeEntity.extend({
 					break;
 
 				case 'getLastAttackingUnit':
-					var id = ige.game.lastAttackingUnitId;
+					var id = vars && vars.triggeredBy && Object.prototype.hasOwnProperty.call(vars.triggeredBy, 'attackingUnitId')
+						? vars.triggeredBy.attackingUnitId : ige.game.lastAttackingUnitId;
 					unit = ige.$(id);
 					if (unit && unit._category == 'unit') {
 						return unit;
@@ -871,7 +907,10 @@ var VariableComponent = IgeEntity.extend({
 					break;
 
 				case 'getLastChatMessageSentByPlayer':
-					returnValue = ige.game.lastChatMessageSentByPlayer;
+					var chatPlayer = self.getValue(text.player, vars);
+					returnValue = chatPlayer && chatPlayer.lastMessageSent !== undefined
+						? chatPlayer.lastMessageSent
+						: ige.game.lastChatMessageSentByPlayer;
 					break;
 
 				// doesn't work yet
@@ -936,7 +975,7 @@ var VariableComponent = IgeEntity.extend({
 
 				case 'getPlayerCount':
 					returnValue = ige.$$('player').filter(function (player) {
-						return player._stats.controlledBy == 'human' && player._stats.playerJoined == true;
+						return (player._stats.controlledBy == 'human' || player._stats.isBattleBot === true) && player._stats.playerJoined == true;
 					}).length;
 					break;
 
@@ -1045,7 +1084,7 @@ var VariableComponent = IgeEntity.extend({
 					break;
 
 				case 'currentTimeStamp':
-					returnValue = Date.now();
+					returnValue = (ige.training && ige.training.clock ? ige.training.clock.now() : Date.now()) / 1000;
 					break;
 
 				case 'getRandomPositionInRegion':
@@ -1138,6 +1177,10 @@ var VariableComponent = IgeEntity.extend({
 					if (entity) {
 						if (entity._category === 'item' && entity._stats && entity._stats.currentBody && entity._stats.currentBody.type === 'spriteOnly') {
 							var ownerUnit = entity.getOwnerUnit();
+							if (!ownerUnit || !ownerUnit._translate || !ownerUnit._rotate) {
+								returnValue = entity._translate ? _.cloneDeep(entity._translate) : undefined;
+								break;
+							}
 							var unitPosition = _.cloneDeep(ownerUnit._translate);
 							unitPosition.x = (ownerUnit._translate.x) + (entity._stats.currentBody.unitAnchor.y * Math.cos(ownerUnit._rotate.z + Math.radians(-90))) + (entity._stats.currentBody.unitAnchor.x * Math.cos(ownerUnit._rotate.z));
 							unitPosition.y = (ownerUnit._translate.y) + (entity._stats.currentBody.unitAnchor.y * Math.sin(ownerUnit._rotate.z + Math.radians(-90))) + (entity._stats.currentBody.unitAnchor.x * Math.sin(ownerUnit._rotate.z));
@@ -1184,6 +1227,10 @@ var VariableComponent = IgeEntity.extend({
 					break;
 				case 'getMouseCursorPosition':
 					var player = self.getValue(text.player, vars);
+					if (player && player._stats.isBattleBot && player.getSelectedUnit()) {
+						returnValue = player.getSelectedUnit().botAimPosition || player.getSelectedUnit()._translate;
+						break;
+					}
 					if (player && player._category == 'player' && player.control) {
 						if (player.control.input.mouse.x != undefined && player.control.input.mouse.y != undefined &&
 							!isNaN(player.control.input.mouse.x) && !isNaN(player.control.input.mouse.y))
@@ -1191,6 +1238,13 @@ var VariableComponent = IgeEntity.extend({
 								x: parseInt(player.control.input.mouse.x),
 								y: parseInt(player.control.input.mouse.y)
 							};
+					}
+					if (player && player._category == 'player' && player._stats.controlledBy === 'computer') {
+						var selectedUnit = player.getSelectedUnit && player.getSelectedUnit();
+						var targetPosition = selectedUnit && selectedUnit.ai && selectedUnit.ai.getTargetPosition();
+						if (targetPosition && Number.isFinite(targetPosition.x) && Number.isFinite(targetPosition.y)) {
+							returnValue = { x: targetPosition.x, y: targetPosition.y };
+						}
 					}
 					break;
 
@@ -1725,6 +1779,12 @@ var VariableComponent = IgeEntity.extend({
 
 				case 'humanPlayers':
 					returnValue = ige.$$('player').filter(function (player) { return player._stats.controlledBy == 'human'; });
+					break;
+
+				case 'matchPlayers':
+					returnValue = ige.$$('player').filter(function (player) {
+						return player._stats.playerJoined && !player._stats.isSpectator && (player._stats.controlledBy === 'human' || player._stats.isBattleBot === true);
+					});
 					break;
 
 				case 'computerPlayers':

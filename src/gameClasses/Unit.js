@@ -145,6 +145,7 @@ var Unit = IgeEntityPhysics.extend({
 		self.addBehaviour('unitBehaviour', self._behaviour);
 		self.scaleDimensions(self._stats.width, self._stats.height);
 		self._stats.isStunned = false;
+		if (ige.script) ige.script.entityCreated(self);
 	},
 
 	shouldRenderAttribute: function (attribute) {
@@ -875,7 +876,7 @@ var Unit = IgeEntityPhysics.extend({
 		if (!time) {
 			return;
 		}
-		var timeLimit = Date.now() + time;
+		var timeLimit = (ige.training && ige.training.clock ? ige.training.clock.now() : Date.now()) + time;
 		var unit = self;
 
 		if (attributeId && value && unit) {
@@ -1161,7 +1162,7 @@ var Unit = IgeEntityPhysics.extend({
 
 		var DEFAULT_COLOR = 'white';
 		var shouldBeBold = ige.network.id() == self._stats.clientId;
-		var isQueueProcessorRunning = !!self._stats.fadingTextQueue.length;
+		var isQueueProcessorRunning = !!self._fadingTextInterval;
 
 		self._stats.fadingTextQueue.push({
 			text: text,
@@ -1169,9 +1170,18 @@ var Unit = IgeEntityPhysics.extend({
 		});
 
 		if (!isQueueProcessorRunning) {
-			var queueProcessor = setInterval(function () {
+			self._fadingTextInterval = setInterval(function () {
+				if (!self._pixiTexture || self._pixiTexture._destroyed || !self._pixiTexture.transform ||
+					!self._pixiContainer || self._pixiContainer._destroyed) {
+					self._stats.fadingTextQueue.length = 0;
+					clearInterval(self._fadingTextInterval);
+					self._fadingTextInterval = null;
+					return;
+				}
 				if (!self._stats.fadingTextQueue.length) {
-					return clearInterval(queueProcessor);
+					clearInterval(self._fadingTextInterval);
+					self._fadingTextInterval = null;
+					return;
 				}
 
 				// var id = self.fadingLabel && self.fadingLabel.id();
@@ -1278,10 +1288,17 @@ var Unit = IgeEntityPhysics.extend({
 			var sourcePlayer = ige.$(damageData.sourcePlayerId);
 			var sourceUnit = ige.$(damageData.sourceUnitId);
 			var isVulnerable = false;
+			var trainingMode = ige.training && ige.training.isTrainingMode;
+			var battleBotTargetAllowed = trainingMode || ige.training && ige.training.isExhibitionMode
+				? ige.training.isOpponent(sourcePlayer, targetPlayer) && this._stats.type !== 'hLrbyj6dKv' &&
+					(!targetPlayer.getSelectedUnit || targetPlayer.getSelectedUnit() === this)
+				: (!sourcePlayer || !sourcePlayer._stats.isBattleBot || (targetPlayer && targetPlayer._stats.controlledBy === 'human' &&
+					targetPlayer.getSelectedUnit && targetPlayer.getSelectedUnit() === this && this._stats.type !== 'hLrbyj6dKv'));
 
 			var targetsAffected = damageData.targetsAffected;
 			if (
 				sourcePlayer && targetPlayer && sourcePlayer != targetPlayer &&
+				battleBotTargetAllowed &&
                 (
                 	targetsAffected == undefined || // attacks everything
                     (targetsAffected.constructor === Array && targetsAffected.length == 0) || // attacks everything
@@ -1300,6 +1317,8 @@ var Unit = IgeEntityPhysics.extend({
 				ige.game.lastAttackedUnitId = this.id();
 				ige.game.lastAttackingItemId = damageData.sourceItemId;
 				this.lastAttackedBy = sourceUnit;
+				this.lastAttackedItemId = damageData.sourceItemId;
+				this.lastAttackedAt = ige.training && ige.training.clock ? ige.training.clock.now() : Date.now();
 
 				if (ige.isClient) {
 					this.playEffect('attacked');
@@ -1310,7 +1329,18 @@ var Unit = IgeEntityPhysics.extend({
 					unitId: ige.game.lastAttackingUnitId,
 					itemId: ige.game.lastAttackingItemId
 				};
-				ige.trigger && ige.trigger.fire('unitAttacksUnit', triggeredBy);
+				if (trainingMode) {
+					var attackSourceItem = ige.$(damageData.sourceItemId);
+					self._trainingDamageContext = {
+						sourceId: damageData.sourcePlayerId,
+						itemTypeId: attackSourceItem && attackSourceItem._stats && attackSourceItem._stats.itemTypeId,
+						projectileId: damageData.sourceProjectileId
+					};
+				}
+				try {
+					ige.trigger && ige.trigger.fire('unitAttacksUnit', triggeredBy);
+					if (ige.script) ige.script.triggerEntity(self, 'entityGetsAttacked', triggeredBy);
+				} finally { self._trainingDamageContext = null; }
 
 				var armor = this._stats.attributes.armor && this._stats.attributes.armor.value || 0;
 				var damageReduction = (0.05 * armor) / (1.5 + 0.04 * armor);
@@ -1324,7 +1354,16 @@ var Unit = IgeEntityPhysics.extend({
 							}
 							damageValue *= 1 - damageReduction;
 							var newValue = (attribute.value || 0) - (damageValue || 0);
-							self.attribute.update(damageAttrKey, newValue, true);
+							if (trainingMode && damageAttrKey === 'health') {
+								var sourceItem = ige.$(damageData.sourceItemId);
+								self._trainingDamageContext = {
+									sourceId: damageData.sourcePlayerId,
+									itemTypeId: sourceItem && sourceItem._stats && sourceItem._stats.itemTypeId,
+									projectileId: damageData.sourceProjectileId
+								};
+							}
+							try { self.attribute.update(damageAttrKey, newValue, true); }
+							finally { self._trainingDamageContext = null; }
 						}
 					});
 				}
@@ -1381,6 +1420,7 @@ var Unit = IgeEntityPhysics.extend({
 				delete self.minimapUnit;
 			}
 		} else if (ige.isServer) {
+			this.cleanUpProjectiles();
 			// destroy all items in inventory
 			for (var i = 0; i < self._stats.itemIds.length; i++) {
 				var currentItem = this.inventory.getItemBySlotNumber(i + 1);
@@ -1734,8 +1774,9 @@ var Unit = IgeEntityPhysics.extend({
 		if (ige.isServer || (ige.isClient && ige.client.selectedUnit == this)) {
 			var ownerPlayer = ige.$(this._stats.ownerId);
 			if (ownerPlayer) {
+				var isSelectedUnit = typeof ownerPlayer.getSelectedUnit !== 'function' || ownerPlayer.getSelectedUnit() == this;
 				if (ownerPlayer._stats.controlledBy == 'human') {
-					if (ownerPlayer.getSelectedUnit() == this) {
+					if (isSelectedUnit) {
 						var mouse = ownerPlayer.control.input.mouse;
 						if (mouse) {
 							self.angleToTarget = Math.atan2(mouse.y - self._translate.y, mouse.x - self._translate.x) + Math.radians(90);
@@ -1744,9 +1785,41 @@ var Unit = IgeEntityPhysics.extend({
 							self.distanceToTarget = Math.sqrt(a * a + b * b);
 						}
 					} else {
-						self.angleToTarget = undefined;
+						if (self._stats.ai && self._stats.ai.enabled) {
+							self.distanceToTarget = self.ai.getDistanceToTarget();
+							self.ai.update();
+						}
+						if (self.isLookingAt === 'mouse' || (self._stats.controls && self._stats.controls.mouseBehaviour && self._stats.controls.mouseBehaviour.rotateToFaceMouseCursor)) {
+							var mouse = ownerPlayer.control && ownerPlayer.control.input && ownerPlayer.control.input.mouse;
+							if (mouse && mouse.x != undefined && mouse.y != undefined) {
+								self.angleToTarget = Math.atan2(mouse.y - self._translate.y, mouse.x - self._translate.x) + Math.radians(90);
+								var a = self._translate.x - mouse.x;
+								var b = self._translate.y - mouse.y;
+								self.distanceToTarget = Math.sqrt(a * a + b * b);
+							}
+						} else if (self.isLookingAt && !isNaN(self.isLookingAt.x) && !isNaN(self.isLookingAt.y)) {
+							self.angleToTarget = Math.atan2(self.isLookingAt.y - self._translate.y, self.isLookingAt.x - self._translate.x) + Math.radians(90);
+						} else if (!self._stats.ai || !self._stats.ai.enabled) {
+							self.angleToTarget = undefined;
+						}
 					}
-				} else if (self._stats.ai && self._stats.ai.enabled) { // AI unit
+				} else if (ownerPlayer._stats.isBattleBot) {
+					// Battle bots use normal player units; their aim and movement are independent.
+					if (isSelectedUnit) {
+						if (self.botAimPosition) {
+							self.angleToTarget = Math.atan2(self.botAimPosition.y - self._translate.y, self.botAimPosition.x - self._translate.x) + Math.radians(90);
+						}
+					} else {
+						if (self._stats.ai && self._stats.ai.enabled) {
+							self.distanceToTarget = self.ai.getDistanceToTarget();
+							self.ai.update();
+						}
+						var aimPos = self.botAimPosition || (ownerPlayer.getSelectedUnit && ownerPlayer.getSelectedUnit() && ownerPlayer.getSelectedUnit().botAimPosition);
+						if (aimPos) {
+							self.angleToTarget = Math.atan2(aimPos.y - self._translate.y, aimPos.x - self._translate.x) + Math.radians(90);
+						}
+					}
+				} else if (self._stats.ai && self._stats.ai.enabled) { // legacy NPC AI unit
 					self.distanceToTarget = self.ai.getDistanceToTarget();
 					self.ai.update();
 				}
@@ -1772,20 +1845,28 @@ var Unit = IgeEntityPhysics.extend({
 					var vector = undefined;
 					if (
 						( // either unit is AI unit that is currently moving
-							ownerPlayer._stats.controlledBy != 'human' && self.isMoving
+							(ownerPlayer._stats.controlledBy != 'human' || !isSelectedUnit) && self.isMoving
 						) ||
                         ( // or human player's unit that's "following cursor"
-                        	ownerPlayer._stats.controlledBy == 'human' && self._stats.controls &&
+                        	ownerPlayer._stats.controlledBy == 'human' && isSelectedUnit && self._stats.controls &&
                             self._stats.controls.movementControlScheme == 'followCursor' && self.distanceToTarget > this.width()
                         )
 					) {
-						if (self.angleToTarget != undefined && !isNaN(self.angleToTarget)) {
+						if (ownerPlayer._stats.isBattleBot && self.movementAngle != undefined && !isNaN(self.movementAngle)) {
 							vector = {
-								x: (speed * Math.sin(self.angleToTarget)),
-								y: -(speed * Math.cos(self.angleToTarget))
+								x: speed * Math.cos(self.movementAngle),
+								y: speed * Math.sin(self.movementAngle)
 							};
+						} else {
+							var moveAngle = (self.ai && self.ai.targetPosition && self.ai.getAngleToTarget) ? self.ai.getAngleToTarget() : self.angleToTarget;
+							if (moveAngle != undefined && !isNaN(moveAngle)) {
+								vector = {
+									x: speed * Math.sin(moveAngle),
+									y: -speed * Math.cos(moveAngle)
+								};
+							}
 						}
-					} else if (ownerPlayer._stats.controlledBy == 'human') { // WASD or AD movement
+					} else if (ownerPlayer._stats.controlledBy == 'human' && isSelectedUnit) { // WASD or AD movement
 						// moving diagonally should reduce speed
 						if (self.direction.x != 0 && self.direction.y != 0) {
 							speed = speed / 1.41421356237;
@@ -1799,7 +1880,7 @@ var Unit = IgeEntityPhysics.extend({
 					}
 				}
 
-				if (!self._stats.ai || !self._stats.ai.enabled || (ownerPlayer && ownerPlayer._stats.controlledBy == 'human')) {
+				if (!ownerPlayer._stats.isBattleBot && isSelectedUnit && (!self._stats.ai || !self._stats.ai.enabled || ownerPlayer._stats.controlledBy == 'human')) {
 					if (self._stats.controls && self._stats.controls.movementControlScheme == 'followCursor') {
 						if (!this.isMoving && self.distanceToTarget > this.width()) {
 							this.startMoving();
@@ -1876,7 +1957,7 @@ var Unit = IgeEntityPhysics.extend({
 			if (this._stats.buffs && this._stats.buffs.length > 0) {
 				for (let i = 0; i < this._stats.buffs.length; i++) {
 					var buff = this._stats.buffs[i];
-					if (buff.timeLimit < Date.now()) {
+					if (buff.timeLimit < (ige.training && ige.training.clock ? ige.training.clock.now() : Date.now())) {
 						this.removeAttributeBuff(buff.attrId, buff.value, i);
 					}
 				}
@@ -1891,8 +1972,80 @@ var Unit = IgeEntityPhysics.extend({
 			}
 	},
 
+	cleanUpProjectiles: function () {
+		var self = this;
+		if (self._cleaningUpProjectiles) {
+			return;
+		}
+
+		var secondaryUnitTypes = new Set([
+			'fg6GvDXnkW', // Grand Artificer Spatial Collapse Marker 1
+			't6eGlgZJZd', // Grand Artificer Spatial Collapse Marker 2
+			'0UN2VxudQK', // Orlette Clone
+			'fBm2V1iqSv', // Corkmaster's Clone
+			'tPW4ck2QvI', // Overlord Minion
+			'ZvCJrakO2E', // Dual Assassin Clone
+			'FLBECLt1vt', // Hunter Bear Trap Marker
+			'KLPIuFzXz2', // Gata Fluid Counterforce Clone
+			'Htn19AD105', // SubLazer Laser of Doom Clone
+			'p1z5xAOdG1', // SubLazer Crystal Counter Clone
+			'er6IMq92Hb'  // Bush Man Clone
+		]);
+
+		if (self._stats && secondaryUnitTypes.has(self._stats.type)) {
+			return;
+		}
+
+		self._cleaningUpProjectiles = true;
+		try {
+			var unitId = self.id();
+			var ownerPlayer = self.getOwner && self.getOwner();
+			var ownerPlayerId = ownerPlayer && ownerPlayer.id && ownerPlayer.id();
+
+			if (ige.$$ && ige.$$('projectile')) {
+				var projectiles = ige.$$('projectile');
+				if (projectiles && projectiles.length) {
+					var list = projectiles.slice ? projectiles.slice() : Array.from(projectiles);
+					for (var i = 0; i < list.length; i++) {
+						var p = list[i];
+						if (p && !p._isBeingRemoved && !p._cleaningUpProjectiles && p._alive !== false && p._stats) {
+							if (p._stats.sourceUnitId === unitId || (ownerPlayerId && p._stats.sourcePlayerId === ownerPlayerId)) {
+								p._isBeingRemoved = true;
+								p.destroy();
+							}
+						}
+					}
+				}
+			}
+
+			if (ownerPlayerId && ige.$$ && ige.$$('unit')) {
+				var units = ige.$$('unit');
+				if (units && units.length) {
+					var uList = units.slice ? units.slice() : Array.from(units);
+					for (var j = 0; j < uList.length; j++) {
+						var u = uList[j];
+						if (u && u !== self && !u._isBeingRemoved && !u._cleaningUpProjectiles && u._alive !== false && u._stats) {
+							if (u._stats.ownerId === ownerPlayerId && secondaryUnitTypes.has(u._stats.type)) {
+								u._isBeingRemoved = true;
+								u.destroy();
+							}
+						}
+					}
+				}
+			}
+		} finally {
+			self._cleaningUpProjectiles = false;
+		}
+	},
 	destroy: function () {
+		if (this._destroyed) return;
+		this._destroyed = true;
+		this._isBeingRemoved = true;
+		this.cleanUpProjectiles();
 		this.playEffect('destroy');
+		if (this._fadingTextInterval) clearInterval(this._fadingTextInterval);
+		this._fadingTextInterval = null;
+		if (this._stats.fadingTextQueue) this._stats.fadingTextQueue.length = 0;
 		IgeEntityPhysics.prototype.destroy.call(this);
 	}
 });

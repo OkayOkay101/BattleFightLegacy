@@ -133,7 +133,7 @@ var IgePixiAnimation = IgeClass.extend({
 			}
 		} else if (this.loopCount > 0) {
 			this.stopAtFrame(this.startFrame);
-			loopCount--;
+			this.loopCount--;
 			i = 0;
 			// stopAtFrame(startFrame);
 			// self._entity.pixianimation.select(frames, fps, loopCount = true, self._entity.currentAnimId);

@@ -6,7 +6,7 @@ var AttributeComponent = IgeEntity.extend({
 		var self = this;
 		self._entity = entity;
 
-		self.now = Date.now();
+		self.now = ige.training && ige.training.clock ? ige.training.clock.now() : Date.now();
 		self.lastRegenerated = self.now;
 		self.lastSynced = self.now;
 	},
@@ -15,7 +15,7 @@ var AttributeComponent = IgeEntity.extend({
 	regenerate: function () {
 		var self = this;
 
-		self.now = Date.now();
+		self.now = ige.training && ige.training.clock ? ige.training.clock.now() : Date.now();
 
 		// reneration happens every 200ms
 		if (self.now - self.lastRegenerated > 200) {
@@ -194,6 +194,40 @@ var AttributeComponent = IgeEntity.extend({
 				var newValue = Math.max(min, Math.min(max, parseFloat(newValue)));
 
 				self._entity._stats.attributes[attributeTypeId].value = newValue;
+				if (ige.isServer && attributeTypeId === 'health' && self._entity._category === 'unit' &&
+					ige.training && ige.training.isTrainingMode && ige.training.stats && newValue < oldValue) {
+					var context = self._entity._trainingDamageContext || {};
+					var owner = self._entity.getOwner && self._entity.getOwner();
+					if (!owner || !owner.getSelectedUnit || owner.getSelectedUnit() === self._entity) {
+						var contactProjectileId = context.projectileId || ige.training.currentProjectileId;
+						var contactProjectile = contactProjectileId && ige.$(contactProjectileId);
+						var projectileSourceUnit = contactProjectile && ige.$(contactProjectile._stats.sourceUnitId);
+						var projectileSourceOwner = projectileSourceUnit && projectileSourceUnit.getOwner && projectileSourceUnit.getOwner();
+						var projectileSourceAllowed = projectileSourceOwner && owner && ige.training.isOpponent &&
+							ige.training.isOpponent(projectileSourceOwner, owner);
+						var projectileSourceItem = projectileSourceAllowed && ige.$(contactProjectile._stats.sourceItemId);
+						var recentAttackerUnit = self._entity.lastAttackedBy;
+						var recentOwner = recentAttackerUnit && recentAttackerUnit.getOwner && recentAttackerUnit.getOwner();
+						var sourceId = context.sourceId || (projectileSourceAllowed && projectileSourceOwner.id()) ||
+							(recentOwner && self._entity.lastAttackedAt &&
+							(ige.training.clock ? ige.training.clock.now() : Date.now()) - self._entity.lastAttackedAt <= 250 && owner &&
+							ige.training.isOpponent && ige.training.isOpponent(recentOwner, owner) ? recentOwner.id() : null);
+						var recentItem = sourceId && !context.itemTypeId && self._entity.lastAttackedItemId && ige.$(self._entity.lastAttackedItemId);
+						ige.training.nextEventId = (ige.training.nextEventId || 0) + 1;
+						ige.training.stats.recordHealthChange({
+						eventId: `${self._entity.id()}:health:${ige.training.nextEventId}`,
+						projectileId: contactProjectileId,
+						itemTypeId: context.itemTypeId || (projectileSourceItem && projectileSourceItem._stats && projectileSourceItem._stats.itemTypeId) ||
+							(recentItem && recentItem._stats && recentItem._stats.itemTypeId),
+						sourceId: sourceId,
+						targetId: owner && owner.id(),
+						before: oldValue,
+						after: newValue,
+						at: ige.training.clock ? ige.training.clock.now() : Date.now()
+					});
+					}
+					self._entity._trainingDamageContext = null;
+				}
 
 				if (ige.isServer) {
 					if (newValue != oldValue) {
@@ -215,14 +249,22 @@ var AttributeComponent = IgeEntity.extend({
 						}
 
 						var triggeredBy = { attribute: attribute };
+						if (this._entity._category === 'unit') {
+							var recentAttacker = self._entity.lastAttackedAt &&
+								(ige.training && ige.training.clock ? ige.training.clock.now() : Date.now()) - self._entity.lastAttackedAt < 10000 ? self._entity.lastAttackedBy : null;
+							triggeredBy.attackingUnitId = recentAttacker && recentAttacker.id();
+						}
 						triggeredBy[`${this._entity._category}Id`] = this._entity.id();
 						if (newValue <= 0 && oldValue > 0) // when attribute becomes zero, trigger attributeBecomesZero event
 						{
 							// unit's health became 0. announce death
 							if (self._entity._category == 'unit' && attributeTypeId == 'health') {
+								self._entity._alive = false;
+								if (self._entity.cleanUpProjectiles) self._entity.cleanUpProjectiles();
 								self._entity.ai.announceDeath();
 							}
 							ige.trigger.fire(`${this._entity._category}AttributeBecomesZero`, triggeredBy);
+							if (this._entity._category === 'unit' && ige.game.handleBattleBotDeath) ige.game.handleBattleBotDeath(this._entity, triggeredBy);
 						} else if (newValue >= attribute.max) // when attribute becomes full, trigger attributeBecomesFull event
 						{
 							// console.log("update attr fire!")

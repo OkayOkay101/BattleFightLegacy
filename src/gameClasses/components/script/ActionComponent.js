@@ -9,6 +9,7 @@ var ActionComponent = IgeEntity.extend({
 	// entity can be either trigger entity, or entity in loop
 	run: function (actionList, vars) {
 		var self = this;
+		vars = vars || {};
 
 		if (actionList == undefined || actionList.length <= 0)
 			return;
@@ -69,10 +70,14 @@ var ActionComponent = IgeEntity.extend({
 
 						// const use for creating new instance of variable every time.
 						const setTimeOutActions = JSON.parse(JSON.stringify(action.actions));
-						// const setTimeoutVars = _.cloneDeep(vars);
-						setTimeout(function (actions) {
-							self.run(actions, vars);
-						}, action.duration, setTimeOutActions);
+						// Preserve loop selections without cloning live engine entities.
+						const setTimeoutVars = Object.assign({}, vars, { triggeredBy: Object.assign({}, vars.triggeredBy) });
+						const timeoutDuration = ige.variable.getValue(action.duration, vars);
+						if (ige.training && ige.training.clock) {
+							ige.training.clock.schedule(function () { self.run(setTimeOutActions, setTimeoutVars); }, timeoutDuration);
+						} else {
+							setTimeout(function (actions) { self.run(actions, setTimeoutVars); }, timeoutDuration, setTimeOutActions);
+						}
 						break;
 
 					case 'repeat':
@@ -100,7 +105,7 @@ var ActionComponent = IgeEntity.extend({
 
 					case 'runScript':
 						var previousScriptId = ige.script.currentScriptId;
-						ige.script.runScript(action.scriptName, vars);
+						ige.script.runScript(action.scriptName, vars, action.isEntityScript === true ? vars.thisEntity : undefined);
 						ige.script.currentScriptId = previousScriptId;
 						break;
 
@@ -142,19 +147,19 @@ var ActionComponent = IgeEntity.extend({
 
 					case 'setLastAttackingUnit':
 						var unit = ige.variable.getValue(action.unit, vars);
-						ige.game.lastAttackingUnitId = unit.id();
+						ige.game.lastAttackingUnitId = unit && unit.id();
 
 						break;
 
 					case 'setLastAttackedUnit':
 						var unit = ige.variable.getValue(action.unit, vars);
-						ige.game.lastAttackedUnitId = unit.id();
+						ige.game.lastAttackedUnitId = unit && unit.id();
 
 						break;
 
 					case 'setLastAttackingItem':
 						var item = ige.variable.getValue(action.item, vars);
-						ige.game.lastAttackingItemId = item.id();
+						ige.game.lastAttackingItemId = item && item.id();
 
 						break;
 
@@ -375,8 +380,9 @@ var ActionComponent = IgeEntity.extend({
 						break;
 					case 'saveUnitData':
 						var unit = ige.variable.getValue(action.unit, vars);
+						if (!unit) break;
 						var ownerPlayer = unit.getOwner();
-						var userId = ownerPlayer._stats.userId;
+						var userId = ownerPlayer && ownerPlayer._stats && ownerPlayer._stats.userId;
 
 						if (unit && ownerPlayer && userId && ownerPlayer.persistentDataLoaded) {
 							var data = unit.getPersistentData('unit');
@@ -431,7 +437,7 @@ var ActionComponent = IgeEntity.extend({
 
 						/* UI */
 					case 'showUiTextForPlayer':
-						if (entity && entity._stats) {
+						if (entity && entity._category === 'player' && entity._stats && entity._stats.clientId) {
 							var text = ige.variable.getValue(action.value, vars);
 							ige.gameText.updateText({ target: action.target, value: text, action: 'show' }, entity._stats.clientId);
 						}
@@ -443,7 +449,7 @@ var ActionComponent = IgeEntity.extend({
 						break;
 
 					case 'hideUiTextForPlayer':
-						if (entity && entity._stats) {
+						if (entity && entity._category === 'player' && entity._stats && entity._stats.clientId) {
 							var text = ige.variable.getValue(action.value, vars);
 							ige.gameText.updateText({ target: action.target, value: text, action: 'hide' }, entity._stats.clientId);
 						}
@@ -470,7 +476,7 @@ var ActionComponent = IgeEntity.extend({
 						break;
 
 					case 'updateUiTextForPlayer':
-						if (entity && entity._stats) {
+						if (entity && entity._category === 'player' && entity._stats && entity._stats.clientId) {
 							var text = ige.variable.getValue(action.value, vars);
 							ige.gameText.updateText({ target: action.target, value: text, action: 'update' }, entity._stats.clientId);
 						}
@@ -1026,6 +1032,8 @@ var ActionComponent = IgeEntity.extend({
 					case 'changeUnitType':
 
 						var unitTypeId = ige.variable.getValue(action.unitType, vars);
+						// A delayed action may outlive the unit it targeted.
+						if (!entity) break;
 						if (entity && entity._category == 'unit' && unitTypeId != null) {
 							entity.streamUpdateData([{ type: unitTypeId }]);
 						} else {
@@ -1548,26 +1556,55 @@ var ActionComponent = IgeEntity.extend({
 						var error = '';
 						var delta = Math.radians(90); // unitsFacingAngle delta
 						var facingAngleDelta = 0;
-						if (action.angle && action.angle.function == 'angleBetweenPositions') {
-							delta = 0;
-							facingAngleDelta = Math.radians(90);
-						}
+						// Every expression returns the same up-zero heading, including calculated angles.
 
 						if (projectileTypeId) {
 							var projectileData = ige.game.getAsset('projectileTypes', projectileTypeId);
 
-							if (projectileData != undefined && position != undefined && position.x != undefined && position.y != undefined && force != undefined && angle != undefined) {
+							if (force == undefined && projectileData && projectileData.bulletForce) {
+								force = projectileData.bulletForce;
+							}
+							if (force == undefined) force = 10;
+
+							if (!unit && vars.thisEntity) {
+								var sourceEntity = vars.thisEntity;
+								if (sourceEntity._category === 'unit') unit = sourceEntity;
+								if (sourceEntity._category === 'item') unit = sourceEntity.getOwnerUnit();
+								if (sourceEntity._category === 'projectile') unit = ige.$(sourceEntity._stats.sourceUnitId);
+							}
+							if (!unit && vars && vars.triggeredBy && vars.triggeredBy.unitId) {
+								unit = ige.$(vars.triggeredBy.unitId);
+							}
+
+							if (unit && (unit._alive === false || unit._isBeingRemoved || (unit._stats && unit._stats.type === 'hLrbyj6dKv') || (unit._stats && unit._stats.attributes && unit._stats.attributes.health && unit._stats.attributes.health.value <= 0))) {
+								return;
+							}
+							var ownerPlayer = (unit && unit.getOwner) ? unit.getOwner() : undefined;
+							if (ownerPlayer && ownerPlayer._battleBot && ownerPlayer._battleBot.deadUnitId && (!unit || ownerPlayer._battleBot.deadUnitId === unit.id())) {
+								return;
+							}
+
+							if (projectileData != undefined && position != undefined && position.x != undefined && position.y != undefined && angle != undefined) {
 								var facingAngleInRadians = angle + facingAngleDelta;
 								angle = angle - delta;
 								var streamMode = 1;
 								var unitId = (unit) ? unit.id() : undefined;
+								var ownerPlayer = (unit && unit.getOwner) ? unit.getOwner() : undefined;
+								var ownerPlayerId = (ownerPlayer && ownerPlayer.id) ? ownerPlayer.id() : undefined;
+
 								var data = Object.assign(
-									projectileData,
+									JSON.parse(JSON.stringify(projectileData)),
 									{
 										type: projectileTypeId,
 										bulletForce: force,
-										sourceItemId: undefined,
+										sourceItemId: (vars && vars.triggeredBy) ? vars.triggeredBy.itemId : undefined,
 										sourceUnitId: unitId,
+										sourcePlayerId: ownerPlayerId,
+										damageData: {
+											sourceUnitId: unitId,
+											sourcePlayerId: ownerPlayerId,
+											sourceItemId: (vars && vars.triggeredBy) ? vars.triggeredBy.itemId : undefined
+										},
 										defaultData: {
 											rotate: facingAngleInRadians,
 											translate: position,
@@ -1584,18 +1621,39 @@ var ActionComponent = IgeEntity.extend({
 								ige.game.lastCreatedProjectileId = projectile._id;
 							} else {
 								if (!projectileData) {
-									ige.script.errorLog('invalid projectile data');
+									ige.script.errorLog('invalid projectile data: ' + projectileTypeId);
 								}
 								if (!position || position.x == undefined || position.y == undefined) {
 									ige.script.errorLog('invalid position data');
-								}
-								if (force == undefined) {
-									ige.script.errorLog('invalid force value');
 								}
 								if (angle == undefined) {
 									ige.script.errorLog('invalid angle value');
 								}
 							}
+						}
+						break;
+
+					case 'setOwnerUnitOfProjectile':
+						var projectile = ige.variable.getValue(action.projectile, vars);
+						var unit = ige.variable.getValue(action.unit, vars);
+						if (projectile && unit) {
+							projectile._stats.sourceUnitId = unit.id();
+							var ownerPlayer = (unit.getOwner) ? unit.getOwner() : undefined;
+							var ownerPlayerId = (ownerPlayer && ownerPlayer.id) ? ownerPlayer.id() : undefined;
+							projectile._stats.sourcePlayerId = ownerPlayerId;
+							if (!projectile._stats.damageData) projectile._stats.damageData = {};
+							projectile._stats.damageData.sourceUnitId = unit.id();
+							projectile._stats.damageData.sourcePlayerId = ownerPlayerId;
+						}
+						break;
+
+					case 'setSourceItemOfProjectile':
+						var projectile = ige.variable.getValue(action.projectile, vars);
+						var item = ige.variable.getValue(action.item, vars);
+						if (projectile && item) {
+							projectile._stats.sourceItemId = item.id();
+							if (!projectile._stats.damageData) projectile._stats.damageData = {};
+							projectile._stats.damageData.sourceItemId = item.id();
 						}
 						break;
 
@@ -2603,7 +2661,7 @@ var ActionComponent = IgeEntity.extend({
 					case 'comment':
 						break;
 					default:
-						// console.log('trying to run', action);
+						ige.script.errorLog('unsupported action: ' + action.type);
 						break;
 				}
 			} catch (e) {

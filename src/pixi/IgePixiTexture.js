@@ -28,8 +28,8 @@ var IgePixiTexture = IgeClass.extend({
 				// if image is not from discord
 				options = { crossOrigin: true };
 				
-				// check if the cell sheet url (source) is a valid url
-				if (source && source.indexOf('http') === 0) {
+				// check if the cell sheet url (source) is a valid url or local asset path
+				if (source && (source.indexOf('http') === 0 || source.indexOf('/assets') === 0 || source.indexOf('/') === 0)) {
 					resource.add(source, `${source}?version=${version}`, options)
 						.load(function () {
 							data.entity.pixianimation._anims = {};
@@ -81,6 +81,9 @@ var IgePixiTexture = IgeClass.extend({
 			animationId: gid
 		});
 
+		// Some exported projectiles reference a frame beyond their actual sheet.
+		var cellCount = this._stats.columns * this._stats.rows;
+		gid = Number.isInteger(Number(gid)) && Number(gid) >= 0 && Number(gid) < cellCount ? Number(gid) : 0;
 		var tilesetColumn = (gid) % this._stats.columns;
 		var tilesetRow = Math.floor((gid) / this._stats.columns);
 		var spriteWidth = resource.width / this._stats.columns;

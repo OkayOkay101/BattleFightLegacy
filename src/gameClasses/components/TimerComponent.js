@@ -76,8 +76,9 @@ var TimerComponent = IgeEntity.extend({
 		console.log(new Date(), 'gameClock started');
 		self.shutdownMessageCheckpoint = -1;
 
-		var everySecond = setInterval(function () {
-			self.now = Date.now();
+		var trainingClock = ige.training && ige.training.clock;
+		function tick() {
+			self.now = trainingClock ? trainingClock.now() : Date.now();
 			if (ige.isServer) {
 				self.lastTick = self.now;
 				// var shouldLog = ige.server.logTriggers && ige.server.logTriggers.timerLogs;
@@ -121,7 +122,10 @@ var TimerComponent = IgeEntity.extend({
 			} else if (ige.isClient) {
 				ige.scoreboard.update();
 			}
-		}, 1000);
+			if (trainingClock) trainingClock.schedule(tick, 1000);
+		}
+		if (trainingClock) trainingClock.schedule(tick, 1000);
+		else setInterval(tick, 1000);
 	}
 });
 

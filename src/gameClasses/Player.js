@@ -34,7 +34,7 @@ var Player = IgeEntity.extend({
 			ige.server.totalPlayersCreated++;
 		} else if (ige.isClient) {
 			// if this player is "me"
-			if (self._stats.clientId == ige.network.id()) {
+			if (self._stats.clientId == ige.network.id() && !self._stats.isSpectator) {
 				self.addComponent(ControlComponent);
 
 				// mouse move listener
@@ -62,7 +62,7 @@ var Player = IgeEntity.extend({
 		}
 
 		if (self._stats.playerJoined != true) {
-			if (self._stats.controlledBy == 'human' && ige.script) // do not send trigger for neutral player
+			if (self._stats.controlledBy == 'human' && !self._stats.isSpectator && ige.script) // spectators never enter match scripts
 			{
 				ige.trigger.fire('playerJoinsGame', { playerId: self.id() });
 			}
@@ -100,6 +100,7 @@ var Player = IgeEntity.extend({
 				data,
 				{
 					clientId: self._stats.clientId,
+					ownerId: self.id(),
 					name: self._stats.name
 				});
 
@@ -322,6 +323,13 @@ var Player = IgeEntity.extend({
 		if (player == undefined) {
 			return false;
 		}
+		if (ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode)) {
+			return ige.training.isOpponent(this, player);
+		}
+		if (this._stats.isBattleBot || player._stats.isBattleBot) {
+			return !!(this._stats.isBattleBot !== player._stats.isBattleBot &&
+				(this._stats.controlledBy === 'human' || player._stats.controlledBy === 'human'));
+		}
 
 		var myPlayerType = ige.game.getAsset('playerTypes', this._stats.playerTypeId);
 		if (myPlayerType && myPlayerType.relationships) {
@@ -335,6 +343,17 @@ var Player = IgeEntity.extend({
 	isFriendlyTo: function (player) {
 		if (player == undefined) {
 			return false;
+		}
+		if (ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode)) {
+			return !!(this !== player && this._stats && player._stats &&
+				(this._stats.isBattleBot || ige.training.isExhibitionMode && this._stats.controlledBy === 'human') &&
+				(player._stats.isBattleBot || ige.training.isExhibitionMode && player._stats.controlledBy === 'human') &&
+				this._stats.playerJoined && player._stats.playerJoined &&
+				!this._stats.isSpectator && !player._stats.isSpectator &&
+				this._stats.trainingTeamId && this._stats.trainingTeamId === player._stats.trainingTeamId);
+		}
+		if (this._stats.isBattleBot || player._stats.isBattleBot) {
+			return this._stats.isBattleBot === true && player._stats.isBattleBot === true;
 		}
 
 		var myPlayerType = ige.game.getAsset('playerTypes', this._stats.playerTypeId);

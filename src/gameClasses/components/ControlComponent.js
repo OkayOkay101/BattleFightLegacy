@@ -99,7 +99,7 @@ var ControlComponent = IgeEntity.extend({
 			}
 		}
 
-		var player = ige.game.getPlayerByClientId(this._entity._stats.clientId);
+		var player = this._entity._stats.controlledBy === 'computer' ? this._entity : ige.game.getPlayerByClientId(this._entity._stats.clientId);
 		if (!player) {
 			return;
 		}
@@ -216,7 +216,7 @@ var ControlComponent = IgeEntity.extend({
 	keyUp: function (device, key) {
 		this.lastActionAt = Date.now();
 
-		var player = ige.game.getPlayerByClientId(this._entity._stats.clientId);
+		var player = this._entity._stats.controlledBy === 'computer' ? this._entity : ige.game.getPlayerByClientId(this._entity._stats.clientId);
 		if (!player) return;
 		var unit = player.getSelectedUnit();
 		// for (i in units) {

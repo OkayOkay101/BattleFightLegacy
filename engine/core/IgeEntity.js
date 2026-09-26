@@ -4758,6 +4758,7 @@ var IgeEntity = IgeObject.extend({
 	_streamSync: function () {
 		var recipientArr = ige.network.clientIds;
 		var arrCount = recipientArr.length;
+		if (ige.training && ige.training.isTrainingMode && arrCount === 0) return;
 		var arrIndex;
 		var clientId;
 		var thisId = this.id();

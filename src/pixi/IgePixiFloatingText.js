@@ -95,18 +95,17 @@ var IgePixiFloatingText = IgeEntity.extend({
 		var displacementPerStep = -20 / step;
 
 		this.interval = setInterval(function () {
-			if (self._pixiText) {
-				self._pixiText.y += displacementPerStep;
-				self._pixiText.alpha -= opacityStep;
+			if (!self._pixiText || self._pixiText._destroyed || !self._pixiText.transform) {
+				clearInterval(self.interval);
+				self.interval = null;
+				self.destroy();
+				return;
 			}
+			self._pixiText.y += displacementPerStep;
+			self._pixiText.alpha -= opacityStep;
 		}, 1000 / 60);
 
-		setTimeout(function () {
-			clearInterval(self.interval);
-			delete ige.entitiesToRender.trackEntityById[self.id];
-			if (self._pixiText) {
-				self._pixiText.destroy();
-			}
+		this.fadeUpTimeout = setTimeout(function () {
 			self.destroy();
 		}, duration);
 
@@ -143,6 +142,13 @@ var IgePixiFloatingText = IgeEntity.extend({
 	},
 	destroy: function () {
 		var self = this;
+		if (self.interval) clearInterval(self.interval);
+		if (self.fadeUpTimeout) clearTimeout(self.fadeUpTimeout);
+		self.interval = null;
+		self.fadeUpTimeout = null;
+		delete ige.entitiesToRender.trackEntityById[self.id()];
+		if (self._pixiText && !self._pixiText._destroyed) self._pixiText.destroy();
+		self._pixiText = null;
 		var parentUnit = self.getOwner();
 
 		if (parentUnit && parentUnit.gluedEntities) {

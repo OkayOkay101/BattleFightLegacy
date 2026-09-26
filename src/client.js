@@ -109,7 +109,7 @@ const Client = IgeEventingClass.extend({
 			'penetration', 'bulletDistance', 'bulletType', 'ammoSize', 'ammo', 'ammoTotal',
 			'reloadRate', 'recoilForce', 'fireRate', 'knockbackForce', 'canBeUsedBy', 'spawnChance',
 			'consumeBonus', 'isConsumedImmediately', 'type', 'lifeSpan', 'removeWhenEmpty', 'spawnPosition',
-			'baseSpeed', 'bonusSpeed', 'controls'
+			'baseSpeed', 'bonusSpeed', 'controls', 'projectileType', 'defaultProjectile', 'scripts'
 		];
 
 		// can we just comment this out
@@ -218,9 +218,8 @@ const Client = IgeEventingClass.extend({
 			});
 
 			setTimeout(() => {
-				// console.log('loading removed'); // not necessary in production
 				$('#loading-container').addClass('slider-out');
-			}, 2000);
+			}, 200);
 
 			// let's try getting our server here
 			//
@@ -660,10 +659,19 @@ const Client = IgeEventingClass.extend({
 			const version = 1;
 			const pixiLoader = ige.pixi.loader; // renamed this from 'resource' to 'pixiLoader'
 
+			// Rewrite CDN URLs to local paths when running standalone
+			const toLocalUrl = function(url) {
+				if (!url) return url;
+				if (window.isStandalone) {
+					return url.replace(/^https?:\/\//, '/');
+				}
+				return url;
+			};
+
 			// old comment => 'used when texture is not loaded in cache'
 			pixiLoader.add(
 				'emptyTexture',
-				`https://cache.modd.io/asset/spriteImage/1560747844626_dot.png?version=${version}`,
+				`/assets/cache.modd.io/asset/spriteImage/1560747844626_dot.png?version=${version}`,
 				{ crossOrigin: true }
 			);
 
@@ -680,11 +688,12 @@ const Client = IgeEventingClass.extend({
 						//
 						ige.client.loadedTextures[cellSheet.url] = cellSheet;
 
-						// check if the cell sheet url is a valid url
-						if (cellSheet.url && cellSheet.url.indexOf('http') === 0) {
+						// check if the cell sheet url is a valid url (http or local /assets path)
+						if (cellSheet.url && (cellSheet.url.indexOf('http') === 0 || cellSheet.url.indexOf('/assets') === 0 || cellSheet.url.indexOf('/') === 0)) {
+							const localUrl = cellSheet.url.startsWith('http') ? toLocalUrl(cellSheet.url) : cellSheet.url;
 							pixiLoader.add(
 								cellSheet.url,
-								`${cellSheet.url}?version=${version}`,
+								`${localUrl}?version=${version}`,
 								{ crossOrigin: true }
 							);
 						}
@@ -823,6 +832,9 @@ const Client = IgeEventingClass.extend({
 							]);
 							// old comment => 'declare my player'
 							ige.client.myPlayer = player;
+							if (player._stats.isSpectator) {
+								$('#unit-status, #my-score-div, #backpack-wrapper').hide();
+							}
 
 							if (typeof startVideoChat == 'function') {
 								// the elephant is back
@@ -1089,6 +1101,7 @@ const Client = IgeEventingClass.extend({
 		});
 
 		data.isAdBlockEnabled = !!isAdBlockEnabled;
+		if (window.trainingDemoMode) data.demoMode = window.trainingDemoMode;
 
 		ige.network.send('joinGame', data);
 

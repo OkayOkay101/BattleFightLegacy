@@ -1,0 +1,8 @@
+{
+  "python": "3.14.7",
+  "torch": "2.14.0+cpu",
+  "numpy": "2.5.3",
+  "torchIndex": "https://download.pytorch.org/whl/cpu",
+  "platform": "win_amd64",
+  "verified": "2026-09-25"
+}

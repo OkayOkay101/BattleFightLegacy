@@ -19,23 +19,23 @@ var ScriptComponent = IgeEntity.extend({
 		ScriptComponent.prototype.log('initializing Script Component');
 	},
 
-	runScript: function (scriptId, localVariables) {
+	runScript: function (scriptId, localVariables, scriptEntity) {
 		// console.log("running script", scriptId)
 		var timings = false;
 		if (timings) var started = new Date();
 		var self = this;
 
+		var previousScriptId = self.currentScriptId;
+		var previousEntity = self.currentScriptEntity;
 		self.currentScriptId = scriptId;
-		if (ige.game.data.scripts[scriptId]) {
-			// var actions = JSON.parse(JSON.stringify(ige.game.data.scripts[scriptId].actions));
-			var actions = self.getScriptActions(scriptId, timings);
-			if (actions) {
-				var cmd = ige.action.run(actions, localVariables);
-				if (cmd == 'return') {
-					ige.log('script return called');
-					return;
-				}
-			}
+		self.currentScriptEntity = scriptEntity;
+		try {
+			var actions = self.getScriptActions(scriptId, timings, scriptEntity);
+			if (actions) return ige.action.run(actions, localVariables || {});
+			self.errorLog('script not found: ' + scriptId);
+		} finally {
+			self.currentScriptId = previousScriptId;
+			self.currentScriptEntity = previousEntity;
 		}
 
 		if (timings) {
@@ -48,19 +48,28 @@ var ScriptComponent = IgeEntity.extend({
 				self.scriptTime[scriptId] += elapsed;
 				var avg = self.scriptTime[scriptId] / (self.scriptRuns[scriptId] - 1);
 				if (self.scriptRuns[scriptId] % 100 == 0) {
-					console.log(`runScript: ${scriptId} ${ige.game.data.scripts[scriptId].name} [${avg} ms avg in ${self.scriptRuns[scriptId]}x]`);
+					console.log(`runScript: ${scriptId} [${avg} ms avg in ${self.scriptRuns[scriptId]}x]`);
 				}
 			}
 		}
 	},
 
-	getScriptActions: function (scriptId, timings) {
+	getEntityScripts: function (entity) {
+		return (entity && entity._stats && entity._stats.scripts) || {};
+	},
+
+	// Entity script IDs are only unique inside their owning type.
+	getScriptActions: function (scriptId, timings, scriptEntity) {
 		var self = this;
+		if (scriptEntity) {
+			var entityScript = self.getEntityScripts(scriptEntity)[scriptId];
+			return entityScript && entityScript.actions;
+		}
 		if (self.scriptCache[scriptId] && (typeof mode === 'undefined' || (typeof mode === 'string' && mode != 'sandbox'))) {
 			return self.scriptCache[scriptId];
 		} else {
-			var script = ige.game.data.scripts[scriptId];
-			if (!script.actions) return null;
+			var script = (ige.game && ige.game.data && ige.game.data.scripts && ige.game.data.scripts[scriptId]);
+			if (!script || !script.actions) return null;
 			if (script) {
 				if (timings) {
 					var started = new Date();
@@ -79,6 +88,31 @@ var ScriptComponent = IgeEntity.extend({
 			}
 		}
 		return null;
+	},
+
+	triggerEntity: function (entity, eventName, triggeredBy) {
+		if (!ige.isServer || !entity || entity._alive === false) return 0;
+		var scripts = this.getEntityScripts(entity);
+		var count = 0;
+		var context = { thisEntity: entity, triggeredBy: Object.assign({}, triggeredBy) };
+		for (var id in scripts) {
+			var script = scripts[id];
+			if (!script || script.disabled || !script.actions || !(script.triggers || []).some(function (t) { return t.type === eventName; })) continue;
+			if (ige.condition.run(script.conditions, context)) {
+				this.runScript(id, context, entity);
+				count++;
+			}
+		}
+		return count;
+	},
+
+	entityCreated: function (entity) {
+		if (!ige.isServer || !entity || entity._scriptCreated) return;
+		entity._scriptCreated = true;
+		var by = {};
+		by[entity._category + 'Id'] = entity.id();
+		if (entity._category === 'item') by.unitId = entity._stats.ownerUnitId;
+		this.triggerEntity(entity, 'entityCreated', by);
 	},
 
 	scriptLog: function (str, tabCount) {
@@ -129,7 +163,7 @@ var ScriptComponent = IgeEntity.extend({
 		self.last50Actions.push(record);
 	},
 	errorLog: function (message) {
-		var script = ige.game.data.scripts[this.currentScriptId];
+		var script = this.currentScriptEntity ? this.getEntityScripts(this.currentScriptEntity)[this.currentScriptId] : ige.game.data.scripts[this.currentScriptId];
 		var log = `Script error '${(script) ? script.name : ''}' in Action '${this.currentActionName}' : ${message}`;
 		this.errorLogs[this.currentActionName] = log;
 		ige.devLog('script errorLog', log, message);

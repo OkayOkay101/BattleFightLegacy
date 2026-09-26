@@ -305,6 +305,7 @@ canvas {
   text-align: center;
   color: white;
   z-index: 9000;
+  pointer-events: none;
 }
 
 .ui-text-top {

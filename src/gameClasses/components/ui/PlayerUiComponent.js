@@ -1,3 +1,24 @@
+function sanitizeDialogueOptionHtml (value) {
+	var allowedTags = { B: true, BR: true, EM: true, I: true, S: true, SMALL: true, SPAN: true, STRONG: true, SUB: true, SUP: true, U: true };
+	var parser = new DOMParser();
+	var document = parser.parseFromString(String(value == null ? '' : value), 'text/html');
+
+	function serializeNode (node) {
+		if (node.nodeType === 3) {
+			return node.nodeValue.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		}
+		if (node.nodeType !== 1 && node.nodeType !== 11) return '';
+
+		var children = Array.prototype.map.call(node.childNodes, serializeNode).join('');
+		if (node.nodeType !== 1) return children;
+		if (!allowedTags[node.tagName]) return children;
+		if (node.tagName === 'BR') return '<br>';
+		return '<' + node.tagName.toLowerCase() + '>' + children + '</' + node.tagName.toLowerCase() + '>';
+	}
+
+	return serializeNode(document.body);
+}
+
 var PlayerUiComponent = IgeEntity.extend({
 	classId: 'PlayerUiComponent',
 	componentId: 'playerUi',
@@ -289,6 +310,9 @@ var PlayerUiComponent = IgeEntity.extend({
 		}
 
 		function initModal () {
+			$('#battlefight-picker-tools, #battlefight-picker-detail, #battlefight-picker-confirm').remove();
+			$('#modd-dialogue-modal .modal-content').css({ background: '', color: '', border: '', borderRadius: '' });
+			$('#modd-dialogue-message').css({ color: '', fontWeight: '', fontSize: '' });
 			$('#modd-dialogue-message').html('');
 			$('#modd-dialogue-image').attr('src', '');
 			$('#modd-dialogue-options-container').addClass('d-none');
@@ -333,13 +357,78 @@ var PlayerUiComponent = IgeEntity.extend({
 
 		function showOptions () {
 			$('#modd-dialogue-options').html('');
+			var isCharacterPicker = /^Choose Unit/.test(dialogue.name || '');
+			var chosenCharacterOption = null;
+			if (isCharacterPicker) {
+				$('#modd-dialogue-modal .modal-content').css({ background: '#f5f8fc', color: '#17243a', border: '1px solid #d7e1ef', borderRadius: '16px' });
+				$('#modd-dialogue-message').css({ color: '#17243a', fontWeight: '700', fontSize: '1.25rem' });
+				$('#modd-dialogue-options-container').prepend('<div id="battlefight-picker-tools" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0"><input id="battlefight-picker-search" type="search" class="form-control" placeholder="ค้นหาตัวละคร…" aria-label="ค้นหาตัวละคร" style="flex:1;min-width:180px;background:white;color:#17243a"><select id="battlefight-picker-role" class="form-control" aria-label="กรองประเภท" style="max-width:190px;background:white;color:#17243a"><option value="">ทุกประเภท</option><option value="ระยะไกล">ระยะไกล</option><option value="ประชิด">ประชิด</option><option value="ซัพพอร์ต">ซัพพอร์ต</option><option value="ทดลอง">ทดลอง</option></select></div><div id="battlefight-picker-detail" role="status" aria-live="polite" style="padding:10px 12px;margin:8px 0;background:#eaf2ff;border-radius:10px;color:#17243a">เลือกการ์ดเพื่อดูตัวละคร แล้วกดยืนยัน</div>');
+				$('#modd-dialogue-options-container').append('<button id="battlefight-picker-confirm" type="button" class="btn btn-primary btn-block" disabled style="margin-top:12px;background:#1769d2;border-color:#1769d2">เลือกตัวละคร</button>');
+				$('#battlefight-picker-search, #battlefight-picker-role').on('click', function (event) { event.stopPropagation(); });
+				$('#battlefight-picker-search, #battlefight-picker-role').on('keydown', function (event) { event.stopPropagation(); });
+				$('#battlefight-picker-search').on('input', function () { filterCharacterOptions(); });
+				$('#battlefight-picker-role').on('change', function () { filterCharacterOptions(); });
+				$('#battlefight-picker-confirm').on('click', function (event) {
+					event.stopPropagation();
+					if (!chosenCharacterOption) return;
+					$(this).prop('disabled', true).text('กำลังเลือก…');
+					ige.playerUi.submitDialogueModal(dialogueId, chosenCharacterOption);
+				});
+			}
+
+			function filterCharacterOptions () {
+				var query = String($('#battlefight-picker-search').val() || '').toLocaleLowerCase();
+				var role = $('#battlefight-picker-role').val();
+				$('#modd-dialogue-options .dialogue-option-button').each(function () {
+					var text = $(this).text().toLocaleLowerCase();
+					var unitTypeId = unitTypeForOption(dialogue.options[this.id]);
+					var optionRole = unitTypeId === 'Z60xDr0g4n' ? 'ซัพพอร์ต' : (['Pko4SCDSlz', 'AuD3DjTn9B'].includes(unitTypeId) ? 'ประชิด' : (/ทดลอง|beta|custom/i.test(text) ? 'ทดลอง' : 'ระยะไกล'));
+					$(this).toggle(text.indexOf(query) > -1 && (!role || role === optionRole));
+				});
+			}
+
+			function unitTypeForOption (option) {
+				var found;
+				function visit (value) {
+					if (!value || typeof value !== 'object' || found) return;
+					if (value.type === 'createUnitAtPosition' && !value.disabled && value.unitType) { found = value.unitType; return; }
+					Object.keys(value).forEach(function (key) { visit(value[key]); });
+				}
+				var script = option && ige.game.data.scripts && ige.game.data.scripts[option.scriptName];
+				visit(script);
+				return found;
+			}
+
+			function renderCharacterDetails (option) {
+				var unitId = unitTypeForOption(option);
+				var unit = unitId && ige.game.data.unitTypes && ige.game.data.unitTypes[unitId];
+				var stats = unit && unit.attributes || {};
+				var hp = stats.health && (stats.health.max || stats.health.value);
+				var speed = stats.speed && (stats.speed.value || stats.speed.max);
+				var portrait = unit && (unit.inventoryImage || unit.cellSheet && unit.cellSheet.url);
+				var items = (unit && unit.defaultItems || []).map(function (id) { return ige.game.data.itemTypes[id] && ige.game.data.itemTypes[id].name; }).filter(Boolean);
+				var safeName = $('<div/>').html(sanitizeDialogueOptionHtml(option.name || '')).text();
+				var image = portrait && /^\/assets\//.test(portrait) ? '<img src="' + portrait.replace(/"/g, '') + '" alt="" style="width:68px;height:68px;object-fit:cover;border-radius:12px;float:right" onerror="this.remove()">' : '';
+				var summary = [hp ? 'เลือด ' + hp : '', speed ? 'ความเร็ว ' + speed : '', items.length ? 'อาวุธ/สกิล: ' + items.join(' · ') : ''].filter(Boolean).join(' | ');
+				$('#battlefight-picker-detail').html(image + '<strong>' + $('<div/>').text(safeName).html() + '</strong><div style="margin-top:6px">' + $('<div/>').text(summary || 'ไม่มีข้อมูลค่าสถานะเพิ่มเติม').html() + '</div><div style="clear:both"></div>');
+			}
 
 			for (var key in dialogue.options) {
 				var optionObject = dialogue.options[key];
 				var button = $('<button/>', {
 					id: key,
-					class: 'btn btn-light border btn-block text-left dialogue-option-button',
-					click: function () {
+					class: 'btn btn-light border btn-block text-left dialogue-option-button' + (isCharacterPicker ? ' battlefight-character-card' : ''),
+					style: isCharacterPicker ? 'background:#fff;color:#17243a;border:1px solid #d7e1ef!important;border-radius:10px;margin:5px 0;padding:12px;white-space:normal;transition:box-shadow .15s,border-color .15s' : '',
+					click: function (event) {
+						if (isCharacterPicker) {
+							event.stopPropagation();
+							chosenCharacterOption = this.id;
+							$('.battlefight-character-card').css({ borderColor: '#d7e1ef', boxShadow: 'none' });
+							$(this).css({ borderColor: '#1769d2', boxShadow: '0 0 0 3px #1769d233' });
+							renderCharacterDetails(dialogue.options[this.id]);
+							$('#battlefight-picker-confirm').prop('disabled', false);
+							return;
+						}
 						var optionId = this.id;
 						$('.dialogue-option-button').addClass('disabled');
 						$(this).find('.fa-check').removeClass('d-none');
@@ -348,10 +437,17 @@ var PlayerUiComponent = IgeEntity.extend({
 				});
 
 				button.append($('<i/>', { class: 'd-none fa fa-check mr-2' }));
-				button.append($('<span/>', { text: optionObject.name }));
+				button.append($('<span/>').html(sanitizeDialogueOptionHtml(optionObject.name)));
+				if (isCharacterPicker) {
+					var typeId = unitTypeForOption(optionObject);
+					var unitType = typeId && ige.game.data.unitTypes && ige.game.data.unitTypes[typeId];
+					var portraitUrl = unitType && (unitType.inventoryImage || unitType.cellSheet && unitType.cellSheet.url);
+					if (portraitUrl && /^\/assets\//.test(portraitUrl)) button.prepend($('<img/>', { src: portraitUrl, alt: '', css: { width: '46px', height: '46px', objectFit: 'cover', borderRadius: '9px', marginRight: '10px', verticalAlign: 'middle' }, error: function () { $(this).remove(); } }));
+				}
 
 				$('#modd-dialogue-options').append(button);
 			}
+			if (isCharacterPicker) filterCharacterOptions();
 
 			$('#modd-dialogue-skip-hint').addClass('d-none');
 			$('#modd-dialogue-options-container').removeClass('d-none');

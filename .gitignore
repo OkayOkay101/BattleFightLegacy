@@ -9,7 +9,22 @@ commands
 .circleci/
 deployment/
 sslcert/
-src/game.json
+training-data/
+training-data-backup-legacy/
+training-python/.venv/
+training-python/__pycache__/
+
+# Audio files
+*.mp3
+*.wav
+*.ogg
+*.m4a
+*.flac
+*.aac
+assets/cache.modd.io/asset/sound/
+assets/modd.s3.amazonaws.com/asset/sound/
+assets/modd.s3.amazonaws.com/sprites/
+src/assets/cache.modd.io/asset/sound/
 
 # Logs
 logs

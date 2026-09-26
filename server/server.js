@@ -264,6 +264,18 @@ var Server = IgeClass.extend({
 			'dat.gui.min.js',
 			'msgpack.min.js'
 		];
+		// Fast loading: serve pre-compressed gzip game.json (280KB instead of 12MB)
+		app.get('/src/game.json', (req, res) => {
+			const acceptEncoding = req.headers['accept-encoding'] || '';
+			const gzPath = path.resolve('./src/game.json.gz');
+			if (acceptEncoding.includes('gzip') && fs.existsSync(gzPath)) {
+				res.setHeader('Content-Type', 'application/json');
+				res.setHeader('Content-Encoding', 'gzip');
+				return res.sendFile(gzPath);
+			}
+			return res.sendFile(path.resolve('./src/game.json'));
+		});
+
 		const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
 		app.use('/src', express.static(path.resolve('./src/'), {
 			setHeaders: (res, path, stat) => {
@@ -279,6 +291,30 @@ var Server = IgeClass.extend({
 		}));
 
 		app.use('/assets', express.static(path.resolve('./assets/'), { cacheControl: 7 * 24 * 60 * 60 * 1000 }));
+
+		// Proxy CDN assets: serve local file first, then fall back to real CDN
+		const http = require('http');
+		const https = require('https');
+		const makeCdnProxy = (cdnHost) => {
+			const localDir = path.resolve(`./assets/${cdnHost}`);
+			return (req, res, next) => {
+				const localFile = path.join(localDir, req.path);
+				// try local first
+				if (fs.existsSync(localFile) && fs.statSync(localFile).isFile()) {
+					return res.sendFile(localFile);
+				}
+				// fallback: proxy from real CDN
+				const cdnUrl = `https://${cdnHost}${req.path}`;
+				const client = cdnUrl.startsWith('https') ? https : http;
+				const proxyReq = client.get(cdnUrl, (proxyRes) => {
+					res.writeHead(proxyRes.statusCode, proxyRes.headers);
+					proxyRes.pipe(res);
+				});
+				proxyReq.on('error', () => res.status(404).send('Not found'));
+			};
+		};
+		app.use('/cache.modd.io', makeCdnProxy('cache.modd.io'));
+		app.use('/modd.s3.amazonaws.com', makeCdnProxy('modd.s3.amazonaws.com'));
 
 		if (global.isDev) {
 			// needed for source maps
@@ -326,6 +362,8 @@ var Server = IgeClass.extend({
 				}],
 				createdBy: '',
 				menudiv: false,
+				trainingDemoPolicy: process.env.BATTLEFIGHT_DEMO_POLICY ?
+					(ige.trainingPolicy && ige.trainingPolicy.version || process.env.BATTLEFIGHT_DEMO_POLICY) : '',
 				gameTitle: game.title,
 				currentUserPresentInHighscore: false,
 				discordLink: null,
@@ -517,6 +555,18 @@ var Server = IgeClass.extend({
 						// 	ige.physics.addBorders();
 						// }
 
+						try {
+							var registry = new (require('./training/PolicyRegistry').PolicyRegistry)();
+							if (process.env.BATTLEFIGHT_DEMO_POLICY && !(ige.training && ige.training.isTrainingMode)) {
+								var demo = require('./training/DemoRuntime');
+								ige.trainingPolicy = demo.resolveDemoPolicy(registry, process.env.BATTLEFIGHT_DEMO_POLICY);
+								demo.installDemo(ige, ige.trainingPolicy);
+								console.log('BattleFight exhibition: 3v3, policy ' + ige.trainingPolicy.version);
+							} else ige.trainingPolicy = registry.policyForNewMatch();
+						} catch (error) {
+							if (process.env.BATTLEFIGHT_DEMO_POLICY) throw error;
+							console.warn('Training policy unavailable; battle bots will use baseline tactics:', error.message);
+						}
 						ige.game.start();
 
 						self.gameLoaded = true;

@@ -83,6 +83,7 @@ var IgeChatServer = {
 				return;
 			}
 
+			player.lastMessageSent = message;
 			ige.game.lastChatMessageSentByPlayer = message;
 			ige.trigger.fire('playerSendsChatMessage', {
 				playerId: player.id()

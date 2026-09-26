@@ -1001,7 +1001,7 @@ var IgeEngine = IgeEntity.extend({
 
 				if (ige.isServer) {
 					this.emptyTimeLimit = this.getIdleTimeoutMs();
-					requestAnimFrame(ige.engineStep);
+					if (!this._useManualTicks) requestAnimFrame(ige.engineStep);
 				}
 
 				IgeEngine.prototype.log('Engine started');
@@ -1805,7 +1805,7 @@ var IgeEngine = IgeEntity.extend({
 	 * @returns {Number}
 	 */
 	incrementTime: function () {
-		var now = Date.now();
+		var now = this.training && this.training.clock ? this.training.clock.now() : Date.now();
 
 		// console.log("increment time", this._currentTime, now, this._timeScaleLastTimestamp, (now - this._timeScaleLastTimestamp))
 		this._currentTime = (now + this.timeDiscrepancy) * this._timeScale;
@@ -1993,7 +1993,7 @@ var IgeEngine = IgeEntity.extend({
 				self._tickDelta = self._tickStart - self.lastTick;
 				// console.log("wtf tick", self._tickStart, self.lastTick, self._tickDelta)
 			}
-			ige.now = Date.now();
+			ige.now = ige.training && ige.training.clock ? ige.training.clock.now() : Date.now();
 
 			timeElapsed = ige.now - ige._lastGameLoopTickAt;
 			if (timeElapsed >= (1000 / ige._gameLoopTickRate) - ige._gameLoopTickRemainder) {
@@ -2002,16 +2002,18 @@ var IgeEngine = IgeEntity.extend({
 				ige.gameLoopTickHasExecuted = true;
 			}
 
-			var timeElapsed = ige.now - ige._lastPhysicsTickAt;
+			var fixedTrainingStep = ige.training && ige.training.clock && ige._useManualTicks;
+			var timeElapsed = fixedTrainingStep ? 1000 / 60 : ige.now - ige._lastPhysicsTickAt;
 
 			if (// physics update should execute as soon as gameloop has executed in order to stream the accurate, latest translation data computed from physics update
 				ige.physics && (
+					fixedTrainingStep ||
 					ige.gameLoopTickHasExecuted || // don't ask. - Jaeyun
 					timeElapsed >= (1000 / ige._physicsTickRate) - ige._physicsTickRemainder
 				)
 			) {
 				ige._lastPhysicsTickAt = ige.now;
-				ige._physicsTickRemainder = Math.min(timeElapsed - ((1000 / ige._physicsTickRate) - ige._physicsTickRemainder), (1000 / ige._physicsTickRate));
+				ige._physicsTickRemainder = fixedTrainingStep ? 0 : Math.min(timeElapsed - ((1000 / ige._physicsTickRate) - ige._physicsTickRemainder), (1000 / ige._physicsTickRate));
 				ige.physics.update(timeElapsed);
 				ige.physicsTickHasExecuted = true;
 			}
@@ -2038,7 +2040,7 @@ var IgeEngine = IgeEntity.extend({
 				// 	ige.nextSnapshot = undefined;
 				// }
 
-				if (ige.client.myPlayer) {
+				if (ige.client.myPlayer && ige.client.myPlayer.control) {
 					ige.client.myPlayer.control._behaviour();
 				}
 

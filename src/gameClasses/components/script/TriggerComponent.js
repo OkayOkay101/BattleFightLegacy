@@ -39,6 +39,18 @@ var TriggerComponent = IgeEntity.extend({
 		var entityB = contact.m_fixtureB.m_body._entity;
 		if (!entityA || !entityB)
 			return;
+		if (ige.training && ige.training.stats && ige.training.stats.trace) {
+			var contactProjectile = entityA._category === 'projectile' ? entityA :
+				entityB._category === 'projectile' ? entityB : null;
+			var contactTarget = contactProjectile === entityA ? entityB : entityA;
+			var contactCategory = contactTarget && (contactTarget._category || 'wall');
+			if (contactProjectile && ['wall', 'unit', 'item', 'debris'].includes(contactCategory)) {
+				var contactOwner = contactTarget.getOwner && contactTarget.getOwner();
+				ige.training.stats.trace.recordContact({ projectileId: contactProjectile.id(),
+					targetCategory: contactCategory, targetType: contactTarget._stats && contactTarget._stats.type,
+					targetPlayerId: contactOwner && contactOwner.id() });
+			}
+		}
 
 		if (entityA._stats && entityB._stats) {
 			// a unit's sensor detected another unit
@@ -86,6 +98,25 @@ var TriggerComponent = IgeEntity.extend({
 			) {
 				var entityA = contact.m_fixtureB.m_body._entity;
 				var entityB = contact.m_fixtureA.m_body._entity;
+			}
+			// Dispatch both sides with the other body as the triggering entity.
+			// This is where exported per-projectile damage scripts receive their victim.
+			if (ige.isServer && ige.script && entityA._category !== 'region' && entityB._category !== 'region') {
+				[ [entityA, entityB], [entityB, entityA] ].forEach(function (pair) {
+					var subject = pair[0], other = pair[1];
+					if (subject._alive === false || other._alive === false) return;
+					if (subject._category === 'item' && subject._stats.ownerUnitId === other.id()) return;
+					if (subject._category === 'projectile' && subject._stats.sourceUnitId === other.id()) return;
+					if (other._category === 'projectile' && other._stats.sourceUnitId === subject.id()) return;
+					var by = {};
+					by[subject._category + 'Id'] = subject.id();
+					by[(other._category || 'wall') + 'Id'] = other.id();
+					by.collidingEntity = other.id();
+					if (other._category === 'unit') ige.game.lastTouchedUnitId = other.id();
+					if (other._category === 'projectile') ige.game.lastTouchedProjectileId = other.id();
+					var category = other._category || 'wall';
+					ige.script.triggerEntity(subject, 'entityTouches' + category[0].toUpperCase() + category.slice(1), by);
+				});
 			}
 
 			switch (entityA._category) {
@@ -153,11 +184,20 @@ var TriggerComponent = IgeEntity.extend({
 							break;
 
 						case 'projectile':
-							// console.log(entityA._category, entityA._stats.name, entityA.id())
+							if (entityB._stats.sourceUnitId == entityA.id())
+								return;
+
+							var pSourceUnit = entityB._stats.sourceUnitId && ige.$(entityB._stats.sourceUnitId);
+							var pSourcePlayer = pSourceUnit && pSourceUnit.getOwner && pSourceUnit.getOwner();
+							var pAttackedPlayer = entityA.getOwner && entityA.getOwner();
+							var pIsFriendly = pSourcePlayer && pAttackedPlayer && (pSourcePlayer === pAttackedPlayer || (pSourcePlayer.isFriendlyTo && pSourcePlayer.isFriendlyTo(pAttackedPlayer)));
+							if (pIsFriendly)
+								return;
+
+							triggeredBy.unitId = entityA.id();
 							triggeredBy.projectileId = entityB.id();
 							triggeredBy.collidingEntity = entityA.id();
 							ige.game.lastTouchedProjectileId = entityB.id();
-							triggeredBy.projectileId = entityB.id();
 							ige.game.lastAttackingUnitId = entityB._stats.sourceUnitId;
 							ige.game.lastAttackedUnitId = entityA.id();
 							ige.trigger.fire('unitTouchesProjectile', triggeredBy);
@@ -228,13 +268,20 @@ var TriggerComponent = IgeEntity.extend({
 	},
 
 	_endContactCallback: function (contact) {
-
+		var a = contact.m_fixtureA.m_body._entity;
+		var b = contact.m_fixtureB.m_body._entity;
+		if (!a || !b) return;
+		var region = a._category === 'region' ? a : b._category === 'region' ? b : undefined;
+		var entity = region === a ? b : a;
+		if (region && entity._category === 'unit') {
+			ige.trigger.fire('unitLeavesRegion', { unitId: entity.id(), region: ige.variable.getValue({ function: 'getVariable', variableName: region._stats.id }) });
+		}
 	},
 
 	_enableContactListener: function () {
 		// Set the contact listener methods to detect when
 		// contacts (collisions) begin and end
-		ige.physics.contactListener(this._beginContactCallback, this.endContactCallback);
+		ige.physics.contactListener(this._beginContactCallback, this._endContactCallback);
 	},
 
 	/*
@@ -243,9 +290,30 @@ var TriggerComponent = IgeEntity.extend({
 	fire: function (triggerName, triggeredBy) {
 		// if (triggerName === 'projectileTouchesWall') console.log("trigger fire", triggerName, triggeredBy)
 
+		if (ige.isServer && ige.script) {
+			if (triggerName === 'frameTick' || triggerName === 'secondTick') {
+				['unit', 'item', 'projectile'].forEach(function (category) {
+					(ige.$$(category) || []).slice().forEach(function (entity) {
+						var by = {}; by[category + 'Id'] = entity.id();
+						ige.script.triggerEntity(entity, triggerName, by);
+					});
+				});
+			} else if (triggeredBy) {
+				var unit = ige.$(triggeredBy.unitId);
+				if (triggerName === 'unitUsesItem') ige.script.triggerEntity(unit, 'thisUnitUsesItem', triggeredBy);
+				if (triggerName === 'unitStartsUsingAnItem') ige.script.triggerEntity(unit, triggerName, triggeredBy);
+				var attrMatch = /^(unit|item|projectile)AttributeBecomes(Zero|Full)$/.exec(triggerName);
+				if (attrMatch) ige.script.triggerEntity(ige.$(triggeredBy[attrMatch[1] + 'Id']), 'entityAttributeBecomes' + attrMatch[2], triggeredBy);
+			}
+		}
 		if (ige.isServer || (ige.isClient && ige.physics)) {
+			var previousTrainingProjectileId = ige.training && ige.training.currentProjectileId;
+			if (ige.training && ige.training.isTrainingMode && triggerName === 'unitTouchesProjectile') {
+				ige.training.currentProjectileId = triggeredBy && triggeredBy.projectileId;
+			}
+			try {
 			let scriptIds = this.triggeredScripts[triggerName]
-			for (i in scriptIds) {
+			for (let i in scriptIds) {
 				let scriptId = scriptIds[i]
 				ige.script.scriptLog(`\ntrigger: ${triggerName}`);
 
@@ -254,6 +322,9 @@ var TriggerComponent = IgeEntity.extend({
 				};
 				ige.script.runScript(scriptId, localVariables);
 			}
+			} finally {
+				if (ige.training && ige.training.isTrainingMode) ige.training.currentProjectileId = previousTrainingProjectileId;
+			}
 		}
 
 		if (triggeredBy && triggeredBy.projectileId) {
@@ -261,11 +332,18 @@ var TriggerComponent = IgeEntity.extend({
 			if (projectile) {
 				switch (triggerName) {
 					case 'unitTouchesProjectile':
-						var attackedUnit = ige.$(ige.game.lastTouchingUnitId);
+						var attackedUnit = ige.$(triggeredBy.collidingEntity || ige.game.lastAttackedUnitId);
 						if (attackedUnit) {
+							if (ige.training && ige.training.isTrainingMode && projectile._stats.damageData) {
+								projectile._stats.damageData.sourceProjectileId = projectile.id();
+							}
 							var damageHasBeenInflicted = attackedUnit.inflictDamage(projectile._stats.damageData);
 
-							if (projectile._stats.destroyOnContactWith && projectile._stats.destroyOnContactWith.units && damageHasBeenInflicted) {
+							var sourceUnit = projectile._stats.sourceUnitId && ige.$(projectile._stats.sourceUnitId);
+							var sourcePlayer = sourceUnit && sourceUnit.getOwner && sourceUnit.getOwner();
+							var attackedPlayer = attackedUnit && attackedUnit.getOwner && attackedUnit.getOwner();
+							var isFriendly = sourcePlayer && attackedPlayer && (sourcePlayer === attackedPlayer || (sourcePlayer.isFriendlyTo && sourcePlayer.isFriendlyTo(attackedPlayer)));
+							if (!isFriendly && projectile._stats.destroyOnContactWith && projectile._stats.destroyOnContactWith.units) {
 								projectile.destroy();
 							}
 						}
@@ -281,7 +359,27 @@ var TriggerComponent = IgeEntity.extend({
 						}
 						break;
 					case 'projectileTouchesWall':
-						if (projectile._stats.destroyOnContactWith && projectile._stats.destroyOnContactWith.walls) {
+						var projectileType = ige.game.getAsset('projectileTypes', projectile._stats.type);
+						var body = projectileType && projectileType.bodies && Object.values(projectileType.bodies)[0];
+						var fixture = body && body.fixtures && body.fixtures[0];
+						var restitution = Number(fixture && fixture.restitution) || 0;
+						var canBounce = restitution > 0 && body && body.collidesWith && body.collidesWith.walls;
+
+						if (ige.training && ige.training.isTrainingMode && ige.training.stats &&
+							projectile._alive !== false && projectile._stats.destroyOnContactWith &&
+							projectile._stats.destroyOnContactWith.walls === false) {
+							if (restitution > 0) {
+								var sourceUnit = ige.$(projectile._stats.sourceUnitId);
+								var sourceOwner = sourceUnit && sourceUnit.getOwner && sourceUnit.getOwner();
+								var sourceItem = ige.$(projectile._stats.sourceItemId);
+								ige.training.stats.recordWallBounce({
+									eventId: `${projectile.id()}:${triggeredBy.collidingEntity}:${ige.now}`,
+									projectileId: projectile.id(), sourceId: sourceOwner && sourceOwner.id(),
+									itemTypeId: sourceItem && sourceItem._stats && sourceItem._stats.itemTypeId
+								});
+							}
+						}
+						if (!canBounce && projectile._stats.destroyOnContactWith && projectile._stats.destroyOnContactWith.walls) {
 							projectile.destroy();
 						}
 						break;

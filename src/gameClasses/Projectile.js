@@ -72,7 +72,9 @@ var Projectile = IgeEntityPhysics.extend({
 		// console.log("previousFrame", this.previousFrame)
 
 		var sourceItem = this.getSourceItem();
-		if ( // stream projectile data if
+		if (data.streamMode !== undefined) {
+			this.streamMode(data.streamMode);
+		} else if ( // stream projectile data if
 			!ige.game.data.defaultData.clientPhysicsEngine || // client side isn't running physics (csp requires physics) OR
 			!sourceItem || // projectile does not have source item (created via script) OR
 			(sourceItem && sourceItem._stats.projectileStreamMode) // item is set to stream its projectiles from server
@@ -102,6 +104,7 @@ var Projectile = IgeEntityPhysics.extend({
 		// add behaviour also have isClient block so we will have to execute this in both client and server
 		this.addBehaviour('projectileBehaviour', this._behaviour);
 		this.scaleDimensions(this._stats.width, this._stats.height);
+		if (ige.script) ige.script.entityCreated(this);
 	},
 
 	_behaviour: function (ctx) {
@@ -124,7 +127,7 @@ var Projectile = IgeEntityPhysics.extend({
 	},
 
 	streamUpdateData: function (queuedData) {
-		IgeEntity.prototype.streamUpdateData.call(this, data);
+		IgeEntity.prototype.streamUpdateData.call(this, queuedData);
 		for (var i = 0; i < queuedData.length; i++) {
 			var data = queuedData[i];
 			for (attrName in data) {

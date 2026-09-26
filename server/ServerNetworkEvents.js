@@ -92,6 +92,9 @@ var ServerNetworkEvents = {
 	},
 
 	_onJoinGame: function (data, clientId) {
+		if (ige.training && ige.training.isExhibitionMode) {
+			data.demoMode = data.demoMode === 'spectate' ? 'spectate' : 'fight';
+		}
 
 		// assign _id and sessionID to the new client
 		var client = ige.server.clients[clientId];
@@ -220,6 +223,10 @@ var ServerNetworkEvents = {
 
 				if (player) {
 					player._stats.isAdBlockEnabled = data.isAdBlockEnabled;
+					if (ige.training && ige.training.isExhibitionMode && !player._stats.playerJoined) {
+						player._stats.isSpectator = data.demoMode === 'spectate';
+						player._stats.trainingTeamId = player._stats.isSpectator ? null : 'blue';
+					}
 				} else {
 					if (typeof data.number != 'number') {
 						data.number = " lol"
@@ -231,6 +238,8 @@ var ServerNetworkEvents = {
 						coins: 0,
 						points: 0,
 						clientId: clientId,
+						isSpectator: data.demoMode === 'spectate' && !!(ige.training && ige.training.isExhibitionMode),
+						trainingTeamId: ige.training && ige.training.isExhibitionMode && data.demoMode !== 'spectate' ? 'blue' : null,
 						isAdBlockEnabled: data.isAdBlockEnabled
 					});
 				}
@@ -717,7 +726,8 @@ var ServerNetworkEvents = {
 	_onPlayerDialogueSubmit: function (data, clientId) {
 		var player = ige.game.getPlayerByClientId(clientId);
 
-		if (player) {
+		if (player && player._stats.controlledBy === 'human' && data && data.status === 'submitted' &&
+			player._stats.lastOpenedDialogue === data.dialogue && player._stats.playerJoined) {
 			var selectedOption = null;
 
 			for (var dialogId in ige.game.data.dialogues) {
@@ -736,11 +746,14 @@ var ServerNetworkEvents = {
 			}
 
 			if (selectedOption) {
+				// Consume the server-authorized dialogue before running its server-owned script.
+				player._stats.lastOpenedDialogue = null;
 				ige.game.lastPlayerSelectingDialogueOption = player.id();
 				if (selectedOption.scriptName) {
 					ige.script.runScript(selectedOption.scriptName, {});
 				}
 				if (selectedOption.followUpDialogue) {
+					player._stats.lastOpenedDialogue = selectedOption.followUpDialogue;
 					ige.network.send("openDialogue", {
 						type: selectedOption.followUpDialogue,
 						extraData: {

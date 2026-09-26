@@ -21,7 +21,7 @@ var Item = IgeEntityPhysics.extend({
 			itemData
 		);
 
-		if (self._stats.projectileType) {
+		if (self._stats.projectileType && !self._stats.projectileType.endsWith('_defaultProjectile')) {
 			self.projectileData = ige.game.getAsset('projectileTypes', self._stats.projectileType);
 		}
 
@@ -88,6 +88,7 @@ var Item = IgeEntityPhysics.extend({
 		// behaviour handles:
 		this.addBehaviour('itemBehaviour', this._behaviour);
 		this.scaleDimensions(this._stats.width, this._stats.height);
+		if (ige.script) ige.script.entityCreated(this);
 	},
 
 	updateBody: function (initTransform) {
@@ -275,10 +276,33 @@ var Item = IgeEntityPhysics.extend({
 				}
 
 				self._stats.lastUsed = ige.now;
-				ige.trigger && ige.trigger.fire('unitUsesItem', {
-					unitId: (owner) ? owner.id() : undefined,
-					itemId: self.id()
+				if (ige.isServer && ige.training && ige.training.isTrainingMode && ige.training.stats && player) {
+					ige.training.nextEventId = (ige.training.nextEventId || 0) + 1;
+					ige.training.stats.recordItemUse({
+						eventId: `${self.id()}:use:${ige.training.nextEventId}`,
+						actorId: player.id(),
+						itemTypeId: self._stats.itemTypeId
+					});
+				}
+				var localVariables = {
+					triggeredBy: {
+						unitId: (owner) ? owner.id() : undefined,
+						itemId: self.id(),
+						playerId: (owner && owner.getOwner) ? (owner.getOwner() ? owner.getOwner().id() : undefined) : undefined
+					}
+				};
+
+				ige.trigger && ige.trigger.fire('unitUsesItem', localVariables.triggeredBy);
+
+				var scriptedUse = Object.values(self._stats.scripts || {}).some(function (script) {
+					return script && !script.disabled && script.actions && (script.triggers || []).some(function (t) {
+						return t.type === 'itemIsUsed' || t.type === 'unitUsesItem';
+					});
 				});
+				if (ige.script) {
+					ige.script.triggerEntity(self, 'itemIsUsed', localVariables.triggeredBy);
+					ige.script.triggerEntity(self, 'unitUsesItem', localVariables.triggeredBy);
+				}
 
 				if (ige.physics && self._stats.type == 'weapon') {
 					if (self._stats.isGun) {
@@ -325,19 +349,19 @@ var Item = IgeEntityPhysics.extend({
 										y: Math.sin(rotate + Math.radians(-90)) * self._stats.bulletForce
 									};
 
-									// console.log(self._stats.currentBody.type, "unit: ", angleToTarget, "item's rotate.z: ", self._rotate.z, "facing angle", itemrotate)
+									var projType = self._stats.projectileType;
 									var data = Object.assign(
 										JSON.parse(JSON.stringify(self.projectileData)),
 										{
-											type: self._stats.projectileType,
+											type: projType,
 											sourceItemId: self.id(),
 											sourceUnitId: (owner) ? owner.id() : undefined,
 											defaultData: defaultData,
 											damageData: {
-												targetsAffected: this._stats.damage.targetsAffected,
+												targetsAffected: (this._stats.damage) ? this._stats.damage.targetsAffected : undefined,
 												sourceUnitId: owner.id(),
 												sourceItemId: self.id(),
-												sourcePlayerId: owner.getOwner().id(),
+												sourcePlayerId: (owner && owner.getOwner()) ? owner.getOwner().id() : undefined,
 												unitAttributes: this._stats.damage.unitAttributes,
 												playerAttributes: this._stats.damage.playerAttributes
 											}
@@ -441,7 +465,7 @@ var Item = IgeEntityPhysics.extend({
 								}
 							}
 						}
-					} else { // melee weapon
+					} else if (!self._stats.isGun) { // melee weapon
 						var hitboxData = this._stats.damageHitBox;
 
 						if (hitboxData) {
@@ -463,7 +487,7 @@ var Item = IgeEntityPhysics.extend({
 								targetsAffected: this._stats.damage.targetsAffected,
 								sourceUnitId: owner.id(),
 								sourceItemId: self.id(),
-								sourcePlayerId: owner.getOwner().id(),
+								sourcePlayerId: (owner && owner.getOwner()) ? owner.getOwner().id() : undefined,
 								unitAttributes: this._stats.damage.unitAttributes,
 								playerAttributes: this._stats.damage.playerAttributes
 							};
