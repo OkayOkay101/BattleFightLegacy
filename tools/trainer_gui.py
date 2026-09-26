@@ -6,7 +6,7 @@ import urllib.error
 import webbrowser
 import threading
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 
 SERVER_BASE_URL = "http://127.0.0.1"
 STATUS_API = f"{SERVER_BASE_URL}/api/training/status"
@@ -15,13 +15,15 @@ START_API = f"{SERVER_BASE_URL}/api/training/start"
 STOP_API = f"{SERVER_BASE_URL}/api/training/stop"
 ACTIVATE_API = f"{SERVER_BASE_URL}/api/training/activate"
 WORKERS_API = f"{SERVER_BASE_URL}/api/training/workers"
+EXPORT_BUNDLE_API = f"{SERVER_BASE_URL}/api/training/sync/export-bundle"
+IMPORT_BUNDLE_API = f"{SERVER_BASE_URL}/api/training/sync/import-bundle"
 
 class BattleFightTrainerApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("BattleFight AI - Control Center & Live Stats")
-        self.geometry("800x690")
-        self.minsize(720, 600)
+        self.geometry("820x720")
+        self.minsize(740, 620)
         self.configure(bg="#0f172a")
 
         # Styling
@@ -55,23 +57,23 @@ class BattleFightTrainerApp(tk.Tk):
     def _create_widgets(self):
         # Header container
         header_frame = ttk.Frame(self)
-        header_frame.pack(fill="x", padx=20, pady=(15, 10))
+        header_frame.pack(fill="x", padx=20, pady=(15, 8))
 
         title_box = ttk.Frame(header_frame)
         title_box.pack(side="left")
         ttk.Label(title_box, text="⚔️ BATTLEFIGHT AI CONTROL CENTER", style="Header.TLabel").pack(anchor="w")
-        ttk.Label(title_box, text="ระบบมอนิเตอร์และควบคุมการฝึกฝน AI พร้อมปรับจำนวน Worker แบบ Real-time", style="SubHeader.TLabel").pack(anchor="w")
+        ttk.Label(title_box, text="ระบบมอนิเตอร์และควบคุมการฝึกฝน AI พร้อมเชื่อมต่อ Kaggle Cloud", style="SubHeader.TLabel").pack(anchor="w")
 
         # Status badge
         self.badge_lbl = tk.Label(header_frame, text="CONNECTING...", font=("Segoe UI", 9, "bold"), bg="#475569", fg="#ffffff", padx=12, pady=5)
         self.badge_lbl.pack(side="right", pady=5)
 
         # Main Card for Stats
-        card = ttk.Frame(self, style="Card.TFrame", padding=15)
-        card.pack(fill="x", padx=20, pady=8)
+        card = ttk.Frame(self, style="Card.TFrame", padding=14)
+        card.pack(fill="x", padx=20, pady=6)
 
         card_title_row = ttk.Frame(card, style="Card.TFrame")
-        card_title_row.pack(fill="x", pady=(0, 10))
+        card_title_row.pack(fill="x", pady=(0, 8))
         ttk.Label(card_title_row, text="📊 สถิติการเทรนแบบเรียลไทม์ (Live Stats)", font=("Segoe UI", 12, "bold"), background="#1e293b", foreground="#38bdf8").pack(side="left")
 
         # Stats Grid (6 cards)
@@ -95,17 +97,17 @@ class BattleFightTrainerApp(tk.Tk):
         self.s_speed = self._add_stat_box(stats_grid, 1, 2, "WORKERS / SPEED", "- W / 1.0x", "#c084fc")
 
         # Quick Control Panel
-        control_card = ttk.Frame(self, style="Card.TFrame", padding=15)
-        control_card.pack(fill="x", padx=20, pady=8)
+        control_card = ttk.Frame(self, style="Card.TFrame", padding=14)
+        control_card.pack(fill="x", padx=20, pady=6)
         
-        ttk.Label(control_card, text="🎮 การควบคุม Worker & AI", font=("Segoe UI", 12, "bold"), background="#1e293b", foreground="#38bdf8").pack(anchor="w", pady=(0, 10))
+        ttk.Label(control_card, text="🎮 การควบคุม Worker & AI", font=("Segoe UI", 12, "bold"), background="#1e293b", foreground="#38bdf8").pack(anchor="w", pady=(0, 8))
 
         # Row 1: Start/Stop Training + Worker Stepper Control
         ctrl_row1 = ttk.Frame(control_card, style="Card.TFrame")
         ctrl_row1.pack(fill="x", pady=4)
 
         self.btn_toggle_train = tk.Button(ctrl_row1, text="▶ เริ่มเทรน AI (Start Training)", font=("Segoe UI", 10, "bold"), bg="#2563eb", fg="#ffffff", activebackground="#1d4ed8", activeforeground="#ffffff", padx=12, pady=5, relief="flat", cursor="hand2", command=self.toggle_training)
-        self.btn_toggle_train.pack(side="left", padx=(0, 15))
+        self.btn_toggle_train.pack(side="left", padx=(0, 12))
 
         # Worker Controller Box
         worker_box = ttk.Frame(ctrl_row1, style="Card.TFrame")
@@ -129,7 +131,7 @@ class BattleFightTrainerApp(tk.Tk):
         btn_refresh = tk.Button(ctrl_row1, text="🔄 รีเฟรช", font=("Segoe UI", 9), bg="#475569", fg="#ffffff", relief="flat", padx=10, pady=4, cursor="hand2", command=self.poll_status)
         btn_refresh.pack(side="right")
 
-        # Row 2: Model selection
+        # Row 2: Model selection & Cloud Sync Tools
         ctrl_row2 = ttk.Frame(control_card, style="Card.TFrame")
         ctrl_row2.pack(fill="x", pady=(10, 0))
 
@@ -142,9 +144,19 @@ class BattleFightTrainerApp(tk.Tk):
         self.policy_combo.pack(side="left", padx=(0, 6))
         self.policy_combo.bind("<<ComboboxSelected>>", self.on_policy_change)
 
+        # Cloud Sync Buttons (Kaggle Sync)
+        sync_frame = ttk.Frame(ctrl_row2, style="Card.TFrame")
+        sync_frame.pack(side="right")
+        
+        btn_export_sync = tk.Button(sync_frame, text="📤 ส่งข้อมูลไป Kaggle (Export)", font=("Segoe UI", 9, "bold"), bg="#6366f1", fg="#ffffff", relief="flat", padx=8, pady=3, cursor="hand2", command=self.export_sync_bundle)
+        btn_export_sync.pack(side="left", padx=4)
+
+        btn_import_sync = tk.Button(sync_frame, text="📥 นำเข้าจาก Kaggle (Import)", font=("Segoe UI", 9, "bold"), bg="#0d9488", fg="#ffffff", relief="flat", padx=8, pady=3, cursor="hand2", command=self.import_sync_bundle)
+        btn_import_sync.pack(side="left", padx=4)
+
         # Play / Spectate Game Action
-        play_card = ttk.Frame(self, style="Card.TFrame", padding=15)
-        play_card.pack(fill="x", padx=20, pady=8)
+        play_card = ttk.Frame(self, style="Card.TFrame", padding=14)
+        play_card.pack(fill="x", padx=20, pady=6)
 
         play_inner = ttk.Frame(play_card, style="Card.TFrame")
         play_inner.pack(fill="x")
@@ -196,6 +208,61 @@ class BattleFightTrainerApp(tk.Tk):
         count = self.worker_var.get()
         self.log(f"กำลังตั้งค่าจำนวน Worker เป็น {count} ...")
         threading.Thread(target=self._api_post, args=(WORKERS_API, {"workers": count}), daemon=True).start()
+
+    def export_sync_bundle(self):
+        def worker():
+            try:
+                self.log("กำลังดึงชุดข้อมูลแมตช์และโมเดลสำหรับ Kaggle...")
+                req = urllib.request.Request(EXPORT_BUNDLE_API)
+                with urllib.request.urlopen(req, timeout=15) as res:
+                    bundle_data = res.read().decode('utf-8')
+                
+                # บันทึกเป็นไฟล์ json
+                default_file = os.path.join(os.getcwd(), "kaggle_sync_bundle.json")
+                file_path = filedialog.asksaveasfilename(
+                    defaultextension=".json",
+                    initialfile="kaggle_sync_bundle.json",
+                    filetypes=[("JSON Bundle", "*.json")],
+                    title="บันทึกไฟล์ Sync Bundle สำหรับอัปโหลดไป Kaggle"
+                )
+                if file_path:
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        f.write(bundle_data)
+                    self.after(0, lambda: self.log(f"✅ ส่งออกไฟล์สำเร็จ: {file_path} (พร้อมอัปโหลดไป Kaggle!)"))
+            except Exception as e:
+                self.after(0, lambda: self.log(f"❌ ส่งออกไม่สำเร็จ: {e}"))
+        
+        threading.Thread(target=worker, daemon=True).start()
+
+    def import_sync_bundle(self):
+        file_path = filedialog.askopenfilename(
+            filetypes=[("JSON Bundle", "*.json")],
+            title="เลือกไฟล์ Sync Bundle ที่ดาวน์โหลดมาจาก Kaggle"
+        )
+        if not file_path:
+            return
+        
+        def worker():
+            try:
+                self.log(f"กำลังนำเข้าข้อมูลจาก {os.path.basename(file_path)}...")
+                with open(file_path, "r", encoding="utf-8") as f:
+                    payload = json.load(f)
+                
+                data_bytes = json.dumps(payload).encode("utf-8")
+                req = urllib.request.Request(
+                    IMPORT_BUNDLE_API,
+                    data=data_bytes,
+                    headers={"Content-Type": "application/json"},
+                    method="POST"
+                )
+                with urllib.request.urlopen(req, timeout=20) as res:
+                    resp = json.loads(res.read().decode("utf-8"))
+                    self.after(0, lambda: self.log(f"🎉 นำเข้าสำเร็จ: เพิ่ม {resp.get('importedPolicies', 0)} โมเดล, รวม {resp.get('mergedMatches', 0)} แมตช์!"))
+                    self.after(0, self.poll_status)
+            except Exception as e:
+                self.after(0, lambda: self.log(f"❌ นำเข้าไม่สำเร็จ: {e}"))
+
+        threading.Thread(target=worker, daemon=True).start()
 
     def poll_status(self):
         def worker():
@@ -266,7 +333,6 @@ class BattleFightTrainerApp(tk.Tk):
 
         # Sync worker control variable if not interacting
         if state == "running" and workers and self.focus_get() != self.lbl_worker_count:
-            # only update if differ
             if self.worker_var.get() != workers:
                 self.worker_var.set(workers)
 

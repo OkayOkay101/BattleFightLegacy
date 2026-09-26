@@ -427,6 +427,90 @@ var Server = IgeClass.extend({
 			}
 		});
 
+		// Export matches.jsonl or sync bundle for Kaggle
+		app.get('/api/training/sync/export-bundle', (req, res) => {
+			try {
+				const matchesFile = path.join(trainingDataDir, 'matches.jsonl');
+				const regFile = path.join(trainingDataDir, 'registry.json');
+				const policiesDir = path.join(trainingDataDir, 'policies');
+				
+				const policies = {};
+				if (fs.existsSync(policiesDir)) {
+					for (const file of fs.readdirSync(policiesDir)) {
+						if (file.endsWith('.json')) {
+							policies[file] = fs.readFileSync(path.join(policiesDir, file), 'utf8');
+						}
+					}
+				}
+
+				let matchesSnippet = '';
+				if (fs.existsSync(matchesFile)) {
+					matchesSnippet = fs.readFileSync(matchesFile, 'utf8');
+				}
+
+				let registryData = null;
+				if (fs.existsSync(regFile)) {
+					registryData = fs.readFileSync(regFile, 'utf8');
+				}
+
+				res.json({
+					ok: true,
+					source: 'local',
+					timestamp: Date.now(),
+					registry: registryData,
+					policies,
+					matchesCount: matchesSnippet.split('\n').filter(Boolean).length,
+					matches: matchesSnippet
+				});
+			} catch (error) {
+				res.status(500).json({ ok: false, error: error.message });
+			}
+		});
+
+		// Import / Merge matches and policies from Kaggle
+		app.post('/api/training/sync/import-bundle', (req, res) => {
+			try {
+				const bundle = req.body;
+				if (!bundle || typeof bundle !== 'object') {
+					return res.status(400).json({ ok: false, error: 'Invalid bundle payload' });
+				}
+
+				let importedPolicies = 0;
+				if (bundle.policies && typeof bundle.policies === 'object') {
+					const policiesDir = path.join(trainingDataDir, 'policies');
+					fs.mkdirSync(policiesDir, { recursive: true });
+					for (const [filename, content] of Object.entries(bundle.policies)) {
+						if (/^[a-zA-Z0-9_.-]+\.json$/.test(filename)) {
+							fs.writeFileSync(path.join(policiesDir, filename), typeof content === 'string' ? content : JSON.stringify(content));
+							importedPolicies++;
+						}
+					}
+				}
+
+				let mergedMatches = 0;
+				if (bundle.matches && typeof bundle.matches === 'string') {
+					const matchesFile = path.join(trainingDataDir, 'matches.jsonl');
+					fs.appendFileSync(matchesFile, bundle.matches.endsWith('\n') ? bundle.matches : bundle.matches + '\n');
+					mergedMatches = bundle.matches.split('\n').filter(Boolean).length;
+				}
+
+				if (bundle.registry) {
+					const regFile = path.join(trainingDataDir, 'registry.json');
+					const regContent = typeof bundle.registry === 'string' ? bundle.registry : JSON.stringify(bundle.registry);
+					fs.writeFileSync(regFile, regContent);
+				}
+
+				res.json({
+					ok: true,
+					importedPolicies,
+					mergedMatches,
+					message: 'Bundle imported & merged successfully!'
+				});
+			} catch (error) {
+				res.status(500).json({ ok: false, error: error.message });
+			}
+		});
+
 		if (global.isDev) {
 			// needed for source maps
 			app.use('/ts', express.static(path.resolve('./ts/')));
