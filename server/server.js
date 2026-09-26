@@ -362,8 +362,7 @@ var Server = IgeClass.extend({
 				}],
 				createdBy: '',
 				menudiv: false,
-				trainingDemoPolicy: process.env.BATTLEFIGHT_DEMO_POLICY ?
-					(ige.trainingPolicy && ige.trainingPolicy.version || process.env.BATTLEFIGHT_DEMO_POLICY) : '',
+				trainingDemoPolicy: (ige.trainingPolicy && ige.trainingPolicy.version) || process.env.BATTLEFIGHT_DEMO_POLICY || '',
 				gameTitle: game.title,
 				currentUserPresentInHighscore: false,
 				discordLink: null,
