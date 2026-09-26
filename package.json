@@ -55,7 +55,7 @@
     "rate-limiter-flexible": "^2.3.7",
     "request": "^2.88.2",
     "sanitizer": "^0.1.3",
-    "validator": "^13.7.0",
+    "validator": "^13.15.35",
     "ws": "^8.8.1",
     "xss-filters": "^1.2.7"
   },
