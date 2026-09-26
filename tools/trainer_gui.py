@@ -8,7 +8,7 @@ import threading
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-SERVER_BASE_URL = "http://localhost"
+SERVER_BASE_URL = "http://127.0.0.1"
 STATUS_API = f"{SERVER_BASE_URL}/api/training/status"
 POLICIES_API = f"{SERVER_BASE_URL}/api/training/policies"
 START_API = f"{SERVER_BASE_URL}/api/training/start"
