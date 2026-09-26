@@ -14,13 +14,14 @@ POLICIES_API = f"{SERVER_BASE_URL}/api/training/policies"
 START_API = f"{SERVER_BASE_URL}/api/training/start"
 STOP_API = f"{SERVER_BASE_URL}/api/training/stop"
 ACTIVATE_API = f"{SERVER_BASE_URL}/api/training/activate"
+WORKERS_API = f"{SERVER_BASE_URL}/api/training/workers"
 
 class BattleFightTrainerApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("BattleFight AI - Control Center & Live Stats")
-        self.geometry("760x640")
-        self.minsize(680, 560)
+        self.geometry("800x690")
+        self.minsize(720, 600)
         self.configure(bg="#0f172a")
 
         # Styling
@@ -50,11 +51,6 @@ class BattleFightTrainerApp(tk.Tk):
         
         self.style.configure("StatTitle.TLabel", background="#334155", foreground="#94a3b8", font=("Segoe UI", 8, "bold"))
         self.style.configure("StatVal.TLabel", background="#334155", foreground="#f8fafc", font=("Segoe UI", 13, "bold"))
-        
-        self.style.configure("Play.TButton", font=("Segoe UI", 11, "bold"), background="#10b981", foreground="#ffffff")
-        self.style.configure("Start.TButton", font=("Segoe UI", 10, "bold"), background="#2563eb", foreground="#ffffff")
-        self.style.configure("Stop.TButton", font=("Segoe UI", 10, "bold"), background="#ef4444", foreground="#ffffff")
-        self.style.configure("Action.TButton", font=("Segoe UI", 9), background="#475569", foreground="#ffffff")
 
     def _create_widgets(self):
         # Header container
@@ -64,7 +60,7 @@ class BattleFightTrainerApp(tk.Tk):
         title_box = ttk.Frame(header_frame)
         title_box.pack(side="left")
         ttk.Label(title_box, text="⚔️ BATTLEFIGHT AI CONTROL CENTER", style="Header.TLabel").pack(anchor="w")
-        ttk.Label(title_box, text="ระบบมอนิเตอร์และควบคุมการฝึกฝน AI พร้อมเชื่อมต่อเข้าเล่นเกม", style="SubHeader.TLabel").pack(anchor="w")
+        ttk.Label(title_box, text="ระบบมอนิเตอร์และควบคุมการฝึกฝน AI พร้อมปรับจำนวน Worker แบบ Real-time", style="SubHeader.TLabel").pack(anchor="w")
 
         # Status badge
         self.badge_lbl = tk.Label(header_frame, text="CONNECTING...", font=("Segoe UI", 9, "bold"), bg="#475569", fg="#ffffff", padx=12, pady=5)
@@ -72,7 +68,7 @@ class BattleFightTrainerApp(tk.Tk):
 
         # Main Card for Stats
         card = ttk.Frame(self, style="Card.TFrame", padding=15)
-        card.pack(fill="x", padx=20, pady=10)
+        card.pack(fill="x", padx=20, pady=8)
 
         card_title_row = ttk.Frame(card, style="Card.TFrame")
         card_title_row.pack(fill="x", pady=(0, 10))
@@ -95,38 +91,60 @@ class BattleFightTrainerApp(tk.Tk):
         self.s_versions = self._add_stat_box(stats_grid, 1, 0, "CHAMPION / CANDIDATE", "- / -", "#cbd5e1")
         # Stat 5: Matches Completed
         self.s_matches = self._add_stat_box(stats_grid, 1, 1, "แมตช์ที่เสร็จสิ้น", "0", "#cbd5e1")
-        # Stat 6: Sim Speed
-        self.s_speed = self._add_stat_box(stats_grid, 1, 2, "ความเร็วเร่งจำลอง", "1.0x", "#c084fc")
+        # Stat 6: Workers & Speed
+        self.s_speed = self._add_stat_box(stats_grid, 1, 2, "WORKERS / SPEED", "- W / 1.0x", "#c084fc")
 
         # Quick Control Panel
         control_card = ttk.Frame(self, style="Card.TFrame", padding=15)
-        control_card.pack(fill="x", padx=20, pady=10)
+        control_card.pack(fill="x", padx=20, pady=8)
         
-        ttk.Label(control_card, text="🎮 การควบคุมเซิร์ฟเวอร์ & AI", font=("Segoe UI", 12, "bold"), background="#1e293b", foreground="#38bdf8").pack(anchor="w", pady=(0, 10))
+        ttk.Label(control_card, text="🎮 การควบคุม Worker & AI", font=("Segoe UI", 12, "bold"), background="#1e293b", foreground="#38bdf8").pack(anchor="w", pady=(0, 10))
 
+        # Row 1: Start/Stop Training + Worker Stepper Control
         ctrl_row1 = ttk.Frame(control_card, style="Card.TFrame")
-        ctrl_row1.pack(fill="x", pady=5)
+        ctrl_row1.pack(fill="x", pady=4)
 
-        self.btn_toggle_train = tk.Button(ctrl_row1, text="▶ เริ่มเทรน AI (Start Training)", font=("Segoe UI", 10, "bold"), bg="#2563eb", fg="#ffffff", activebackground="#1d4ed8", activeforeground="#ffffff", padx=12, pady=6, relief="flat", cursor="hand2", command=self.toggle_training)
-        self.btn_toggle_train.pack(side="left", padx=(0, 10))
+        self.btn_toggle_train = tk.Button(ctrl_row1, text="▶ เริ่มเทรน AI (Start Training)", font=("Segoe UI", 10, "bold"), bg="#2563eb", fg="#ffffff", activebackground="#1d4ed8", activeforeground="#ffffff", padx=12, pady=5, relief="flat", cursor="hand2", command=self.toggle_training)
+        self.btn_toggle_train.pack(side="left", padx=(0, 15))
 
-        # Model Selector
-        sel_frame = ttk.Frame(ctrl_row1, style="Card.TFrame")
-        sel_frame.pack(side="left", padx=10)
-        ttk.Label(sel_frame, text="เลือกโมเดลเล่นในเกม:", font=("Segoe UI", 9, "bold"), background="#1e293b", foreground="#94a3b8").pack(side="left", padx=(0, 6))
-        
-        self.policy_var = tk.StringVar(value="latest")
-        self.policy_combo = ttk.Combobox(sel_frame, textvariable=self.policy_var, state="readonly", width=16)
-        self.policy_combo.pack(side="left", padx=(0, 6))
-        self.policy_combo.bind("<<ComboboxSelected>>", self.on_policy_change)
+        # Worker Controller Box
+        worker_box = ttk.Frame(ctrl_row1, style="Card.TFrame")
+        worker_box.pack(side="left", padx=5)
+        ttk.Label(worker_box, text="⚡ ควบคุม Worker (1-8):", font=("Segoe UI", 9, "bold"), background="#1e293b", foreground="#94a3b8").pack(side="left", padx=(0, 6))
+
+        self.worker_var = tk.IntVar(value=2)
+        btn_w_minus = tk.Button(worker_box, text=" - ", font=("Segoe UI", 9, "bold"), bg="#475569", fg="#ffffff", relief="flat", padx=6, pady=2, cursor="hand2", command=lambda: self.change_worker_delta(-1))
+        btn_w_minus.pack(side="left", padx=2)
+
+        self.lbl_worker_count = tk.Label(worker_box, textvariable=self.worker_var, font=("Segoe UI", 11, "bold"), bg="#334155", fg="#38bdf8", width=4, relief="flat")
+        self.lbl_worker_count.pack(side="left", padx=3)
+
+        btn_w_plus = tk.Button(worker_box, text=" + ", font=("Segoe UI", 9, "bold"), bg="#475569", fg="#ffffff", relief="flat", padx=6, pady=2, cursor="hand2", command=lambda: self.change_worker_delta(+1))
+        btn_w_plus.pack(side="left", padx=2)
+
+        btn_w_apply = tk.Button(worker_box, text="บันทึก Worker", font=("Segoe UI", 8, "bold"), bg="#0284c7", fg="#ffffff", relief="flat", padx=8, pady=3, cursor="hand2", command=self.apply_workers)
+        btn_w_apply.pack(side="left", padx=(8, 0))
 
         # Refresh button
         btn_refresh = tk.Button(ctrl_row1, text="🔄 รีเฟรช", font=("Segoe UI", 9), bg="#475569", fg="#ffffff", relief="flat", padx=10, pady=4, cursor="hand2", command=self.poll_status)
         btn_refresh.pack(side="right")
 
+        # Row 2: Model selection
+        ctrl_row2 = ttk.Frame(control_card, style="Card.TFrame")
+        ctrl_row2.pack(fill="x", pady=(10, 0))
+
+        sel_frame = ttk.Frame(ctrl_row2, style="Card.TFrame")
+        sel_frame.pack(side="left")
+        ttk.Label(sel_frame, text="เลือกโมเดลเล่นในเกม:", font=("Segoe UI", 9, "bold"), background="#1e293b", foreground="#94a3b8").pack(side="left", padx=(0, 6))
+        
+        self.policy_var = tk.StringVar(value="latest")
+        self.policy_combo = ttk.Combobox(sel_frame, textvariable=self.policy_var, state="readonly", width=18)
+        self.policy_combo.pack(side="left", padx=(0, 6))
+        self.policy_combo.bind("<<ComboboxSelected>>", self.on_policy_change)
+
         # Play / Spectate Game Action
         play_card = ttk.Frame(self, style="Card.TFrame", padding=15)
-        play_card.pack(fill="x", padx=20, pady=10)
+        play_card.pack(fill="x", padx=20, pady=8)
 
         play_inner = ttk.Frame(play_card, style="Card.TFrame")
         play_inner.pack(fill="x")
@@ -141,7 +159,7 @@ class BattleFightTrainerApp(tk.Tk):
 
         # Logs / Console preview
         log_frame = ttk.Frame(self, style="Card.TFrame", padding=10)
-        log_frame.pack(fill="both", expand=True, padx=20, pady=(5, 15))
+        log_frame.pack(fill="both", expand=True, padx=20, pady=(5, 12))
 
         ttk.Label(log_frame, text="Activity Log", font=("Segoe UI", 9, "bold"), background="#1e293b", foreground="#64748b").pack(anchor="w", pady=(0, 4))
         
@@ -169,6 +187,16 @@ class BattleFightTrainerApp(tk.Tk):
         webbrowser.open(SERVER_BASE_URL)
         self.log(f"เปิดหน้าเกมที่ {SERVER_BASE_URL}")
 
+    def change_worker_delta(self, delta):
+        cur = self.worker_var.get()
+        new_val = max(1, min(8, cur + delta))
+        self.worker_var.set(new_val)
+
+    def apply_workers(self):
+        count = self.worker_var.get()
+        self.log(f"กำลังตั้งค่าจำนวน Worker เป็น {count} ...")
+        threading.Thread(target=self._api_post, args=(WORKERS_API, {"workers": count}), daemon=True).start()
+
     def poll_status(self):
         def worker():
             try:
@@ -185,7 +213,6 @@ class BattleFightTrainerApp(tk.Tk):
                 self.after(0, lambda: self._handle_poll_error(str(e)))
 
         threading.Thread(target=worker, daemon=True).start()
-        # Schedule next poll every 2.5s
         if self.is_running_loop:
             self.after(2500, self.poll_status)
 
@@ -232,9 +259,16 @@ class BattleFightTrainerApp(tk.Tk):
         failed = train.get("failed", 0)
         self.s_matches.configure(text=f"{comp} (err: {failed})")
 
+        workers = train.get("workers", self.worker_var.get())
+        active_w = train.get("active", 0)
         speed = train.get("simulatedSecondsPerWallSecond", 0)
-        smode = train.get("speedMode", "max")
-        self.s_speed.configure(text=f"{speed:.1f}x ({smode})")
+        self.s_speed.configure(text=f"{active_w}/{workers} W ({speed:.1f}x)")
+
+        # Sync worker control variable if not interacting
+        if state == "running" and workers and self.focus_get() != self.lbl_worker_count:
+            # only update if differ
+            if self.worker_var.get() != workers:
+                self.worker_var.set(workers)
 
         # Policies Combobox
         if pdata.get("ok"):
@@ -255,9 +289,10 @@ class BattleFightTrainerApp(tk.Tk):
             self.btn_toggle_train.configure(text="⏳ กำลังหยุด...", bg="#64748b")
             threading.Thread(target=self._api_post, args=(STOP_API, {}), daemon=True).start()
         else:
-            self.log("กำลังส่งคำสั่งเริ่มเทรน AI (Start)...")
+            workers = self.worker_var.get()
+            self.log(f"กำลังส่งคำสั่งเริ่มเทรน AI ด้วย {workers} workers...")
             self.btn_toggle_train.configure(text="⏳ กำลังเริ่ม...", bg="#64748b")
-            body = {"workers": 2, "neural": True, "speed": "max"}
+            body = {"workers": workers, "neural": True, "speed": "max"}
             threading.Thread(target=self._api_post, args=(START_API, body), daemon=True).start()
 
     def on_policy_change(self, event):

@@ -43,6 +43,13 @@
                 <button type="button" id="btn-train-toggle" class="btn btn-sm btn-outline-success font-weight-bold">
                     ▶ เริ่มเทรน AI
                 </button>
+                <div class="d-inline-flex align-items-center ml-2">
+                    <label class="mr-2 mb-0 small text-muted font-weight-bold">Workers:</label>
+                    <button type="button" id="btn-web-w-minus" class="btn btn-sm btn-secondary py-0 px-2 font-weight-bold">-</button>
+                    <span id="stat-web-workers" class="badge badge-light border mx-1 font-weight-bold px-2 py-1" style="font-size: 0.9rem;">2</span>
+                    <button type="button" id="btn-web-w-plus" class="btn btn-sm btn-secondary py-0 px-2 font-weight-bold">+</button>
+                    <button type="button" id="btn-web-w-apply" class="btn btn-sm btn-info py-0 px-2 ml-2" style="font-size: 0.8rem;">ตั้งค่า</button>
+                </div>
                 <div class="d-inline-flex align-items-center ml-auto">
                     <label class="mr-2 mb-0 small text-muted font-weight-bold">เลือกโมเดลเล่น:</label>
                     <select id="select-active-policy" class="form-control form-control-sm" style="width: auto; height: 30px; padding: 2px 8px;">
@@ -170,7 +177,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (statMatches) statMatches.textContent = (train.completed || 0) + ' (Fail: ' + (train.failed || 0) + ')';
                 if (statSpeed) {
                     var sp = train.simulatedSecondsPerWallSecond ? (train.simulatedSecondsPerWallSecond.toFixed(1) + 'x') : '1.0x';
-                    statSpeed.textContent = sp + ' (' + (train.speedMode || 'norm') + ')';
+                    var actW = train.active != null ? train.active : 0;
+                    var cfgW = train.workers != null ? train.workers : webWorkersCount;
+                    statSpeed.textContent = actW + '/' + cfgW + ' W (' + sp + ')';
+                    if (train.state === 'running' && train.workers && spanWebWorkers && document.activeElement !== spanWebWorkers) {
+                        webWorkersCount = train.workers;
+                        spanWebWorkers.textContent = train.workers;
+                    }
                 }
             })
             .catch(function(err) {
@@ -199,6 +212,40 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(function() {});
     }
 
+    var webWorkersCount = 2;
+    var spanWebWorkers = document.getElementById('stat-web-workers');
+    var btnWMinus = document.getElementById('btn-web-w-minus');
+    var btnWPlus = document.getElementById('btn-web-w-plus');
+    var btnWApply = document.getElementById('btn-web-w-apply');
+
+    if (btnWMinus) {
+        btnWMinus.addEventListener('click', function () {
+            webWorkersCount = Math.max(1, webWorkersCount - 1);
+            if (spanWebWorkers) spanWebWorkers.textContent = webWorkersCount;
+        });
+    }
+    if (btnWPlus) {
+        btnWPlus.addEventListener('click', function () {
+            webWorkersCount = Math.min(8, webWorkersCount + 1);
+            if (spanWebWorkers) spanWebWorkers.textContent = webWorkersCount;
+        });
+    }
+    if (btnWApply) {
+        btnWApply.addEventListener('click', function () {
+            btnWApply.textContent = '...';
+            fetch('/api/training/workers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ workers: webWorkersCount })
+            }).then(function() {
+                setTimeout(function() {
+                    btnWApply.textContent = 'ตั้งค่า';
+                    fetchTrainingStatus();
+                }, 600);
+            });
+        });
+    }
+
     if (btnTrainToggle) {
         btnTrainToggle.addEventListener('click', function () {
             if (currentTrainState === 'running') {
@@ -210,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch('/api/training/start', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ workers: 2, neural: true, speed: 'max' })
+                    body: JSON.stringify({ workers: webWorkersCount, neural: true, speed: 'max' })
                 }).then(function() { setTimeout(fetchTrainingStatus, 1200); });
             }
         });

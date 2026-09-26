@@ -379,6 +379,26 @@ var Server = IgeClass.extend({
 			}
 		});
 
+		app.post('/api/training/workers', async (req, res) => {
+			try {
+				const count = Number(req.body?.workers);
+				if (!Number.isInteger(count) || count < 1 || count > 8) {
+					return res.status(400).json({ ok: false, error: 'workers must be 1..8' });
+				}
+				const lockFile = path.join(trainingDataDir, 'supervisor.lock.json');
+				let lock = null;
+				try { lock = JSON.parse(fs.readFileSync(lockFile, 'utf8')); } catch (e) {}
+				if (!lock || !lock.runId) {
+					return res.status(400).json({ ok: false, error: 'Training not running' });
+				}
+				const controlFile = path.join(trainingDataDir, 'control.json');
+				fs.writeFileSync(controlFile, JSON.stringify({ runId: lock.runId, workers: count, updatedAt: Date.now() }));
+				res.json({ ok: true, workers: count });
+			} catch (error) {
+				res.status(500).json({ ok: false, error: error.message });
+			}
+		});
+
 		app.post('/api/training/activate', (req, res) => {
 			try {
 				const version = req.body && req.body.version;

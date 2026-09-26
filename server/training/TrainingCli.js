@@ -58,6 +58,7 @@ async function daemon(options) {
 	const lockFile = path.join(options.dataDir, 'supervisor.lock.json');
 	const statusFile = path.join(options.dataDir, 'status.json');
 	const stopFile = path.join(options.dataDir, 'stop-request.json');
+	const controlFile = path.join(options.dataDir, 'control.json');
 	const runId = options['run-id'];
 	const supervisor = new TrainingSupervisor({ dataDir: options.dataDir, runId,
 		mode: options.neural === 'on' ? 'neural' : 'heuristic',
@@ -82,6 +83,10 @@ async function daemon(options) {
 			if (request?.runId === runId) {
 				if (stopStartedAt === null) { stopStartedAt = Date.now(); supervisor.stop(); }
 				else if (Date.now() - stopStartedAt > 30000) supervisor.stop({ abortActive: true });
+			}
+			const ctrl = await readJson(controlFile);
+			if (ctrl && ctrl.runId === runId && Number.isInteger(ctrl.workers)) {
+				try { supervisor.setWorkers(ctrl.workers); } catch (e) {}
 			}
 			await publish(!ready ? 'starting' : (supervisor.stopRequested ? 'stopping' : 'running'));
 		} catch (error) { console.error(error); }

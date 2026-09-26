@@ -184,6 +184,12 @@ class TrainingSupervisor {
 		});
 	}
 
+	setWorkers(count) {
+		this.workers = workerCount(count);
+		this._pump();
+		return this.workers;
+	}
+
 	stop({ abortActive = false } = {}) {
 		this.stopRequested = true;
 		if (abortActive) for (const { child } of this.active.values()) child.kill();
