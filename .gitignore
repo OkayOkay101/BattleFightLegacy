@@ -1,0 +1,37 @@
+# Audio files (as requested)
+*.mp3
+*.wav
+*.ogg
+*.m4a
+*.flac
+*.aac
+
+# Node / dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python environments & caches
+.venv/
+__pycache__/
+*.pyc
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Large exported assets / caches if any
+assets/cache.modd.io/asset/sound/
+assets/modd.s3.amazonaws.com/asset/sound/
+src/assets/cache.modd.io/asset/sound/
+BattleFight-export(1)/assets/cache.modd.io/asset/sound/
+BattleFight-export(1)/assets/modd.s3.amazonaws.com/asset/sound/
+
+# Training runtime generated data
+training-data/
+training-data-backup-legacy/
+*.log
+*.pid
