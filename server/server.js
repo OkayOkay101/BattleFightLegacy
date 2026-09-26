@@ -316,6 +316,97 @@ var Server = IgeClass.extend({
 		app.use('/cache.modd.io', makeCdnProxy('cache.modd.io'));
 		app.use('/modd.s3.amazonaws.com', makeCdnProxy('modd.s3.amazonaws.com'));
 
+		const trainingCli = require('./training/TrainingCli');
+		const { PolicyRegistry } = require('./training/PolicyRegistry');
+		const trainingDataDir = path.resolve(__dirname, '../training-data');
+
+		app.get('/api/training/status', async (req, res) => {
+			try {
+				const currentStatus = await trainingCli.status({ dataDir: trainingDataDir });
+				const registry = new PolicyRegistry(trainingDataDir);
+				res.json({
+					ok: true,
+					training: currentStatus,
+					registry: registry.status(),
+					serverPolicy: (ige.trainingPolicy && ige.trainingPolicy.version) || 'baseline'
+				});
+			} catch (error) {
+				res.status(500).json({ ok: false, error: error.message });
+			}
+		});
+
+		app.get('/api/training/policies', (req, res) => {
+			try {
+				const policiesDir = path.join(trainingDataDir, 'policies');
+				let list = ['baseline'];
+				if (fs.existsSync(policiesDir)) {
+					const files = fs.readdirSync(policiesDir)
+						.filter(name => /^n-\d+\.json$/.test(name))
+						.map(name => name.slice(0, -5))
+						.sort().reverse();
+					list = [...files, 'baseline'];
+				}
+				const registry = new PolicyRegistry(trainingDataDir);
+				res.json({ ok: true, policies: list, registry: registry.status() });
+			} catch (error) {
+				res.status(500).json({ ok: false, error: error.message });
+			}
+		});
+
+		app.post('/api/training/start', async (req, res) => {
+			try {
+				const workers = req.body && req.body.workers ? Number(req.body.workers) : 2;
+				const neural = req.body && req.body.neural === false ? 'off' : 'on';
+				const speed = req.body && req.body.speed ? req.body.speed : 'max';
+				const result = await trainingCli.start({
+					dataDir: trainingDataDir,
+					workers,
+					neural,
+					speed
+				});
+				res.json({ ok: true, result });
+			} catch (error) {
+				res.status(400).json({ ok: false, error: error.message });
+			}
+		});
+
+		app.post('/api/training/stop', async (req, res) => {
+			try {
+				const result = await trainingCli.stop({ dataDir: trainingDataDir });
+				res.json({ ok: true, result });
+			} catch (error) {
+				res.status(400).json({ ok: false, error: error.message });
+			}
+		});
+
+		app.post('/api/training/activate', (req, res) => {
+			try {
+				const version = req.body && req.body.version;
+				if (!version) return res.status(400).json({ ok: false, error: 'Version required' });
+				const registry = new PolicyRegistry(trainingDataDir);
+				registry.activate(version);
+				const pol = registry.policy(version);
+				if (pol) {
+					ige.trainingPolicy = pol;
+					if (ige.training) ige.training.policy = pol;
+				}
+				res.json({ ok: true, registry: registry.status(), active: version });
+			} catch (error) {
+				res.status(400).json({ ok: false, error: error.message });
+			}
+		});
+
+		app.post('/api/training/auto', (req, res) => {
+			try {
+				const enabled = Boolean(req.body && req.body.enabled);
+				const registry = new PolicyRegistry(trainingDataDir);
+				registry.setAutoUpdate(enabled);
+				res.json({ ok: true, registry: registry.status() });
+			} catch (error) {
+				res.status(400).json({ ok: false, error: error.message });
+			}
+		});
+
 		if (global.isDev) {
 			// needed for source maps
 			app.use('/ts', express.static(path.resolve('./ts/')));

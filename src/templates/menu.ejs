@@ -1,66 +1,271 @@
 <!-- play button -->
 <div id="play-game-button-wrapper" class="h-100 w-100 d-flex justify-content-center position-absolute align-items-center d-none-important">
-    <% if (trainingDemoPolicy) { %>
     <div id="training-demo-settings" data-policy="<%= trainingDemoPolicy %>">
-        <span class="demo-kicker">BATTLEFIGHT · TRAINED AI</span>
-        <h2>สนามทดลองบอท</h2>
-        <p>ดูบอทฝึก 3 ต่อ 3 หรือเข้าร่วมทีมฟ้าเพื่อต่อสู้กับทีมแดง</p>
-        <div class="demo-policy">รุ่นบอท: <strong><%= trainingDemoPolicy %></strong> · แมตช์นี้ไม่บันทึกเป็นผลการฝึก</div>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="demo-kicker">⚔️ BATTLEFIGHT · AI LAB & CONTROL</span>
+            <span id="training-live-badge" class="badge badge-secondary px-2 py-1">Connecting...</span>
+        </div>
+        
+        <h2>สนามทดลอง & ควบคุม AI</h2>
+        <p>เลือกโหมดการเล่น ติดตามสถิติการฝึก และควบคุมการเทรน AI จากหน้านี้ได้ทันที</p>
+        
+        <!-- Live AI Training Stats Dashboard -->
+        <div class="train-dashboard mb-3">
+            <div class="train-stat-grid">
+                <div class="stat-card">
+                    <span class="stat-label">สถานะการเทรน</span>
+                    <span class="stat-value text-primary" id="stat-train-state">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">โมเดลเซิร์ฟเวอร์</span>
+                    <span class="stat-value text-success" id="stat-server-policy"><%= trainingDemoPolicy || 'baseline' %></span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Champion / Candidate</span>
+                    <span class="stat-value text-info" id="stat-versions">- / -</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Win Rate ผู้ท้าชิง</span>
+                    <span class="stat-value text-warning" id="stat-winrate">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">แมตช์เสร็จสิ้น</span>
+                    <span class="stat-value" id="stat-matches">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">ความเร็วเร่งจำลอง</span>
+                    <span class="stat-value" id="stat-speed">-</span>
+                </div>
+            </div>
+
+            <!-- Training Control Action Buttons -->
+            <div class="train-controls mt-2 d-flex flex-wrap gap-2 align-items-center">
+                <button type="button" id="btn-train-toggle" class="btn btn-sm btn-outline-success font-weight-bold">
+                    ▶ เริ่มเทรน AI
+                </button>
+                <div class="d-inline-flex align-items-center ml-auto">
+                    <label class="mr-2 mb-0 small text-muted font-weight-bold">เลือกโมเดลเล่น:</label>
+                    <select id="select-active-policy" class="form-control form-control-sm" style="width: auto; height: 30px; padding: 2px 8px;">
+                        <option value="<%= trainingDemoPolicy %>"><%= trainingDemoPolicy %></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <div class="demo-options" role="radiogroup" aria-label="โหมดทดลอง">
-            <label><input type="radio" name="training-demo-mode" value="spectate" checked><span><strong>ดูบอทสู้</strong><small>ชมการต่อสู้และสลับมุมกล้อง</small></span></label>
-            <label><input type="radio" name="training-demo-mode" value="fight"><span><strong>ลงสู้เอง</strong><small>เลือกตัวละครแล้วร่วมทีมฟ้า</small></span></label>
+            <label><input type="radio" name="training-demo-mode" value="spectate" checked><span><strong>👁️ ดูบอทสู้ (Spectate)</strong><small>ชมการต่อสู้ 3v3 และสลับมุมกล้องตามบอท</small></span></label>
+            <label><input type="radio" name="training-demo-mode" value="fight"><span><strong>⚔️ ลงสู้เอง (Play Game)</strong><small>เลือกตัวละครแล้วร่วมทีมฟ้าต่อสู้กับทีมแดง</small></span></label>
         </div>
     </div>
-    <% } %>
+    
     <button id="play-game-button" type="button" class="btn btn-success" data-style="rotate-side-down" data-perspective data-horizontal>
         <div class="bg-success rounded">
             <i class="fa fa-gamepad pr-2 py-3" aria-hidden="true"></i>
-            Play Game
+            เข้าสู่เกม (Enter Game)
         </div>
     </button>
 </div>
-<% if (trainingDemoPolicy) { %>
+
 <div id="training-demo-spectator" hidden aria-live="polite">
     <span id="training-demo-following">กำลังรอบอทลงสนาม…</span>
     <button type="button" id="training-demo-next">ดูกล้องตัวถัดไป</button>
     <button type="button" id="training-demo-exit">เปลี่ยนโหมด</button>
 </div>
+
 <style>
-#play-game-button-wrapper:has(#training-demo-settings) { flex-direction: column; gap: 1rem; background: linear-gradient(145deg,rgba(14,26,48,.82),rgba(10,16,31,.68)); z-index: 100; }
-#training-demo-settings { width: min(92vw,620px); padding: 26px; border: 1px solid #9dc6e5; border-radius: 20px; background: #f5f8fd; color: #14263e; box-shadow: 0 18px 55px #07132488; }
-#training-demo-settings h2 { font-size: clamp(1.5rem,4vw,2.1rem); margin: .25rem 0; font-weight: 800; }
-#training-demo-settings p { margin: .25rem 0 1rem; color: #425673; }
-#training-demo-settings .demo-kicker { font-size: .72rem; letter-spacing: .17em; color: #176bb3; font-weight: 800; }
-#training-demo-settings .demo-policy { background: #e7f1fc; border-radius: 9px; padding: .6rem .8rem; font-size: .86rem; }
-#training-demo-settings .demo-options { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: 1rem; }
+#play-game-button-wrapper:has(#training-demo-settings) { flex-direction: column; gap: 1.2rem; background: linear-gradient(145deg,rgba(10,20,38,.88),rgba(6,12,24,.75)); z-index: 100; }
+#training-demo-settings { width: min(94vw,700px); padding: 24px 26px; border: 1px solid #7eaed4; border-radius: 20px; background: #f8fbff; color: #14263e; box-shadow: 0 20px 60px rgba(4,12,24,0.6); }
+#training-demo-settings h2 { font-size: clamp(1.4rem,3.5vw,1.9rem); margin: .2rem 0; font-weight: 800; color: #0c2340; }
+#training-demo-settings p { margin: .2rem 0 .9rem; color: #475a75; font-size: 0.92rem; }
+#training-demo-settings .demo-kicker { font-size: .75rem; letter-spacing: .15em; color: #176bb3; font-weight: 800; }
+
+.train-dashboard { background: #eaf1fa; border: 1px solid #c2d8ed; border-radius: 12px; padding: 12px 14px; }
+.train-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; }
+.stat-card { background: #ffffff; border: 1px solid #d2e2f2; border-radius: 8px; padding: 7px 10px; display: flex; flex-direction: column; }
+.stat-label { font-size: 0.72rem; color: #617792; font-weight: 600; margin-bottom: 2px; }
+.stat-value { font-size: 0.95rem; font-weight: 800; color: #1b314e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+#training-demo-settings .demo-options { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: .9rem; }
 #training-demo-settings .demo-options label { cursor: pointer; margin: 0; }
 #training-demo-settings .demo-options input { position: absolute; opacity: 0; }
-#training-demo-settings .demo-options span { display: flex; flex-direction: column; gap: .25rem; min-height: 85px; padding: 1rem; border: 2px solid #c6d7e9; border-radius: 12px; background: white; }
-#training-demo-settings .demo-options small { color: #52647b; }
-#training-demo-settings .demo-options input:checked + span { border-color: #0869c2; background: #eaf4ff; box-shadow: inset 0 0 0 1px #0869c2; }
+#training-demo-settings .demo-options span { display: flex; flex-direction: column; gap: .2rem; min-height: 75px; padding: .85rem 1rem; border: 2px solid #c6d7e9; border-radius: 12px; background: white; transition: all 0.15s ease-in-out; }
+#training-demo-settings .demo-options small { color: #55677e; font-size: 0.8rem; }
+#training-demo-settings .demo-options input:checked + span { border-color: #0869c2; background: #e8f3ff; box-shadow: inset 0 0 0 1px #0869c2; }
 #training-demo-settings .demo-options input:focus-visible + span, #training-demo-spectator button:focus-visible { outline: 3px solid #f3a428; outline-offset: 3px; }
-#training-demo-spectator { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: .65rem; max-width: 95vw; padding: .5rem .8rem; border-radius: 11px; background: #f5f8fdef; color: #14263e; box-shadow: 0 4px 22px #07132477; }
+
+#training-demo-spectator { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: .65rem; max-width: 95vw; padding: .5rem .8rem; border-radius: 11px; background: #f5f8fdef; color: #14263e; box-shadow: 0 4px 22px rgba(7,19,36,0.5); }
 #training-demo-spectator[hidden] { display: none; }
 #training-demo-spectator button { border: 0; border-radius: 7px; background: #176bb3; color: white; padding: .45rem .65rem; }
 #game-div:has(#training-demo-spectator:not([hidden])) #counter { top: 68px; }
-@media (max-width: 520px) { #training-demo-settings { padding: 17px; } #training-demo-settings .demo-options { grid-template-columns: 1fr; } #training-demo-spectator { flex-wrap: wrap; justify-content: center; width: 95vw; } #game-div:has(#training-demo-spectator:not([hidden])) #counter { top: 112px; } }
+
+@media (max-width: 520px) { 
+    #training-demo-settings { padding: 16px; } 
+    #training-demo-settings .demo-options { grid-template-columns: 1fr; } 
+    #training-demo-spectator { flex-wrap: wrap; justify-content: center; width: 95vw; } 
+    #game-div:has(#training-demo-spectator:not([hidden])) #counter { top: 112px; } 
+}
 </style>
+
 <script>
 window.trainingDemoMode = 'spectate';
+
 document.addEventListener('DOMContentLoaded', function () {
     var settings = document.getElementById('training-demo-settings');
-    if (!settings) return;
-    settings.addEventListener('change', function (event) {
-        if (event.target.name === 'training-demo-mode') window.trainingDemoMode = event.target.value;
-    });
-    document.getElementById('play-game-button').addEventListener('click', function () {
-        if (window.trainingDemoMode === 'spectate') document.getElementById('training-demo-spectator').hidden = false;
-    });
-    document.getElementById('training-demo-exit').addEventListener('click', function () { window.location.reload(); });
+    var badge = document.getElementById('training-live-badge');
+    var btnTrainToggle = document.getElementById('btn-train-toggle');
+    var selectPolicy = document.getElementById('select-active-policy');
+    
+    var statState = document.getElementById('stat-train-state');
+    var statServerPolicy = document.getElementById('stat-server-policy');
+    var statVersions = document.getElementById('stat-versions');
+    var statWinrate = document.getElementById('stat-winrate');
+    var statMatches = document.getElementById('stat-matches');
+    var statSpeed = document.getElementById('stat-speed');
+
+    var currentTrainState = 'unknown';
+
+    function fetchTrainingStatus() {
+        fetch('/api/training/status')
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (!data.ok) return;
+                var train = data.training || {};
+                var reg = data.registry || {};
+                currentTrainState = train.state || 'stopped';
+
+                if (badge) {
+                    if (currentTrainState === 'running') {
+                        badge.className = 'badge badge-success px-2 py-1';
+                        badge.textContent = '● กำลังเทรน (Running)';
+                        btnTrainToggle.className = 'btn btn-sm btn-outline-danger font-weight-bold';
+                        btnTrainToggle.textContent = '⏹ หยุดเทรน (Stop)';
+                    } else if (currentTrainState === 'stopping') {
+                        badge.className = 'badge badge-warning px-2 py-1';
+                        badge.textContent = '⏳ กำลังหยุด...';
+                        btnTrainToggle.className = 'btn btn-sm btn-outline-secondary font-weight-bold disabled';
+                        btnTrainToggle.textContent = '⏳ กำลังหยุด...';
+                    } else {
+                        badge.className = 'badge badge-secondary px-2 py-1';
+                        badge.textContent = '○ หยุดอยู่ (Stopped)';
+                        btnTrainToggle.className = 'btn btn-sm btn-outline-success font-weight-bold';
+                        btnTrainToggle.textContent = '▶ เริ่มเทรน AI (Start)';
+                    }
+                }
+
+                if (statState) statState.textContent = train.state ? (train.state.toUpperCase() + (train.phase ? ' (' + train.phase + ')' : '')) : 'STOPPED';
+                if (statServerPolicy) statServerPolicy.textContent = data.serverPolicy || 'baseline';
+                if (statVersions) statVersions.textContent = (train.championVersion || reg.championVersion || 'base') + ' / ' + (train.candidateVersion || '-');
+                
+                if (statWinrate) {
+                    if (train.candidateValidationWinRate != null) {
+                        var wr = (train.candidateValidationWinRate * 100).toFixed(1) + '%';
+                        statWinrate.textContent = wr + ' (' + train.candidateValidationGames + 'G)';
+                    } else if (train.phase === 'train') {
+                        statWinrate.textContent = (train.pendingDecisions || 0) + ' Decs';
+                    } else {
+                        statWinrate.textContent = '-';
+                    }
+                }
+
+                if (statMatches) statMatches.textContent = (train.completed || 0) + ' (Fail: ' + (train.failed || 0) + ')';
+                if (statSpeed) {
+                    var sp = train.simulatedSecondsPerWallSecond ? (train.simulatedSecondsPerWallSecond.toFixed(1) + 'x') : '1.0x';
+                    statSpeed.textContent = sp + ' (' + (train.speedMode || 'norm') + ')';
+                }
+            })
+            .catch(function(err) {
+                if (badge) {
+                    badge.className = 'badge badge-danger px-2 py-1';
+                    badge.textContent = 'ออฟไลน์';
+                }
+            });
+    }
+
+    function fetchPolicies() {
+        fetch('/api/training/policies')
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (!data.ok || !data.policies) return;
+                var currentVal = selectPolicy.value;
+                selectPolicy.innerHTML = '';
+                data.policies.forEach(function(p) {
+                    var opt = document.createElement('option');
+                    opt.value = p;
+                    opt.textContent = p + (p === data.registry.championVersion ? ' 🏆 (Champ)' : '') + (p === data.registry.activeVersion ? ' ⭐' : '');
+                    if (p === data.registry.activeVersion || p === currentVal) opt.selected = true;
+                    selectPolicy.appendChild(opt);
+                });
+            })
+            .catch(function() {});
+    }
+
+    if (btnTrainToggle) {
+        btnTrainToggle.addEventListener('click', function () {
+            if (currentTrainState === 'running') {
+                btnTrainToggle.textContent = 'กำลังส่งคำสั่งหยุด...';
+                fetch('/api/training/stop', { method: 'POST' })
+                    .then(function() { setTimeout(fetchTrainingStatus, 800); });
+            } else {
+                btnTrainToggle.textContent = 'กำลังเริ่มเทรน...';
+                fetch('/api/training/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ workers: 2, neural: true, speed: 'max' })
+                }).then(function() { setTimeout(fetchTrainingStatus, 1200); });
+            }
+        });
+    }
+
+    if (selectPolicy) {
+        selectPolicy.addEventListener('change', function () {
+            var selected = selectPolicy.value;
+            fetch('/api/training/activate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ version: selected })
+            }).then(function(res) { return res.json(); })
+              .then(function(d) {
+                  if (d.ok) {
+                      statServerPolicy.textContent = selected;
+                      fetchPolicies();
+                  }
+              });
+        });
+    }
+
+    fetchTrainingStatus();
+    fetchPolicies();
+    setInterval(fetchTrainingStatus, 3000);
+
+    if (settings) {
+        settings.addEventListener('change', function (event) {
+            if (event.target.name === 'training-demo-mode') window.trainingDemoMode = event.target.value;
+        });
+    }
+
+    var playBtn = document.getElementById('play-game-button');
+    if (playBtn) {
+        playBtn.addEventListener('click', function () {
+            if (window.trainingDemoMode === 'spectate') {
+                var spectatorBar = document.getElementById('training-demo-spectator');
+                if (spectatorBar) spectatorBar.hidden = false;
+            }
+        });
+    }
+
+    var exitBtn = document.getElementById('training-demo-exit');
+    if (exitBtn) {
+        exitBtn.addEventListener('click', function () { window.location.reload(); });
+    }
+
     var followedIndex = 0;
     var followedUnit = null;
     var cameraTickerAttached = false;
-    document.getElementById('training-demo-next').addEventListener('click', function () { followedIndex++; });
+    var nextBtn = document.getElementById('training-demo-next');
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function () { followedIndex++; });
+    }
+
     window.setInterval(function () {
         if (window.trainingDemoMode !== 'spectate' || !window.joinedGame || !window.ige || !ige.game || !ige.client || !ige.pixi) return;
         if (!cameraTickerAttached && ige.pixi.ticker && ige.pixi.viewport) {
@@ -84,12 +289,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         if (!bots.length) {
             followedUnit = null;
-            document.getElementById('training-demo-following').textContent = 'กำลังรอบอทลงสนาม…';
+            var followSpan = document.getElementById('training-demo-following');
+            if (followSpan) followSpan.textContent = 'กำลังรอบอทลงสนาม…';
             return;
         }
         followedUnit = bots[followedIndex % bots.length];
-        document.getElementById('training-demo-following').textContent = 'กำลังดู: ' + (followedUnit._stats.name || 'บอท');
+        var followSpan = document.getElementById('training-demo-following');
+        if (followSpan) followSpan.textContent = 'กำลังดู: ' + (followedUnit._stats.name || 'บอท');
     }, 100);
 });
 </script>
-<% } %>
