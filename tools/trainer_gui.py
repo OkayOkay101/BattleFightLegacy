@@ -225,12 +225,15 @@ class BattleFightTrainerApp(tk.Tk):
                     filetypes=[("JSON Bundle", "*.json")],
                     title="บันทึกไฟล์ Sync Bundle สำหรับอัปโหลดไป Kaggle"
                 )
-                if file_path:
-                    with open(file_path, "w", encoding="utf-8") as f:
-                        f.write(bundle_data)
-                    self.after(0, lambda: self.log(f"✅ ส่งออกไฟล์สำเร็จ: {file_path} (พร้อมอัปโหลดไป Kaggle!)"))
+                if not file_path:
+                    self.after(0, lambda: self.log("ยกเลิกการส่งออกไฟล์"))
+                    return
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(bundle_data)
+                self.after(0, lambda: self.log(f"✅ ส่งออกไฟล์สำเร็จ: {file_path} (พร้อมอัปโหลดไป Kaggle!)"))
             except Exception as e:
-                self.after(0, lambda: self.log(f"❌ ส่งออกไม่สำเร็จ: {e}"))
+                err_text = str(e) if str(e) else type(e).__name__
+                self.after(0, lambda: self.log(f"❌ ส่งออกไม่สำเร็จ: {err_text}"))
         
         threading.Thread(target=worker, daemon=True).start()
 

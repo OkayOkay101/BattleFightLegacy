@@ -443,9 +443,16 @@ var Server = IgeClass.extend({
 					}
 				}
 
-				let matchesSnippet = '';
+				// Read recent matches (last 200 lines to avoid string length overflow)
+				let matchesLines = [];
 				if (fs.existsSync(matchesFile)) {
-					matchesSnippet = fs.readFileSync(matchesFile, 'utf8');
+					const stat = fs.statSync(matchesFile);
+					const readBytes = Math.min(stat.size, 5 * 1024 * 1024); // read last 5MB
+					const buffer = Buffer.alloc(readBytes);
+					const fd = fs.openSync(matchesFile, 'r');
+					fs.readSync(fd, buffer, 0, readBytes, stat.size - readBytes);
+					fs.closeSync(fd);
+					matchesLines = buffer.toString('utf8').split('\n').filter(Boolean).slice(-100);
 				}
 
 				let registryData = null;
@@ -459,8 +466,8 @@ var Server = IgeClass.extend({
 					timestamp: Date.now(),
 					registry: registryData,
 					policies,
-					matchesCount: matchesSnippet.split('\n').filter(Boolean).length,
-					matches: matchesSnippet
+					matchesCount: matchesLines.length,
+					matches: matchesLines.join('\n')
 				});
 			} catch (error) {
 				res.status(500).json({ ok: false, error: error.message });
