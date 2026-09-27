@@ -939,9 +939,12 @@ var IgeEngine = IgeEntity.extend({
 	 * @return {String}
 	 */
 	newIdHex: function () {
-		this._idCounter++;
-		// return 'e' + this._idCounter;
-		return (this._idCounter + (Math.random() * Math.pow(10, 17) + Math.random() * Math.pow(10, 17) + Math.random() * Math.pow(10, 17) + Math.random() * Math.pow(10, 17))).toString(16).slice(0, 8);
+		var id;
+		do {
+			this._idCounter++;
+			id = (this._idCounter + (Math.random() * Math.pow(10, 17) + Math.random() * Math.pow(10, 17) + Math.random() * Math.pow(10, 17) + Math.random() * Math.pow(10, 17))).toString(16).slice(0, 8);
+		} while (this._register[id]);
+		return id;
 	},
 
 	/**
