@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { EventEmitter } = require('node:events');
 const { TrainingSupervisor, workerCount } = require('../server/training/TrainingSupervisor');
 const { TrainingStore } = require('../server/training/TrainingStore');
 
@@ -11,6 +12,18 @@ test('worker count accepts 1..8 and leaves one logical core by default', () => {
 	assert.equal(workerCount(undefined, 2), 1);
 	assert.equal(workerCount(8, 2), 8);
 	assert.throws(() => workerCount(9, 8), /1\.\.8/);
+});
+
+test('match workers get a bounded heap so a runaway game script cannot exhaust the supervisor host', () => {
+	let forkOptions;
+	const child = new EventEmitter();
+	child.pid = 12345;
+	child.stderr = new EventEmitter();
+	child.send = () => {};
+	const supervisor = new TrainingSupervisor({ workers: 1,
+		workerFactory: (_script, _args, options) => { forkOptions = options; return child; } });
+	supervisor._launch({ matchId: 'heap-guard', attempts: 0 });
+	assert.ok(forkOptions.execArgv.includes('--max-old-space-size=1024'));
 });
 
 test('two isolated workers finish two short matches and persist them once', async () => {

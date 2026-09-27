@@ -251,7 +251,8 @@ class TrainingSupervisor {
 
 	_launch(job) {
 		const child = this.workerFactory(path.join(__dirname, 'MatchWorker.js'), [], {
-			stdio: ['ignore', 'ignore', 'pipe', 'ipc'], windowsHide: true
+			stdio: ['ignore', 'ignore', 'pipe', 'ipc'], windowsHide: true,
+			execArgv: ['--max-old-space-size=1024']
 		});
 		this.active.set(child.pid, { child, job });
 		let settled = false;

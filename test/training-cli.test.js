@@ -4,7 +4,23 @@ const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-const { start, stop, status, exportResults, resolveSpeed, writeJsonAtomic } = require('../server/training/TrainingCli');
+const { start, stop, status, exportResults, resolveSpeed, writeJsonAtomic, daemon } = require('../server/training/TrainingCli');
+
+test('daemon records a failed state and worker error when its supervisor rejects', async () => {
+	assert.equal(typeof daemon, 'function');
+	const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'battlefight-daemon-error-'));
+	try {
+		const runId = 'failed-worker-run';
+		const supervisor = { stopRequested: false, status: () => ({ runId, failed: 1 }),
+			start: async ({ onReady }) => { await onReady(); throw new Error('worker heap out of memory'); } };
+		await assert.rejects(daemon({ dataDir, 'run-id': runId, workers: '1' },
+			{ supervisorFactory: () => supervisor }), /worker heap out of memory/);
+		const report = JSON.parse(fs.readFileSync(path.join(dataDir, 'status.json'), 'utf8'));
+		assert.equal(report.state, 'failed');
+		assert.match(report.error, /worker heap out of memory/);
+		assert.equal(fs.existsSync(path.join(dataDir, 'supervisor.lock.json')), false);
+	} finally { fs.rmSync(dataDir, { recursive: true, force: true }); }
+});
 
 test('status replacement retries a temporary Windows rename lock', async () => {
 	const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'battlefight-status-retry-'));

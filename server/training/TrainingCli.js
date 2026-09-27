@@ -54,19 +54,20 @@ function resolveSpeed(requestedSpeed, parity) {
 		parityDetails: parity.cases };
 }
 
-async function daemon(options) {
+async function daemon(options, { supervisorFactory = config => new TrainingSupervisor(config) } = {}) {
 	const lockFile = path.join(options.dataDir, 'supervisor.lock.json');
 	const statusFile = path.join(options.dataDir, 'status.json');
 	const stopFile = path.join(options.dataDir, 'stop-request.json');
 	const controlFile = path.join(options.dataDir, 'control.json');
 	const runId = options['run-id'];
-	const supervisor = new TrainingSupervisor({ dataDir: options.dataDir, runId,
+	const supervisor = supervisorFactory({ dataDir: options.dataDir, runId,
 		mode: options.neural === 'on' ? 'neural' : 'heuristic',
 		workers: Number(options.workers),
 		maxMatches: options.matches ? Number(options.matches) : Infinity,
 		maxDurationMs: options['duration-ms'] ? Number(options['duration-ms']) : 300000,
 		speedMode: options['speed-mode'] || 'realtime', parityStatus: options['parity-status'] || 'not-required' });
-	const publish = async state => writeJsonAtomic(statusFile, { ...supervisor.status(), pid: process.pid, state,
+	const publish = async (state, error) => writeJsonAtomic(statusFile, { ...supervisor.status(), pid: process.pid, state,
+		...(error ? { error: String(error.stack || error).slice(-4000) } : {}),
 		requestedSpeedMode: options['requested-speed'] || supervisor.speedMode,
 		parityDetails: options['parity-details'] ?
 			(options['parity-details'].startsWith('{') || options['parity-details'].startsWith('[') ?
@@ -76,9 +77,11 @@ async function daemon(options) {
 	await writeJsonAtomic(lockFile, { pid: process.pid, runId, startedAt: Date.now() });
 	await publish('starting');
 	let ready = false;
+	let terminal = false;
 	let stopStartedAt = null;
 	const interval = setInterval(async () => {
 		try {
+			if (terminal) return;
 			const request = await readJson(stopFile);
 			if (request?.runId === runId) {
 				if (stopStartedAt === null) { stopStartedAt = Date.now(); supervisor.stop(); }
@@ -88,7 +91,7 @@ async function daemon(options) {
 			if (ctrl && ctrl.runId === runId && Number.isInteger(ctrl.workers)) {
 				try { supervisor.setWorkers(ctrl.workers); } catch (e) {}
 			}
-			await publish(!ready ? 'starting' : (supervisor.stopRequested ? 'stopping' : 'running'));
+			if (!terminal) await publish(!ready ? 'starting' : (supervisor.stopRequested ? 'stopping' : 'running'));
 		} catch (error) { console.error(error); }
 	}, 500);
 	try {
@@ -98,7 +101,14 @@ async function daemon(options) {
 		} });
 		await publish('stopped');
 	}
+	catch (error) {
+		terminal = true;
+		clearInterval(interval);
+		await publish('failed', error);
+		throw error;
+	}
 	finally {
+		terminal = true;
 		clearInterval(interval);
 		const lock = await readJson(lockFile);
 		if (lock?.runId === runId) await fs.rm(lockFile, { force: true });
@@ -216,4 +226,4 @@ async function main(argv = process.argv.slice(2)) {
 
 if (require.main === module) main().catch(error => { console.error(error.stack || error); process.exitCode = 1; });
 
-module.exports = { parseArgs, start, stop, status, exportResults, processAlive, resolveSpeed, writeJsonAtomic };
+module.exports = { parseArgs, start, stop, status, exportResults, processAlive, resolveSpeed, writeJsonAtomic, daemon };
