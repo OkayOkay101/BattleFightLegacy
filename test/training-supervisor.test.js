@@ -7,11 +7,10 @@ const { EventEmitter } = require('node:events');
 const { TrainingSupervisor, workerCount } = require('../server/training/TrainingSupervisor');
 const { TrainingStore } = require('../server/training/TrainingStore');
 
-test('worker count accepts 1..8 and leaves one logical core by default', () => {
-	assert.equal(workerCount(undefined, 8), 4);
-	assert.equal(workerCount(undefined, 2), 1);
-	assert.equal(workerCount(8, 2), 8);
-	assert.throws(() => workerCount(9, 8), /1\.\.8/);
+test('worker count accepts 1..8 and defaults to four workers', () => {
+	assert.equal(workerCount(undefined), 4);
+	assert.equal(workerCount(8), 8);
+	assert.throws(() => workerCount(9), /1\.\.8/);
 });
 
 test('match workers get a bounded heap so a runaway game script cannot exhaust the supervisor host', () => {

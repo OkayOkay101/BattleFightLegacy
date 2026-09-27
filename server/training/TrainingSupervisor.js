@@ -1,4 +1,3 @@
-const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { fork } = require('node:child_process');
@@ -9,8 +8,8 @@ const { mutatePolicy, pairedLowerBound, candidateScore } = require('./HeuristicP
 const { NeuralTrainer } = require('./NeuralTrainer');
 const { canPromoteNeural } = require('./NeuralPromotion');
 
-function workerCount(requested, available = os.availableParallelism()) {
-	const count = requested === undefined ? Math.min(4, Math.max(1, available - 1)) : Number(requested);
+function workerCount(requested) {
+	const count = requested === undefined ? 4 : Number(requested);
 	if (!Number.isInteger(count) || count < 1 || count > 8) throw new RangeError('workers must be 1..8');
 	return count;
 }
