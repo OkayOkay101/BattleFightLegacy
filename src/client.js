@@ -446,6 +446,7 @@ const Client = IgeEventingClass.extend({
 				.addComponent(UnitUiComponent)
 				.addComponent(ItemUiComponent)
 				.addComponent(ScoreboardComponent)
+				.addComponent(KillFeedUiComponent)
 				// old comment => 'game data is needed to populate shop
 				.addComponent(ShopComponent);
 
@@ -966,6 +967,10 @@ const Client = IgeEventingClass.extend({
 		ige.network.define('item', this._onItem);
 
 		ige.network.define('clientDisconnect', this._onClientDisconnect);
+		ige.network.define('battleKillFeed', function (event) {
+			var killFeed = ige.client && ige.client.killFeed;
+			if (killFeed) killFeed.add(event);
+		});
 
 		ige.network.define('ui', this._onUi);
 		ige.network.define('playAd', this._onPlayAd);

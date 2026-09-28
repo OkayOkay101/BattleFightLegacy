@@ -30,6 +30,18 @@ test('broadcasts one normalized elimination with hostile killer credit', () => {
   assert.equal(sent[0].payload.eventId, 'life-red-1');
 });
 
+test('initializes the feed service only for the server runtime', () => {
+  const serverGame = Object.create(GameComponent);
+  global.ige = { isServer: true };
+  GameComponent.init.call(serverGame);
+  assert.ok(serverGame.killFeed instanceof KillFeed);
+
+  const clientGame = Object.create(GameComponent);
+  global.ige = { isServer: false };
+  GameComponent.init.call(clientGame);
+  assert.equal(clientGame.killFeed, null);
+});
+
 test('broadcasts an unattributed elimination for friendly or missing attacker', () => {
   const { game, sent, units } = makeGame();
   units.attacker.getOwner = () => participant('red-friend', 'Friend', 'red');

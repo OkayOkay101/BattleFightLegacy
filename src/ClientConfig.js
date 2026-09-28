@@ -32,6 +32,7 @@ var igeClientConfig = {
 		'/gameClasses/components/ui/PlayerUiComponent.js',
 		'/gameClasses/components/ui/GameTextComponent.js',
 		'/gameClasses/components/ui/ScoreboardComponent.js',
+		'/gameClasses/components/ui/KillFeedUiComponent.js',
 		'/gameClasses/components/ui/ItemUiComponent.js',
 		'/gameClasses/components/ui/AdComponent.js',
 		'/gameClasses/components/ui/DevConsoleComponent.js',

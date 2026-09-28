@@ -40,4 +40,16 @@
     </small>
 </div>
 
+<section id="kill-feed" aria-label="Recent eliminations" data-i18n-aria-label="feed.label" class="kill-feed-panel">
+    <h2 data-i18n="feed.label">Recent eliminations</h2>
+    <div id="kill-feed-entries" role="log" aria-live="polite" aria-relevant="additions"></div>
+</section>
+
+<style>
+    .kill-feed-panel { position: absolute; top: 14px; left: 12px; z-index: 40; width: min(360px, 42vw); pointer-events: none; color: #fff; text-shadow: 0 1px 3px #000; }
+    .kill-feed-panel h2 { margin: 0 0 5px; font-size: .78rem; font-weight: 700; opacity: .8; }
+    .kill-feed-entry { margin: 3px 0; padding: 5px 8px; border-radius: 5px; background: rgba(8, 14, 25, .72); font-size: .82rem; overflow-wrap: anywhere; }
+    @media (max-width: 600px) { .kill-feed-panel { top: 116px; left: 6px; width: min(280px, 58vw); } .kill-feed-entry { font-size: .72rem; } }
+</style>
+
 <span class="pointer-events-none ui-text-center-lg"></span>
