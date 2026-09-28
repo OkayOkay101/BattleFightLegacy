@@ -115,12 +115,12 @@
             <div class="video-controls" id="video-controls-my">
                 <button class="btn btn-sm mute-btn btn-primary" data-action="mute"
                     data-nextclass="fa fa-microphone-slash" data-istrueclass="fa fa-microphone-slash"
-                    data-isfalseclass="fa fa-microphone">
+                    data-isfalseclass="fa fa-microphone" data-i18n-aria-label="videochat.mute" aria-label="Mute microphone">
                     <i class="fa fa-microphone"></i>
                 </button>
                 <button class="btn btn-sm hide-btn btn-primary" data-action="hide" data-hidden="0"
                     data-nextclass="fa fa-video-slash" data-istrueclass="fa fa-video-slash"
-                    data-isfalseclass="fa fa-video">
+                    data-isfalseclass="fa fa-video" data-i18n-aria-label="videochat.start" aria-label="Start video">
                     <i class="fa fa-video"></i>
                 </button>
                 <div class="mt-3 name-label">
@@ -148,39 +148,35 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Video and voice settings</h5>
+                    <h5 class="modal-title" data-i18n="videochat.settings">Video and voice settings</h5>
                 </div>
                 <div class="modal-step modal-step-1 d-none">
                     <div class="modal-body">
-                        <div class="brand-alert alert alert-secondary">This game supports videochat.<br />You should
+                        <div class="brand-alert alert alert-secondary"><span data-i18n="videochat.permissionHelp">This game supports videochat.<br />You should
                             accept
                             your
-                            broswer permissions in order to enable in-game communication functionalities</div>
+                            browser permissions to enable in-game communication.</span></div>
                         <div class="row mt-4 step1">
                             <img src="/assets/images/permission.jpg" alt="" width="100%">
                         </div>
                     </div>
                     <div class="modal-footer mt-2">
                         <button type="button" class="btn btn-secondary videochat-choice mr-auto"
-                            data-choice="disable">Play
-                            without
-                            VideoChat</button>
-                        <button type="button" class="btn btn-primary modal-step-link" data-step="2">Next</button>
+                            data-choice="disable" data-i18n="videochat.playWithout">Play without VideoChat</button>
+                        <button type="button" class="btn btn-primary modal-step-link" data-step="2" data-i18n="common.next">Next</button>
                     </div>
                 </div>
                 <div class="modal-step modal-step-2">
                     <div class="modal-body">
-                        <div class="brand-alert alert alert-secondary">This game supports videochat.<br />You should
+                        <div class="brand-alert alert alert-secondary"><span data-i18n="videochat.permissionHelp">This game supports videochat.<br />You should
                             accept
                             your
-                            broswer permissions in order to enable in-game communication functionalities</div>
+                            browser permissions to enable in-game communication.</span></div>
                         <div class="row mt-4 ">
                             <div class="col-4"><video id="my-video-preview" playsinline autoplay></video>
                                 <div>
                                     <button type="button" class="btn btn-warning modal-step-link mr-auto mt-4"
-                                        data-step="3">I can't
-                                        see my
-                                        video</button>
+                                        data-step="3" data-i18n="videochat.cannotSeeVideo">I can't see my video</button>
                                 </div>
                             </div>
                             <div class="col">
@@ -215,15 +211,13 @@
                     </div>
                     <div class="modal-footer mt-2">
                         <button type="button" class="btn btn-secondary videochat-choice mr-auto d-none"
-                            data-choice="disable">Play
-                            without
-                            VideoChat</button>
+                            data-choice="disable" data-i18n="videochat.playWithout">Play without VideoChat</button>
                         <button class="btn btn-secondary mr-auto loading-button" type="button" disabled>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                             Loading...
                         </button>
                         <button type="button" class="btn btn-primary videochat-choice d-none"
-                            data-choice="enable">Continue</button>
+                            data-choice="enable" data-i18n="common.continue">Continue</button>
                         <button class="btn btn-primary loading-button" type="button" disabled>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                             Loading...
@@ -232,10 +226,7 @@
                 </div>
                 <div class="modal-step modal-step-3 d-none">
                     <div class="modal-body">
-                        <div class="brand-alert alert alert-secondary">You may have blocked permissions to your devices
-                            in the past.<br />
-                            To restore your device permission you can press the camera icon in your address bar and
-                            enable the access.
+                        <div class="brand-alert alert alert-secondary" data-i18n="videochat.restoreHelp">You may have blocked permissions to your devices in the past. To restore access, press the camera icon in your address bar and enable permission.
                         </div>
                         <div class="mt-4 step1 text-center">
                             <img src="/assets/images/videochathelp_combined.jpg" alt="" width="100%">
@@ -243,10 +234,8 @@
                     </div>
                     <div class="modal-footer mt-2">
                         <button type="button" class="btn btn-secondary videochat-choice mr-auto"
-                            data-choice="disable">Play
-                            without
-                            VideoChat</button>
-                        <button type="button" class="btn btn-primary modal-step-link" data-step="2">Next</button>
+                            data-choice="disable" data-i18n="videochat.playWithout">Play without VideoChat</button>
+                        <button type="button" class="btn btn-primary modal-step-link" data-step="2" data-i18n="common.next">Next</button>
                     </div>
                 </div>
             </div>

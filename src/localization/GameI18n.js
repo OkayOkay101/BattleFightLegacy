@@ -7,9 +7,10 @@
 })(typeof window !== 'undefined' ? window : globalThis, function createGameI18n(options) {
   options = options || {};
   const messages = options.messages || {};
-  const storage = options.storage === undefined
-    ? (typeof localStorage !== 'undefined' ? localStorage : null)
-    : options.storage;
+  let storage = options.storage;
+  if (options.storage === undefined) {
+    try { storage = typeof localStorage !== 'undefined' ? localStorage : null; } catch (_) { storage = null; }
+  }
   const documentRef = options.document || (typeof document !== 'undefined' ? document : null);
   let current = 'en';
   try {
@@ -31,16 +32,21 @@
   function apply(rootNode) {
     const target = rootNode || documentRef;
     if (!target || typeof target.querySelectorAll !== 'function') return;
-    target.querySelectorAll('[data-i18n]').forEach(node => {
+    function all(selector) {
+      const nodes = Array.from(target.querySelectorAll(selector));
+      if (typeof target.matches === 'function' && target.matches(selector)) nodes.unshift(target);
+      return nodes;
+    }
+    all('[data-i18n]').forEach(node => {
       node.textContent = t(node.getAttribute('data-i18n'));
     });
-    target.querySelectorAll('[data-i18n-placeholder]').forEach(node => {
+    all('[data-i18n-placeholder]').forEach(node => {
       node.setAttribute('placeholder', t(node.getAttribute('data-i18n-placeholder')));
     });
-    target.querySelectorAll('[data-i18n-aria-label]').forEach(node => {
+    all('[data-i18n-aria-label]').forEach(node => {
       node.setAttribute('aria-label', t(node.getAttribute('data-i18n-aria-label')));
     });
-    target.querySelectorAll('[data-language-selector]').forEach(node => {
+    all('[data-language-selector]').forEach(node => {
       node.value = current;
     });
   }

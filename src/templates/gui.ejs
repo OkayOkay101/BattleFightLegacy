@@ -4,11 +4,18 @@
     <div class="shop ui-text-scoreboard"></div>
 
     <span id="scoreboard-header">
-        <u id="leaderboard-title" class="cursor-pointer" onclick="ige.scoreboard && ige.scoreboard.toggleScores()">Leaderboard</u>
+        <u id="leaderboard-title" class="cursor-pointer" onclick="ige.scoreboard && ige.scoreboard.toggleScores()" data-i18n="scoreboard.title">Leaderboard</u>
         <div id="leaderboard-toggle" style="display: inline" class="pull-right"></div>
     </span>
     <div id="scoreboard" class="pull-right" style="padding: 10px 19px 0px 0px"></div>
 </div>
+
+<style>
+    .game-language-control { position: absolute; top: 8px; right: 10px; z-index: 10020; }
+    label.game-language-control { right: 92px; top: 13px; color: #fff; font-size: 12px; text-shadow: 0 1px 3px #000; }
+    select.game-language-control { padding: 3px 6px; border-radius: 5px; }
+    .menu-language-control { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 8px; }
+</style>
 
 <!-- player attribute -->
 <div id="my-score-div" class="game-ui position-absolute dark-bg score-div d-block user-select-none" style="bottom: 0; min-width: 250px; right: 0">

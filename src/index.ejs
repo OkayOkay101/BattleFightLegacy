@@ -19,6 +19,33 @@
     <link rel="stylesheet" href="/assets/css/custom.css">
     <link rel="stylesheet" href="/assets/css/common.css">
 
+    <!-- Localization is available before the engine client and UI components load. -->
+    <script src="/src/localization/messages.js"></script>
+    <script src="/src/localization/GameI18n.js"></script>
+    <script>
+        window.gameI18n = window.GameI18n.createGameI18n({ messages: window.GameI18nMessages });
+        document.documentElement.lang = window.gameI18n.language();
+        document.addEventListener('change', function (event) {
+            if (event.target && event.target.matches('[data-language-selector]')) {
+                window.gameI18n.setLanguage(event.target.value);
+                document.documentElement.lang = window.gameI18n.language();
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            window.gameI18n.apply(document);
+            if (typeof MutationObserver !== 'undefined' && document.body) {
+                var localizationObserver = new MutationObserver(function (records) {
+                    records.forEach(function (record) {
+                        record.addedNodes.forEach(function (node) {
+                            if (node.nodeType === 1) window.gameI18n.apply(node);
+                        });
+                    });
+                });
+                localizationObserver.observe(document.body, { childList: true, subtree: true });
+            }
+        });
+    </script>
+
     <!-- jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
@@ -79,6 +106,11 @@
 
 <body>
     <div id="game-div" style="overflow: hidden">
+        <label class="game-language-control" data-i18n="settings.language" for="game-language-selector">Language</label>
+        <select id="game-language-selector" data-language-selector data-i18n-aria-label="settings.language" aria-label="Language" class="game-language-control">
+            <option value="en">English</option>
+            <option value="th">ไทย</option>
+        </select>
         <%- include('templates/dev-console'); -%>
         <%- include('templates/menu'); -%>
         <%- include('templates/shop'); -%>

@@ -3,7 +3,7 @@
     <div class="form-group" id="chat-message-input" style="display: none">
         <div class="input-group d-flex justify-content-center">
             <form class="mb-0" onsubmit="ige.chat.sendChatMessage(); return false">
-                <input type="text" class="form-control btn-sm" id="message" placeholder="Press Enter to send the message" />
+                <input type="text" class="form-control btn-sm" id="message" placeholder="Type a message..." data-i18n-placeholder="chat.placeholder" />
             </form>
             <div class="input-group-append" onclick="ige.chat.sendChatMessage()">
                 <button class="btn btn-secondary" type="button">
@@ -19,7 +19,7 @@
     <div id="chat-tab-container" class="hide-on-mobile d-flex flex-column">
         <ul id="tabs" class="nav nav-pills no-selection">
             <li class="nav-item">
-                <a id="hide-chat" class="cursor-pointer hide-on-mobile pr-0 nav-link" style="position: absolute; right: 0;"> Hide </a>
+                <a id="hide-chat" class="cursor-pointer hide-on-mobile pr-0 nav-link" style="position: absolute; right: 0;" data-i18n="chat.hide"> Hide </a>
             </li>
         </ul>
         <div class="tab-content flex-grow-1 d-flex" style="background-color: rgba(0, 0, 0, 0.5); border-radius: 0px 5px 5px 5px">
@@ -35,5 +35,5 @@
 <!-- show/hide chat button -->
 <div id="show-chat" class="btn btn-success d-none position-absolute" style="bottom: 10">
     <i class="fa fa-comment mr-1"></i>
-    Show Chat
+    <span data-i18n="chat.show">Show Chat</span>
 </div>

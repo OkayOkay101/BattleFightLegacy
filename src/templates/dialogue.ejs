@@ -5,7 +5,7 @@
 
         <div class="modal-header text-center">
           <h4 class="modal-title"></h4>
-          <button id='custom-modal-dismiss-button' type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button id='custom-modal-dismiss-button' type="button" class="close" data-dismiss="modal" aria-label="Close" data-i18n-aria-label="common.close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -18,7 +18,7 @@
           <div class="row">
             <div class="col-sm-12">
               <div id="custom-modal-cancel-container">
-                <button type="button" data-dismiss="modal" id="custom-modal-cancel" class="btn pull-right">Close</button>
+                <button type="button" data-dismiss="modal" id="custom-modal-cancel" class="btn pull-right" data-i18n="common.close">Close</button>
               </div>
             </div>
           </div>
@@ -35,7 +35,7 @@
           <div class="row row-eq-height">
             <div class="col-4 d-none" id="modd-dialogue-image-container">
               <img
-                id="modd-dialogue-image" 
+                id="modd-dialogue-image"
                 class="loading w-100 rounded"
                 src=""
                 alt="image"
@@ -49,7 +49,7 @@
                   <p id="modd-dialogue-message"></p>
 
                   <p class="position-absolute mb-0 text-muted d-none" id="modd-dialogue-skip-hint" style="bottom: 0; right: 15px;">
-                    press enter/click to continue.
+                    <span data-i18n="dialogue.continueHint">press enter/click to continue.</span>
                   </p>
                 </div>
 
@@ -72,17 +72,17 @@
 
         <div class="modal-body">
           <div class="form-group">
-            <label id="player-input-field-label">Email address</label>
+            <label id="player-input-field-label" data-i18n="dialogue.inputLabel">Email address</label>
             <input id="player-input-field" class="form-control">
           </div>
 
           <div class="row">
             <div class="col-sm-12 d-flex justify-content-end">
               <div id="player-input-cancel-container">
-                <button type="button" id="player-input-cancel" class="btn pull-right">Cancel</button>
+                <button type="button" id="player-input-cancel" class="btn pull-right" data-i18n="common.cancel">Cancel</button>
               </div>
               <div id="player-input-submit-container">
-                <button type="button" id="player-input-submit" class="btn pull-right btn-primary ml-2">Submit</button>
+                <button type="button" id="player-input-submit" class="btn pull-right btn-primary ml-2" data-i18n="common.submit">Submit</button>
               </div>
             </div>
           </div>
@@ -91,4 +91,4 @@
     </div>
   </div>
 
-  
+

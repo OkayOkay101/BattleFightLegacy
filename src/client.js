@@ -17,6 +17,8 @@ const Client = IgeEventingClass.extend({
 	classId: 'Client',
 
 	init: function() {
+		this.i18n = window.gameI18n || null;
+		if (this.i18n) this.i18n.apply(document);
 		//
 		this.data = [];
 		this.previousScore = 0;

@@ -27,6 +27,34 @@
       'menu.leave': 'Leave game',
       'menu.teamBlue': 'Blue team',
       'menu.teamRed': 'Red team',
+      'menu.trainingTitle': 'AI Lab & Controls',
+      'menu.trainingDescription': 'Choose a mode, follow training stats, and control AI training here.',
+      'menu.enterGame': 'Enter Game',
+      'training.status': 'Training status',
+      'training.models': 'Blue / Red models',
+      'training.versions': 'Champion / Candidate',
+      'training.winRate': 'Candidate win rate',
+      'training.completedMatches': 'Completed matches',
+      'training.simulationSpeed': 'Simulation speed',
+      'training.blueAi': '🔵 Blue AI',
+      'training.redAi': '🔴 Red AI',
+      'training.applyModels': 'Apply models',
+      'training.mode': 'Training mode',
+      'training.spectate': '👁️ Watch bots fight (Spectate)',
+      'training.spectateHelp': 'Watch a 3v3 fight and switch the camera between bots.',
+      'training.play': '⚔️ Join the fight (Play Game)',
+      'training.playHelp': 'Choose a character and join the Blue team against Red.',
+      'training.stats': '📊 Stats',
+      'training.changeMode': 'Change mode',
+      'training.matchStats': 'AI match stats',
+      'training.statsExplanation': 'Win rate uses completed 5-minute rounds · KDA = (Kills + Assists) / max(1, Deaths)',
+      'training.currentCharacter': 'Current character',
+      'training.damageDealtTaken': 'Damage dealt / taken',
+      'spectator.camera': 'Camera',
+      'spectator.cameraMode': 'Camera mode',
+      'spectator.followPlayer': 'Follow player',
+      'spectator.overview': 'Map overview',
+      'spectator.followingLabel': 'Following',
       'combat.health': 'Health',
       'combat.mana': 'Mana',
       'combat.score': 'Score',
@@ -82,7 +110,28 @@
       'devConsole.command': 'Enter command...',
       'unit.level': 'Level {level}',
       'unit.respawn': 'Respawning...',
-      'unit.dead': 'Eliminated'
+      'unit.dead': 'Eliminated',
+      'inventory.shortcuts': 'Inventory shortcuts',
+      'inventory.items': 'Inventory items',
+      'inventory.backpack': 'Backpack',
+      'shop.units': 'Unit',
+      'shop.items': 'Item',
+      'common.yes': 'Yes',
+      'common.no': 'No',
+      'common.submit': 'Submit',
+      'trade.offerSuffix': "'s offer",
+      'trade.yourOffer': 'Your offer',
+      'chat.hide': 'Hide',
+      'chat.show': 'Show Chat',
+      'dialogue.continueHint': 'Press Enter or click to continue.',
+      'dialogue.inputLabel': 'Email address'
+      ,'common.next': 'Next'
+      ,'common.continue': 'Continue'
+      ,'videochat.settings': 'Video and voice settings'
+      ,'videochat.permissionHelp': 'This game supports videochat. Please allow browser permissions to enable in-game communication.'
+      ,'videochat.playWithout': 'Play without VideoChat'
+      ,'videochat.cannotSeeVideo': "I can't see my video"
+      ,'videochat.restoreHelp': 'You may have blocked device permissions. Press the camera icon in your address bar and enable access.'
     },
     th: {
       'common.play': 'เล่น',
@@ -107,6 +156,34 @@
       'menu.leave': 'ออกจากเกม',
       'menu.teamBlue': 'ทีมฟ้า',
       'menu.teamRed': 'ทีมแดง',
+      'menu.trainingTitle': 'สนามทดลองและควบคุม AI',
+      'menu.trainingDescription': 'เลือกโหมด ติดตามสถิติการฝึก และควบคุมการฝึก AI ได้ที่นี่',
+      'menu.enterGame': 'เข้าสู่เกม',
+      'training.status': 'สถานะการฝึก',
+      'training.models': 'โมเดลทีมฟ้า / ทีมแดง',
+      'training.versions': 'แชมเปี้ยน / แคนดิเดต',
+      'training.winRate': 'อัตราชนะของแคนดิเดต',
+      'training.completedMatches': 'แมตช์ที่เสร็จแล้ว',
+      'training.simulationSpeed': 'ความเร็วจำลอง',
+      'training.blueAi': '🔵 AI ทีมฟ้า',
+      'training.redAi': '🔴 AI ทีมแดง',
+      'training.applyModels': 'ใช้โมเดลที่เลือก',
+      'training.mode': 'โหมดฝึก',
+      'training.spectate': '👁️ ดูบอทต่อสู้ (โหมดผู้ชม)',
+      'training.spectateHelp': 'ชมการต่อสู้ 3 ต่อ 3 และสลับกล้องติดตามบอท',
+      'training.play': '⚔️ เข้าร่วมการต่อสู้',
+      'training.playHelp': 'เลือกตัวละครแล้วเข้าทีมฟ้าเพื่อต่อสู้กับทีมแดง',
+      'training.stats': '📊 สถิติ',
+      'training.changeMode': 'เปลี่ยนโหมด',
+      'training.matchStats': 'สถิติการแข่งขัน AI',
+      'training.statsExplanation': 'อัตราชนะคำนวณจากรอบ 5 นาทีที่จบแล้ว · KDA = (สังหาร + ช่วยสังหาร) / max(1, เสียชีวิต)',
+      'training.currentCharacter': 'ตัวละครปัจจุบัน',
+      'training.damageDealtTaken': 'ความเสียหายที่ทำ / ได้รับ',
+      'spectator.camera': 'กล้อง',
+      'spectator.cameraMode': 'โหมดกล้อง',
+      'spectator.followPlayer': 'ติดตามผู้เล่น',
+      'spectator.overview': 'ดูภาพรวมแผนที่',
+      'spectator.followingLabel': 'กำลังติดตาม',
       'combat.health': 'พลังชีวิต',
       'combat.mana': 'มานา',
       'combat.score': 'คะแนน',
@@ -162,7 +239,28 @@
       'devConsole.command': 'ป้อนคำสั่ง...',
       'unit.level': 'เลเวล {level}',
       'unit.respawn': 'กำลังเกิดใหม่...',
-      'unit.dead': 'ถูกกำจัด'
+      'unit.dead': 'ถูกกำจัด',
+      'inventory.shortcuts': 'ปุ่มลัดช่องเก็บของ',
+      'inventory.items': 'ไอเทมในช่องเก็บของ',
+      'inventory.backpack': 'กระเป๋า',
+      'shop.units': 'ตัวละคร',
+      'shop.items': 'ไอเทม',
+      'common.yes': 'ใช่',
+      'common.no': 'ไม่',
+      'common.submit': 'ส่ง',
+      'trade.offerSuffix': 'เสนอแลกเปลี่ยน',
+      'trade.yourOffer': 'สิ่งที่คุณเสนอ',
+      'chat.hide': 'ซ่อน',
+      'chat.show': 'แสดงแชต',
+      'dialogue.continueHint': 'กด Enter หรือคลิกเพื่อดำเนินการต่อ',
+      'dialogue.inputLabel': 'อีเมล'
+      ,'common.next': 'ถัดไป'
+      ,'common.continue': 'ดำเนินการต่อ'
+      ,'videochat.settings': 'ตั้งค่าวิดีโอและเสียง'
+      ,'videochat.permissionHelp': 'เกมนี้รองรับวิดีโอแชต โปรดอนุญาตสิทธิ์ในเบราว์เซอร์เพื่อเปิดใช้การสื่อสารในเกม'
+      ,'videochat.playWithout': 'เล่นโดยไม่ใช้วิดีโอแชต'
+      ,'videochat.cannotSeeVideo': 'ฉันไม่เห็นภาพวิดีโอ'
+      ,'videochat.restoreHelp': 'คุณอาจเคยปิดกั้นสิทธิ์อุปกรณ์ไว้ คลิกไอคอนกล้องที่แถบที่อยู่แล้วอนุญาตการเข้าถึง'
     }
   };
 });
