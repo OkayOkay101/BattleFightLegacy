@@ -4,6 +4,13 @@ var TradeUiComponent = IgeEntity.extend({
 
 	init: function (entity, options) {
 		var self = this;
+		var i18n = ige.client && ige.client.i18n;
+		self.pendingTradePlayerName = null;
+		self._unsubscribeI18n = i18n && i18n.subscribe(function () {
+			if (self.pendingTradePlayerName && $('#trade-request-div').is(':visible')) {
+				self.renderTradeRequestMessage();
+			}
+		});
 
 		$('#accept-trade-request-button').on('click', function () {
 			var requestedBy = $('#requested-by').text();
@@ -33,10 +40,17 @@ var TradeUiComponent = IgeEntity.extend({
 	},
 
 	initiateTradeRequest: function (player) {
-		var message = `${player._stats.name} wants to trade with you. Trade?`;
+		var i18n = ige.client && ige.client.i18n;
+		this.pendingTradePlayerName = player._stats.name || (i18n ? i18n.t('feed.unknownPlayer') : 'Unknown player');
+		this.renderTradeRequestMessage();
 		$('#requested-by').text(player.id());
-		$('#trade-request-message').text(message);
 		$('#trade-request-div').show();
+	},
+	renderTradeRequestMessage: function () {
+		var i18n = ige.client && ige.client.i18n;
+		var message = i18n ? i18n.t('trade.request', { player: this.pendingTradePlayerName })
+			: `${this.pendingTradePlayerName} wants to trade with you. Trade?`;
+		$('#trade-request-message').text(message);
 	},
 	clearOfferSlots: function () {
 		var offerSlots = $('#offer-trading-slots');
@@ -100,6 +114,7 @@ var TradeUiComponent = IgeEntity.extend({
 	},
 	closeTradeRequest: function () {
 		$('#trade-request-div').hide();
+		this.pendingTradePlayerName = null;
 	},
 
 	closeTrading: function () {

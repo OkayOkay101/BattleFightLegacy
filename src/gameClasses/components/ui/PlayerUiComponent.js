@@ -362,8 +362,8 @@ var PlayerUiComponent = IgeEntity.extend({
 			if (isCharacterPicker) {
 				$('#modd-dialogue-modal .modal-content').css({ background: '#f5f8fc', color: '#17243a', border: '1px solid #d7e1ef', borderRadius: '16px' });
 				$('#modd-dialogue-message').css({ color: '#17243a', fontWeight: '700', fontSize: '1.25rem' });
-				$('#modd-dialogue-options-container').prepend('<div id="battlefight-picker-tools" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0"><input id="battlefight-picker-search" type="search" class="form-control" placeholder="ค้นหาตัวละคร…" aria-label="ค้นหาตัวละคร" style="flex:1;min-width:180px;background:white;color:#17243a"><select id="battlefight-picker-role" class="form-control" aria-label="กรองประเภท" style="max-width:190px;background:white;color:#17243a"><option value="">ทุกประเภท</option><option value="ระยะไกล">ระยะไกล</option><option value="ประชิด">ประชิด</option><option value="ซัพพอร์ต">ซัพพอร์ต</option><option value="ทดลอง">ทดลอง</option></select></div><div id="battlefight-picker-detail" role="status" aria-live="polite" style="padding:10px 12px;margin:8px 0;background:#eaf2ff;border-radius:10px;color:#17243a">เลือกการ์ดเพื่อดูตัวละคร แล้วกดยืนยัน</div>');
-				$('#modd-dialogue-options-container').append('<button id="battlefight-picker-confirm" type="button" class="btn btn-primary btn-block" disabled style="margin-top:12px;background:#1769d2;border-color:#1769d2">เลือกตัวละคร</button>');
+				$('#modd-dialogue-options-container').prepend('<div id="battlefight-picker-tools" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0"><input id="battlefight-picker-search" type="search" class="form-control" placeholder="Search characters..." data-i18n-placeholder="unitPicker.search" aria-label="Search characters" data-i18n-aria-label="unitPicker.search" style="flex:1;min-width:180px;background:white;color:#17243a"><select id="battlefight-picker-role" class="form-control" aria-label="Filter role" data-i18n-aria-label="unitPicker.filterRole" style="max-width:190px;background:white;color:#17243a"><option value="" data-i18n="unitPicker.allRoles">ทุกประเภท</option><option value="ระยะไกล" data-i18n="unitPicker.ranged">ระยะไกล</option><option value="ประชิด" data-i18n="unitPicker.melee">ประชิด</option><option value="ซัพพอร์ต" data-i18n="unitPicker.support">ซัพพอร์ต</option><option value="ทดลอง" data-i18n="unitPicker.experimental">ทดลอง</option></select></div><div id="battlefight-picker-detail" data-i18n="unitPicker.selectHint" role="status" aria-live="polite" style="padding:10px 12px;margin:8px 0;background:#eaf2ff;border-radius:10px;color:#17243a">เลือกการ์ดเพื่อดูตัวละคร แล้วกดยืนยัน</div>');
+				$('#modd-dialogue-options-container').append('<button id="battlefight-picker-confirm" type="button" class="btn btn-primary btn-block" disabled style="margin-top:12px;background:#1769d2;border-color:#1769d2" data-i18n="unitPicker.confirm">เลือกตัวละคร</button>');
 				$('#battlefight-picker-search, #battlefight-picker-role').on('click', function (event) { event.stopPropagation(); });
 				$('#battlefight-picker-search, #battlefight-picker-role').on('keydown', function (event) { event.stopPropagation(); });
 				$('#battlefight-picker-search').on('input', function () { filterCharacterOptions(); });
@@ -371,7 +371,7 @@ var PlayerUiComponent = IgeEntity.extend({
 				$('#battlefight-picker-confirm').on('click', function (event) {
 					event.stopPropagation();
 					if (!chosenCharacterOption) return;
-					$(this).prop('disabled', true).text('กำลังเลือก…');
+					$(this).prop('disabled', true).text(ige.client.i18n ? ige.client.i18n.t('unitPicker.selecting') : 'กำลังเลือก…');
 					ige.playerUi.submitDialogueModal(dialogueId, chosenCharacterOption);
 				});
 			}
@@ -409,8 +409,10 @@ var PlayerUiComponent = IgeEntity.extend({
 				var items = (unit && unit.defaultItems || []).map(function (id) { return ige.game.data.itemTypes[id] && ige.game.data.itemTypes[id].name; }).filter(Boolean);
 				var safeName = $('<div/>').html(sanitizeDialogueOptionHtml(option.name || '')).text();
 				var image = portrait && /^\/assets\//.test(portrait) ? '<img src="' + portrait.replace(/"/g, '') + '" alt="" style="width:68px;height:68px;object-fit:cover;border-radius:12px;float:right" onerror="this.remove()">' : '';
-				var summary = [hp ? 'เลือด ' + hp : '', speed ? 'ความเร็ว ' + speed : '', items.length ? 'อาวุธ/สกิล: ' + items.join(' · ') : ''].filter(Boolean).join(' | ');
-				$('#battlefight-picker-detail').html(image + '<strong>' + $('<div/>').text(safeName).html() + '</strong><div style="margin-top:6px">' + $('<div/>').text(summary || 'ไม่มีข้อมูลค่าสถานะเพิ่มเติม').html() + '</div><div style="clear:both"></div>');
+				var i18n = ige.client.i18n;
+				var summary = [hp ? (i18n ? i18n.t('unitPicker.health', { value: hp }) : 'Health ' + hp) : '', speed ? (i18n ? i18n.t('unitPicker.speed', { value: speed }) : 'Speed ' + speed) : '', items.length ? (i18n ? i18n.t('unitPicker.items', { items: items.join(' · ') }) : 'Items/skills: ' + items.join(' · ')) : ''].filter(Boolean).join(' | ');
+				var noStats = i18n ? i18n.t('unitPicker.noStats') : 'No additional stats';
+				$('#battlefight-picker-detail').html(image + '<strong>' + $('<div/>').text(safeName).html() + '</strong><div style="margin-top:6px">' + $('<div/>').text(summary || noStats).html() + '</div><div style="clear:both"></div>');
 			}
 
 			for (var key in dialogue.options) {
