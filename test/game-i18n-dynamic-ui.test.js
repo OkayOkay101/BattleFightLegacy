@@ -2,6 +2,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { createGameI18n } = require('../src/localization/GameI18n');
 const messages = require('../src/localization/messages');
+global.IgeEntity = { extend(definition) { function Entity() {} Entity.prototype = definition; return Entity; } };
+const ItemUiComponent = require('../src/gameClasses/components/ui/ItemUiComponent');
 
 function liveText(i18n, key, values) {
   const getValues = typeof values === 'function' ? values : () => values;
@@ -29,4 +31,16 @@ test('generated spectator, match-stat, and trade text refresh when the locale ch
   following.unsubscribe();
   stats.unsubscribe();
   trade.unsubscribe();
+});
+
+test('item tooltip interface labels use the selected locale while preserving authored descriptions', () => {
+  const i18n = createGameI18n({ messages });
+  global.ige = { client: { i18n }, game: { data: { attributeTypes: {} } } };
+  const itemUi = Object.create(ItemUiComponent.prototype);
+  const item = { description: 'A player-authored description', attributes: {} };
+  assert.match(itemUi.getItemPopOverContent(item), /Description/);
+  i18n.setLanguage('th');
+  const translated = itemUi.getItemPopOverContent(item);
+  assert.match(translated, /คำอธิบาย/);
+  assert.match(translated, /A player-authored description/);
 });

@@ -469,11 +469,17 @@ var ClientNetworkEvents = {
 
 	_onErrorLogs: function (logs) {
 		var element = document.getElementById('error-log-content');
+		var i18n = ige.client.i18n;
+		if (i18n && !ige.client._unsubscribeErrorCountLocale) {
+			ige.client._unsubscribeErrorCountLocale = i18n.subscribe(function () {
+				$('#dev-error-button').text(i18n.t('devConsole.errors', { count: ige.client.errorLogs.length }));
+			});
+		}
 		for (actionName in logs) {
 			var log = logs[actionName];
 			element.innerHTML += `<li style='font-size:12px;'>${log}</li>`;
 			ige.client.errorLogs.push(log);
-			$('#dev-error-button').text(`Errors (${ige.client.errorLogs.length})`);
+			$('#dev-error-button').text(i18n ? i18n.t('devConsole.errors', { count: ige.client.errorLogs.length }) : `Errors (${ige.client.errorLogs.length})`);
 		}
 	},
 

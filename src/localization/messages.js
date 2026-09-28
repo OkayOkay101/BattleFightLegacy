@@ -124,69 +124,102 @@
       'chat.hide': 'Hide',
       'chat.show': 'Show Chat',
       'dialogue.continueHint': 'Press Enter or click to continue.',
-      'dialogue.inputLabel': 'Email address'
-      ,'common.next': 'Next'
-      ,'common.continue': 'Continue'
-      ,'videochat.settings': 'Video and voice settings'
-      ,'videochat.permissionHelp': 'This game supports videochat. Please allow browser permissions to enable in-game communication.'
-      ,'videochat.playWithout': 'Play without VideoChat'
-      ,'videochat.cannotSeeVideo': "I can't see my video"
-      ,'videochat.restoreHelp': 'You may have blocked device permissions. Press the camera icon in your address bar and enable access.'
-      ,'common.apply': 'Apply'
-      ,'training.connecting': 'Connecting...'
-      ,'training.running': 'Training is running'
-      ,'training.stopping': 'Stopping...'
-      ,'training.stopped': 'Stopped'
-      ,'training.start': 'Start AI training'
-      ,'training.stop': 'Stop training'
-      ,'training.offline': 'Offline'
-      ,'training.workers': 'Workers:'
-      ,'training.winRateGames': '{rate} ({games} games)'
-      ,'training.pendingDecisions': '{count} decisions'
-      ,'training.completedFailed': '{completed} (failed: {failed})'
-      ,'training.workerSpeed': '{active}/{total} workers ({speed})'
-      ,'training.state.running': 'RUNNING'
-      ,'training.state.stopping': 'STOPPING'
-      ,'training.state.stopped': 'STOPPED'
-      ,'training.quickScore': 'Blue {blue} : {red} Red'
-      ,'training.roundClock': 'Round {round} · {seconds}s remaining'
-      ,'training.teamSummary': 'Wins {rate} ({wins}-{losses}-{draws})\nKDA {kda} · K/D/A {kills}/{deaths}/{assists}\nDamage dealt / taken: {dealt} / {taken}'
-      ,'training.humanPresent': 'A human player is in this match, so these stats include human play.'
-      ,'training.aiOnly': 'AI stats are from this match only. Changing models starts a new count.'
-      ,'training.selectingModel': 'Applying selected models...'
-      ,'training.modelsApplied': 'Using Blue {blue} and Red {red}'
-      ,'training.modelsFailed': 'Could not apply models: {detail}'
-      ,'training.champion': 'Champion'
-      ,'training.workersRequested': 'Requested {count} workers.'
-      ,'training.workersFailed': 'Could not update workers: {detail}'
-      ,'training.stopRequested': 'Sending stop command...'
-      ,'training.starting': 'Starting training...'
-      ,'spectator.allTeams': 'All teams'
-      ,'spectator.auto': 'Automatic'
-      ,'spectator.myPlayer': 'My player'
-      ,'spectator.freeCameraHelp': 'Right-drag or touch-drag to pan · scroll to zoom'
-      ,'spectator.waitingRespawn': 'Waiting for {player} to respawn...'
-      ,'spectator.waitingForPlayer': 'Waiting for a player to enter the field...'
-      ,'spectator.fallbackFollowing': 'Selected team eliminated · now following {team}: {player}'
-      ,'trade.request': '{player} wants to trade with you. Trade?'
-      ,'scoreboard.addFriend': 'Add Friend'
-      ,'scoreboard.unmute': 'Unmute {name}'
-      ,'scoreboard.mute': 'Mute {name}'
-      ,'scoreboard.requestSent': 'Friend request sent'
-      ,'unitPicker.search': 'Search characters...'
-      ,'unitPicker.filterRole': 'Filter role'
-      ,'unitPicker.allRoles': 'All roles'
-      ,'unitPicker.ranged': 'Ranged'
-      ,'unitPicker.melee': 'Melee'
-      ,'unitPicker.support': 'Support'
-      ,'unitPicker.experimental': 'Experimental'
-      ,'unitPicker.selectHint': 'Select a card to view details, then confirm.'
-      ,'unitPicker.confirm': 'Select character'
-      ,'unitPicker.selecting': 'Selecting...'
-      ,'unitPicker.health': 'Health {value}'
-      ,'unitPicker.speed': 'Speed {value}'
-      ,'unitPicker.items': 'Items/skills: {items}'
-      ,'unitPicker.noStats': 'No additional stats'
+      'dialogue.inputLabel': 'Email address',
+      'common.next': 'Next',
+      'common.continue': 'Continue',
+      'videochat.settings': 'Video and voice settings',
+      'videochat.permissionHelp': 'This game supports videochat. Please allow browser permissions to enable in-game communication.',
+      'videochat.playWithout': 'Play without VideoChat',
+      'videochat.cannotSeeVideo': "I can't see my video",
+      'videochat.restoreHelp': 'You may have blocked device permissions. Press the camera icon in your address bar and enable access.',
+      'common.apply': 'Apply',
+      'training.connecting': 'Connecting...',
+      'training.running': 'Training is running',
+      'training.stopping': 'Stopping...',
+      'training.stopped': 'Stopped',
+      'training.start': 'Start AI training',
+      'training.stop': 'Stop training',
+      'training.offline': 'Offline',
+      'training.workers': 'Workers:',
+      'training.winRateGames': '{rate} ({games} games)',
+      'training.pendingDecisions': '{count} decisions',
+      'training.completedFailed': '{completed} (failed: {failed})',
+      'training.workerSpeed': '{active}/{total} workers ({speed})',
+      'training.state.running': 'RUNNING',
+      'training.state.stopping': 'STOPPING',
+      'training.state.stopped': 'STOPPED',
+      'training.quickScore': 'Blue {blue} : {red} Red',
+      'training.roundClock': 'Round {round} · {seconds}s remaining',
+      'training.teamSummary': 'Wins {rate} ({wins}-{losses}-{draws})\nKDA {kda} · K/D/A {kills}/{deaths}/{assists}\nDamage dealt / taken: {dealt} / {taken}',
+      'training.humanPresent': 'A human player is in this match, so these stats include human play.',
+      'training.aiOnly': 'AI stats are from this match only. Changing models starts a new count.',
+      'training.selectingModel': 'Applying selected models...',
+      'training.modelsApplied': 'Using Blue {blue} and Red {red}',
+      'training.modelsFailed': 'Could not apply models: {detail}',
+      'training.champion': 'Champion',
+      'training.workersRequested': 'Requested {count} workers.',
+      'training.workersFailed': 'Could not update workers: {detail}',
+      'training.stopRequested': 'Sending stop command...',
+      'training.starting': 'Starting training...',
+      'spectator.allTeams': 'All teams',
+      'spectator.auto': 'Automatic',
+      'spectator.myPlayer': 'My player',
+      'spectator.freeCameraHelp': 'Right-drag or touch-drag to pan · scroll to zoom',
+      'spectator.waitingRespawn': 'Waiting for {player} to respawn...',
+      'spectator.waitingForPlayer': 'Waiting for a player to enter the field...',
+      'spectator.fallbackFollowing': 'Selected team eliminated · now following {team}: {player}',
+      'trade.request': '{player} wants to trade with you. Trade?',
+      'scoreboard.addFriend': 'Add Friend',
+      'scoreboard.unmute': 'Unmute {name}',
+      'scoreboard.mute': 'Mute {name}',
+      'scoreboard.requestSent': 'Friend request sent',
+      'unitPicker.search': 'Search characters...',
+      'unitPicker.filterRole': 'Filter role',
+      'unitPicker.allRoles': 'All roles',
+      'unitPicker.ranged': 'Ranged',
+      'unitPicker.melee': 'Melee',
+      'unitPicker.support': 'Support',
+      'unitPicker.experimental': 'Experimental',
+      'unitPicker.selectHint': 'Select a card to view details, then confirm.',
+      'unitPicker.confirm': 'Select character',
+      'unitPicker.selecting': 'Selecting...',
+      'unitPicker.health': 'Health {value}',
+      'unitPicker.speed': 'Speed {value}',
+      'unitPicker.items': 'Items/skills: {items}',
+      'unitPicker.noStats': 'No additional stats',
+      'menu.connecting': 'Connecting...',
+      'error.connectionLost': 'Lost connection to the game server. Please refresh this page or visit our homepage.',
+      'devConsole.graphs': 'Graphs',
+      'devConsole.canvas': 'Canvas:',
+      'devConsole.engine': 'Engine:',
+      'devConsole.gameServer': 'Game server:',
+      'devConsole.connection': 'Connection:',
+      'devConsole.tuning': 'Tuning',
+      'devConsole.variables': 'Variables',
+      'devConsole.errors': 'Errors (0)',
+      'devConsole.status': 'Status',
+      'devConsole.errorLogs': 'Error Logs',
+      'devConsole.errorsZero': 'Errors (0)',
+      'devConsole.errors': 'Errors ({count})',
+      'item.description': 'Description',
+      'item.consumeBonuses': 'Consume bonuses',
+      'item.passiveBonuses': 'Passive bonuses',
+      'item.cost': 'Cost',
+      'item.price': 'Price',
+      'item.free': 'Free',
+      'item.magazineSize': 'Magazine size',
+      'item.ammoTotal': 'Ammo total',
+      'item.fireRate': 'Fire rate',
+      'item.roundsPerSecond': 'round/s',
+      'item.reloadTime': 'Reload time',
+      'item.knockbackForce': 'Knockback force',
+      'item.range': 'Range',
+      'item.recoil': 'Recoil',
+      'item.speedBonus': 'Speed bonus',
+      'item.immunityBonus': 'Immunity bonus',
+      'item.staminaBonus': 'Stamina bonus',
+      'item.slowTargetChance': 'Slow target chance',
+      'item.stunTargetChance': 'Stun target chance'
     },
     th: {
       'common.play': 'เล่น',
@@ -308,69 +341,102 @@
       'chat.hide': 'ซ่อน',
       'chat.show': 'แสดงแชต',
       'dialogue.continueHint': 'กด Enter หรือคลิกเพื่อดำเนินการต่อ',
-      'dialogue.inputLabel': 'อีเมล'
-      ,'common.next': 'ถัดไป'
-      ,'common.continue': 'ดำเนินการต่อ'
-      ,'videochat.settings': 'ตั้งค่าวิดีโอและเสียง'
-      ,'videochat.permissionHelp': 'เกมนี้รองรับวิดีโอแชต โปรดอนุญาตสิทธิ์ในเบราว์เซอร์เพื่อเปิดใช้การสื่อสารในเกม'
-      ,'videochat.playWithout': 'เล่นโดยไม่ใช้วิดีโอแชต'
-      ,'videochat.cannotSeeVideo': 'ฉันไม่เห็นภาพวิดีโอ'
-      ,'videochat.restoreHelp': 'คุณอาจเคยปิดกั้นสิทธิ์อุปกรณ์ไว้ คลิกไอคอนกล้องที่แถบที่อยู่แล้วอนุญาตการเข้าถึง'
-      ,'common.apply': 'ใช้'
-      ,'training.connecting': 'กำลังเชื่อมต่อ...'
-      ,'training.running': 'กำลังฝึก'
-      ,'training.stopping': 'กำลังหยุด...'
-      ,'training.stopped': 'หยุดแล้ว'
-      ,'training.start': 'เริ่มฝึก AI'
-      ,'training.stop': 'หยุดการฝึก'
-      ,'training.offline': 'ออฟไลน์'
-      ,'training.workers': 'เวิร์กเกอร์:'
-      ,'training.winRateGames': '{rate} ({games} เกม)'
-      ,'training.pendingDecisions': '{count} การตัดสินใจ'
-      ,'training.completedFailed': '{completed} (ล้มเหลว: {failed})'
-      ,'training.workerSpeed': '{active}/{total} เวิร์กเกอร์ ({speed})'
-      ,'training.state.running': 'กำลังทำงาน'
-      ,'training.state.stopping': 'กำลังหยุด'
-      ,'training.state.stopped': 'หยุดแล้ว'
-      ,'training.quickScore': 'ทีมฟ้า {blue} : {red} ทีมแดง'
-      ,'training.roundClock': 'รอบที่ {round} · เหลือ {seconds} วินาที'
-      ,'training.teamSummary': 'ชนะ {rate} ({wins}-{losses}-{draws})\nKDA {kda} · สังหาร/ตาย/ช่วย {kills}/{deaths}/{assists}\nทำ/รับความเสียหาย: {dealt} / {taken}'
-      ,'training.humanPresent': 'มีผู้เล่นเข้าร่วม สถิตินี้จึงรวมผลจากผู้เล่นด้วย'
-      ,'training.aiOnly': 'สถิติ AI นับเฉพาะแมตช์นี้ การเปลี่ยนโมเดลจะเริ่มนับใหม่'
-      ,'training.selectingModel': 'กำลังใช้โมเดลที่เลือก...'
-      ,'training.modelsApplied': 'กำลังใช้โมเดล Blue {blue} และ Red {red}'
-      ,'training.modelsFailed': 'ใช้โมเดลไม่สำเร็จ: {detail}'
-      ,'training.champion': 'แชมเปี้ยน'
-      ,'training.workersRequested': 'ส่งคำขอใช้ {count} เวิร์กเกอร์แล้ว'
-      ,'training.workersFailed': 'ตั้งค่าเวิร์กเกอร์ไม่สำเร็จ: {detail}'
-      ,'training.stopRequested': 'กำลังส่งคำสั่งหยุด...'
-      ,'training.starting': 'กำลังเริ่มฝึก...'
-      ,'spectator.allTeams': 'ทุกทีม'
-      ,'spectator.auto': 'อัตโนมัติ'
-      ,'spectator.myPlayer': 'ตัวละครของฉัน'
-      ,'spectator.freeCameraHelp': 'ลากเมาส์ขวาหรือลากนิ้วเพื่อเลื่อน · หมุนล้อเพื่อซูม'
-      ,'spectator.waitingRespawn': 'กำลังรอ {player} เกิดใหม่...'
-      ,'spectator.waitingForPlayer': 'กำลังรอผู้เล่นลงสนาม...'
-      ,'spectator.fallbackFollowing': 'ทีมที่เลือกถูกกำจัดหมดแล้ว · กำลังติดตาม{team}: {player}'
-      ,'trade.request': '{player} ต้องการแลกเปลี่ยนกับคุณ ต้องการแลกเปลี่ยนหรือไม่?'
-      ,'scoreboard.addFriend': 'เพิ่มเพื่อน'
-      ,'scoreboard.unmute': 'เลิกปิดเสียง {name}'
-      ,'scoreboard.mute': 'ปิดเสียง {name}'
-      ,'scoreboard.requestSent': 'ส่งคำขอเป็นเพื่อนแล้ว'
-      ,'unitPicker.search': 'ค้นหาตัวละคร...'
-      ,'unitPicker.filterRole': 'กรองประเภท'
-      ,'unitPicker.allRoles': 'ทุกประเภท'
-      ,'unitPicker.ranged': 'ระยะไกล'
-      ,'unitPicker.melee': 'ประชิด'
-      ,'unitPicker.support': 'ซัพพอร์ต'
-      ,'unitPicker.experimental': 'ทดลอง'
-      ,'unitPicker.selectHint': 'เลือกการ์ดเพื่อดูรายละเอียด แล้วกดยืนยัน'
-      ,'unitPicker.confirm': 'เลือกตัวละคร'
-      ,'unitPicker.selecting': 'กำลังเลือก...'
-      ,'unitPicker.health': 'พลังชีวิต {value}'
-      ,'unitPicker.speed': 'ความเร็ว {value}'
-      ,'unitPicker.items': 'ไอเทม/สกิล: {items}'
-      ,'unitPicker.noStats': 'ไม่มีข้อมูลค่าสถานะเพิ่มเติม'
+      'dialogue.inputLabel': 'อีเมล',
+      'common.next': 'ถัดไป',
+      'common.continue': 'ดำเนินการต่อ',
+      'videochat.settings': 'ตั้งค่าวิดีโอและเสียง',
+      'videochat.permissionHelp': 'เกมนี้รองรับวิดีโอแชต โปรดอนุญาตสิทธิ์ในเบราว์เซอร์เพื่อเปิดใช้การสื่อสารในเกม',
+      'videochat.playWithout': 'เล่นโดยไม่ใช้วิดีโอแชต',
+      'videochat.cannotSeeVideo': 'ฉันไม่เห็นภาพวิดีโอ',
+      'videochat.restoreHelp': 'คุณอาจเคยปิดกั้นสิทธิ์อุปกรณ์ไว้ คลิกไอคอนกล้องที่แถบที่อยู่แล้วอนุญาตการเข้าถึง',
+      'common.apply': 'ใช้',
+      'training.connecting': 'กำลังเชื่อมต่อ...',
+      'training.running': 'กำลังฝึก',
+      'training.stopping': 'กำลังหยุด...',
+      'training.stopped': 'หยุดแล้ว',
+      'training.start': 'เริ่มฝึก AI',
+      'training.stop': 'หยุดการฝึก',
+      'training.offline': 'ออฟไลน์',
+      'training.workers': 'เวิร์กเกอร์:',
+      'training.winRateGames': '{rate} ({games} เกม)',
+      'training.pendingDecisions': '{count} การตัดสินใจ',
+      'training.completedFailed': '{completed} (ล้มเหลว: {failed})',
+      'training.workerSpeed': '{active}/{total} เวิร์กเกอร์ ({speed})',
+      'training.state.running': 'กำลังทำงาน',
+      'training.state.stopping': 'กำลังหยุด',
+      'training.state.stopped': 'หยุดแล้ว',
+      'training.quickScore': 'ทีมฟ้า {blue} : {red} ทีมแดง',
+      'training.roundClock': 'รอบที่ {round} · เหลือ {seconds} วินาที',
+      'training.teamSummary': 'ชนะ {rate} ({wins}-{losses}-{draws})\nKDA {kda} · สังหาร/ตาย/ช่วย {kills}/{deaths}/{assists}\nทำ/รับความเสียหาย: {dealt} / {taken}',
+      'training.humanPresent': 'มีผู้เล่นเข้าร่วม สถิตินี้จึงรวมผลจากผู้เล่นด้วย',
+      'training.aiOnly': 'สถิติ AI นับเฉพาะแมตช์นี้ การเปลี่ยนโมเดลจะเริ่มนับใหม่',
+      'training.selectingModel': 'กำลังใช้โมเดลที่เลือก...',
+      'training.modelsApplied': 'กำลังใช้โมเดล Blue {blue} และ Red {red}',
+      'training.modelsFailed': 'ใช้โมเดลไม่สำเร็จ: {detail}',
+      'training.champion': 'แชมเปี้ยน',
+      'training.workersRequested': 'ส่งคำขอใช้ {count} เวิร์กเกอร์แล้ว',
+      'training.workersFailed': 'ตั้งค่าเวิร์กเกอร์ไม่สำเร็จ: {detail}',
+      'training.stopRequested': 'กำลังส่งคำสั่งหยุด...',
+      'training.starting': 'กำลังเริ่มฝึก...',
+      'spectator.allTeams': 'ทุกทีม',
+      'spectator.auto': 'อัตโนมัติ',
+      'spectator.myPlayer': 'ตัวละครของฉัน',
+      'spectator.freeCameraHelp': 'ลากเมาส์ขวาหรือลากนิ้วเพื่อเลื่อน · หมุนล้อเพื่อซูม',
+      'spectator.waitingRespawn': 'กำลังรอ {player} เกิดใหม่...',
+      'spectator.waitingForPlayer': 'กำลังรอผู้เล่นลงสนาม...',
+      'spectator.fallbackFollowing': 'ทีมที่เลือกถูกกำจัดหมดแล้ว · กำลังติดตาม{team}: {player}',
+      'trade.request': '{player} ต้องการแลกเปลี่ยนกับคุณ ต้องการแลกเปลี่ยนหรือไม่?',
+      'scoreboard.addFriend': 'เพิ่มเพื่อน',
+      'scoreboard.unmute': 'เลิกปิดเสียง {name}',
+      'scoreboard.mute': 'ปิดเสียง {name}',
+      'scoreboard.requestSent': 'ส่งคำขอเป็นเพื่อนแล้ว',
+      'unitPicker.search': 'ค้นหาตัวละคร...',
+      'unitPicker.filterRole': 'กรองประเภท',
+      'unitPicker.allRoles': 'ทุกประเภท',
+      'unitPicker.ranged': 'ระยะไกล',
+      'unitPicker.melee': 'ประชิด',
+      'unitPicker.support': 'ซัพพอร์ต',
+      'unitPicker.experimental': 'ทดลอง',
+      'unitPicker.selectHint': 'เลือกการ์ดเพื่อดูรายละเอียด แล้วกดยืนยัน',
+      'unitPicker.confirm': 'เลือกตัวละคร',
+      'unitPicker.selecting': 'กำลังเลือก...',
+      'unitPicker.health': 'พลังชีวิต {value}',
+      'unitPicker.speed': 'ความเร็ว {value}',
+      'unitPicker.items': 'ไอเทม/สกิล: {items}',
+      'unitPicker.noStats': 'ไม่มีข้อมูลค่าสถานะเพิ่มเติม',
+      'menu.connecting': 'กำลังเชื่อมต่อ...',
+      'error.connectionLost': 'การเชื่อมต่อกับเซิร์ฟเวอร์เกมขาดหาย โปรดรีเฟรชหน้านี้หรือกลับไปที่หน้าแรก',
+      'devConsole.graphs': 'กราฟ',
+      'devConsole.canvas': 'แคนวาส:',
+      'devConsole.engine': 'เอนจิน:',
+      'devConsole.gameServer': 'เซิร์ฟเวอร์เกม:',
+      'devConsole.connection': 'การเชื่อมต่อ:',
+      'devConsole.tuning': 'การปรับแต่ง',
+      'devConsole.variables': 'ตัวแปร',
+      'devConsole.errors': 'ข้อผิดพลาด (0)',
+      'devConsole.status': 'สถานะ',
+      'devConsole.errorLogs': 'บันทึกข้อผิดพลาด',
+      'devConsole.errorsZero': 'ข้อผิดพลาด (0)',
+      'devConsole.errors': 'ข้อผิดพลาด ({count})',
+      'item.description': 'คำอธิบาย',
+      'item.consumeBonuses': 'โบนัสเมื่อใช้',
+      'item.passiveBonuses': 'โบนัสติดตัว',
+      'item.cost': 'ค่าใช้จ่าย',
+      'item.price': 'ราคา',
+      'item.free': 'ฟรี',
+      'item.magazineSize': 'ขนาดแม็กกาซีน',
+      'item.ammoTotal': 'กระสุนทั้งหมด',
+      'item.fireRate': 'อัตราการยิง',
+      'item.roundsPerSecond': 'นัด/วินาที',
+      'item.reloadTime': 'เวลารีโหลด',
+      'item.knockbackForce': 'แรงผลัก',
+      'item.range': 'ระยะ',
+      'item.recoil': 'แรงดีด',
+      'item.speedBonus': 'โบนัสความเร็ว',
+      'item.immunityBonus': 'โบนัสต้านทาน',
+      'item.staminaBonus': 'โบนัสความอึด',
+      'item.slowTargetChance': 'โอกาสทำให้เป้าหมายช้า',
+      'item.stunTargetChance': 'โอกาสทำให้เป้าหมายมึนงง'
     }
   };
 });
