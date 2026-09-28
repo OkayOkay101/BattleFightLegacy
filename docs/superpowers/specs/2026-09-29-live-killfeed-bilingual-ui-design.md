@@ -17,7 +17,7 @@ Add a real-time kill feed to BattleFight and let players switch the built-in gam
 ### Included
 
 - A server-authoritative live feed for deaths of units controlled by a human or BattleFight bot.
-- Each feed entry identifies the credited killer and eliminated player, with team and character context where available. Unknown, environmental, and self-inflicted deaths remain visible as eliminations without a credited opposing killer.
+- Each feed entry identifies the credited killer and eliminated player, with team and character context where available. Credit follows the game's server-side hostile-player relationship; unknown, environmental, friendly, and self-inflicted deaths remain visible as eliminations without a credited opposing killer.
 - A bounded recent-event list on the game screen, newest first, with readable Thai and English phrasing.
 - A shared Thai/English localization service for built-in game UI: start and mode controls, spectator controls, combat HUD labels, scoreboard, statistics, chat controls, inventory/shop dialogs, system prompts, and application-generated status/error messages.
 - A visible language selector in the menu and in-game interface. Store its choice in browser local storage; default to English when no valid choice exists.
@@ -41,7 +41,7 @@ Templates mark static built-in strings with translation keys. UI components and 
 
 ### Kill event and display
 
-At the server-side health transition to zero, resolve the dead unit's owning player and the recent attacking unit's owning player. Ignore units without a player owner. Deduplicate using the dead unit/life ID so repeated health callbacks cannot create duplicate feed entries. Credit a kill only when killer and victim are distinct players on opposing teams; still emit an elimination event when killer attribution is absent or invalid.
+At the server-side health transition to zero, resolve the dead unit's owning player and the recent attacking unit's owning player. Ignore units without a player owner. Deduplicate using the dead unit/life ID so repeated health callbacks cannot create duplicate feed entries. Credit a kill only when the players are distinct and the game's server-side hostility relationship identifies them as opponents; still emit an elimination event when killer attribution is absent or invalid.
 
 Broadcast a compact event containing stable player IDs, display names, team IDs, character IDs when available, and server event time. Do not include arbitrary entity objects or client-provided text. The client keeps a bounded list of recent events and renders names as text nodes, with localized team and elimination wording. The feed is presentation-only and does not increment score or statistics independently.
 
@@ -58,7 +58,7 @@ The training and exhibition statistics path remains responsible for aggregate ki
 
 ## Validation
 
-- Unit tests verify opposing-team kill credit, friendly/self/environment elimination behavior, non-player unit filtering, and duplicate death suppression.
+- Unit tests verify hostile-player kill credit, friendly/self/environment elimination behavior, non-player unit filtering, and duplicate death suppression.
 - Integration tests verify one server death produces one client feed entry with the expected identity/context fields.
 - Localization tests verify English default, English/Thai persistence, invalid saved-value fallback, parameter substitution, and missing-key detection.
 - UI checks verify language changes update the spectator and combat screens, statistics, and asynchronously generated status text without a reload.
