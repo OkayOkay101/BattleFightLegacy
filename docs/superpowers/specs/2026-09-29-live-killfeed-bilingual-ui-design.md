@@ -20,7 +20,7 @@ Add a real-time kill feed to BattleFight and let players switch the built-in gam
 - Each feed entry identifies the credited killer and eliminated player, with team and character context where available. Unknown, environmental, and self-inflicted deaths remain visible as eliminations without a credited opposing killer.
 - A bounded recent-event list on the game screen, newest first, with readable Thai and English phrasing.
 - A shared Thai/English localization service for built-in game UI: start and mode controls, spectator controls, combat HUD labels, scoreboard, statistics, chat controls, inventory/shop dialogs, system prompts, and application-generated status/error messages.
-- A visible language selector in the menu and in-game interface. Store its choice in browser local storage; default to Thai when no valid choice exists.
+- A visible language selector in the menu and in-game interface. Store its choice in browser local storage; default to English when no valid choice exists.
 - Re-render visible and subsequently generated UI text when the language changes, without reloading the match.
 - Translation of accessibility text such as button labels, input placeholders, and ARIA labels where they are part of the built-in interface.
 - Tests for kill attribution and deduplication, feed event delivery/rendering, language persistence, dictionary completeness, and dynamic UI text updates.
@@ -35,7 +35,7 @@ Add a real-time kill feed to BattleFight and let players switch the built-in gam
 
 ### Localization
 
-Add a focused localization module with `th` and `en` dictionaries, a validated current-language setting, a translation lookup with parameter substitution, and a change event for UI consumers. Read and validate the saved language at startup; write a new value whenever the player changes it. Missing keys must fall back to the Thai source string and be detectable by a test so new UI text cannot silently ship untranslated.
+Add a focused localization module with `th` and `en` dictionaries, a validated current-language setting, a translation lookup with parameter substitution, and a change event for UI consumers. Read and validate the saved language at startup; write a new value whenever the player changes it. English is the default language. Missing keys must fall back to the English source string and be detectable by a test so new UI text cannot silently ship untranslated.
 
 Templates mark static built-in strings with translation keys. UI components and asynchronous status/error updates use the same lookup function rather than embedding localized sentences in event handlers. Switching language updates static labels, accessibility attributes, and current dynamic panels without disturbing game state. User-authored content remains data and is not passed through the translation dictionaries.
 
@@ -49,8 +49,8 @@ The training and exhibition statistics path remains responsible for aggregate ki
 
 ## Error Handling and Compatibility
 
-- If language storage is unavailable or contains an unknown value, use Thai and keep the selector usable for the current session.
-- If a translation key is missing at runtime, display its Thai source text; automated dictionary checks report the missing English key.
+- If language storage is unavailable or contains an unknown value, use English and keep the selector usable for the current session.
+- If a translation key is missing at runtime, display its English source text; automated dictionary checks report the missing Thai key.
 - If a death has no resolvable player owner, do not emit a player kill-feed row.
 - If killer ownership cannot be resolved, show an elimination without a credited killer.
 - Escape names through DOM text APIs; never interpolate player-controlled names into HTML.
@@ -60,7 +60,7 @@ The training and exhibition statistics path remains responsible for aggregate ki
 
 - Unit tests verify opposing-team kill credit, friendly/self/environment elimination behavior, non-player unit filtering, and duplicate death suppression.
 - Integration tests verify one server death produces one client feed entry with the expected identity/context fields.
-- Localization tests verify Thai default, English/Thai persistence, invalid saved-value fallback, parameter substitution, and missing-key detection.
+- Localization tests verify English default, English/Thai persistence, invalid saved-value fallback, parameter substitution, and missing-key detection.
 - UI checks verify language changes update the spectator and combat screens, statistics, and asynchronously generated status text without a reload.
 - Run the repository's full JavaScript test suite and manually inspect both language modes in a live local game.
 
