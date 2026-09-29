@@ -22,7 +22,7 @@ const Client = IgeEventingClass.extend({
 		//
 		this.data = [];
 		this.previousScore = 0;
-		this.host = window.isStandalone ? 'https://www.modd.io' : '';
+		this.host = window.isDesktopApp ? '' : (window.isStandalone ? 'https://www.modd.io' : '');
 		this.loadedTextures = {};
 
 		console.log('window.location.hostname: ', window.location.hostname); // unnecessary
@@ -85,6 +85,9 @@ const Client = IgeEventingClass.extend({
 				url: 'ws://localhost:2001'
 			}
 		];
+		const desktopConnectionPromise = window.isDesktopApp
+			? window.battleFightDesktop.getConnectionConfig()
+			: Promise.resolve(null);
 
 		this.cellSheets = {};
 
@@ -187,7 +190,22 @@ const Client = IgeEventingClass.extend({
 			}
 		});
 
-		promise.then((game) => {
+		Promise.all([promise, desktopConnectionPromise]).then(([game, desktopConnection]) => {
+			if (desktopConnection) {
+				const wsUrl = new URL(desktopConnection.webSocketUrl);
+				if (wsUrl.protocol !== 'ws:' || wsUrl.hostname !== '127.0.0.1' || !Number.isInteger(Number(wsUrl.port))) {
+					throw new Error('Desktop game server returned an invalid WebSocket address');
+				}
+				this.servers = [{
+					ip: '127.0.0.1',
+					port: Number(wsUrl.port),
+					playerCount: 0,
+					maxPlayers: 32,
+					acceptingPlayers: true,
+					gameId: gameId,
+					url: desktopConnection.webSocketUrl
+				}];
+			}
 			ige.game.data = game.data;
 			// let's try here
 			ige.addComponent(IgeInitPixi);
@@ -200,7 +218,7 @@ const Client = IgeEventingClass.extend({
 			// add components to ige instance
 			// old comment => 'components required for client-side game logic'
 			ige.addComponent(IgeNetIoComponent);
-			ige.addComponent(SoundComponent);
+			if (!window.isDesktopApp) ige.addComponent(SoundComponent);
 
 			ige.addComponent(MenuUiComponent);
 			ige.addComponent(TradeUiComponent); // could we comment this one out?
@@ -457,9 +475,10 @@ const Client = IgeEventingClass.extend({
 
 			ige.shop.enableShop();
 
-			//old comments => 'load sound and music when game starts'
-			ige.sound.preLoadSound();
-			ige.sound.preLoadMusic();
+			if (!window.isDesktopApp) {
+				ige.sound.preLoadSound();
+				ige.sound.preLoadMusic();
+			}
 
 			window.activatePlayGame = true; // is there a reason this line was repeated?
 
@@ -662,9 +681,17 @@ const Client = IgeEventingClass.extend({
 			const version = 1;
 			const pixiLoader = ige.pixi.loader; // renamed this from 'resource' to 'pixiLoader'
 
-			// Rewrite CDN URLs to local paths when running standalone
+			// Map the approved game asset hosts to the staged local asset tree.
 			const toLocalUrl = function(url) {
 				if (!url) return url;
+				if (window.isDesktopApp) {
+					const parsed = new URL(url, window.location.href);
+					if (parsed.origin === window.location.origin) return `${parsed.pathname}${parsed.search}`;
+					if (parsed.hostname === 'cache.modd.io' || parsed.hostname === 'modd.s3.amazonaws.com') {
+						return `/assets/${parsed.hostname}${parsed.pathname}${parsed.search}`;
+					}
+					return url;
+				}
 				if (window.isStandalone) {
 					return url.replace(/^https?:\/\//, '/');
 				}
@@ -975,12 +1002,12 @@ const Client = IgeEventingClass.extend({
 		ige.network.define('ui', this._onUi);
 		ige.network.define('playAd', this._onPlayAd);
 		ige.network.define('buySkin', this._onBuySkin);
-		ige.network.define('videoChat', this._onVideoChat);
+		if (!window.isDesktopApp) ige.network.define('videoChat', this._onVideoChat);
 
 		ige.network.define('devLogs', this._onDevLogs);
 		ige.network.define('errorLogs', this._onErrorLogs);
 
-		ige.network.define('sound', this._onSound);
+		if (!window.isDesktopApp) ige.network.define('sound', this._onSound);
 		ige.network.define('particle', this._onParticle);
 		ige.network.define('camera', this._onCamera);
 

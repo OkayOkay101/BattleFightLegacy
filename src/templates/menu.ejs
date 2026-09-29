@@ -3,7 +3,9 @@
     <div id="training-demo-settings" data-policy="<%= trainingDemoPolicy %>">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="demo-kicker">⚔️ BATTLEFIGHT · AI LAB & CONTROL</span>
+            <% if (!desktopMode) { %>
             <span id="training-live-badge" class="badge badge-secondary px-2 py-1" data-i18n="training.connecting">Connecting...</span>
+            <% } %>
         </div>
         
         <div class="menu-language-control">
@@ -18,6 +20,7 @@
         
         <!-- Live AI Training Stats Dashboard -->
         <div class="train-dashboard mb-3">
+            <% if (!desktopMode) { %>
             <div class="train-stat-grid">
                 <div class="stat-card">
                     <span class="stat-label" data-i18n="training.status">สถานะการเทรน</span>
@@ -59,6 +62,7 @@
                 </div>
                 <span id="web-workers-message" class="small ml-2" role="status" aria-live="polite"></span>
             </div>
+            <% } %>
             <div class="demo-model-controls mt-2">
                 <label for="select-blue-policy" data-i18n="training.blueAi">🔵 Blue AI</label>
                 <select id="select-blue-policy" class="form-control form-control-sm">
@@ -205,6 +209,7 @@
 window.trainingDemoMode = 'spectate';
 
 document.addEventListener('DOMContentLoaded', function () {
+    var desktopMode = <%- JSON.stringify(!!desktopMode) %>;
     var i18n = window.gameI18n;
     function tr(key, values) { return i18n ? i18n.t(key, values) : key; }
     var settings = document.getElementById('training-demo-settings');
@@ -385,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (i18n) i18n.subscribe(function () {
-        fetchTrainingStatus();
+        if (!desktopMode) fetchTrainingStatus();
         fetchDemoStatus();
         fetchPolicies();
     });
@@ -457,10 +462,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     if (btnApplyPolicies) btnApplyPolicies.addEventListener('click', applyDemoPolicies);
 
-    fetchTrainingStatus();
+    if (!desktopMode) fetchTrainingStatus();
     fetchPolicies();
     fetchDemoStatus();
-    setInterval(fetchTrainingStatus, 3000);
+    if (!desktopMode) setInterval(fetchTrainingStatus, 3000);
     setInterval(fetchDemoStatus, 1500);
 
     if (settings) {
