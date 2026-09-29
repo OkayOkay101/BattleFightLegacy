@@ -319,11 +319,24 @@ var Server = IgeClass.extend({
 			app.use('/modd.s3.amazonaws.com', makeCdnProxy('modd.s3.amazonaws.com'));
 		}
 
-		const trainingCli = require('./training/TrainingCli');
+		const trainingCli = desktopMode ? null : require('./training/TrainingCli');
 		const { PolicyRegistry } = require('./training/PolicyRegistry');
-		const trainingDataDir = path.resolve(__dirname, '../training-data');
+		const trainingDataDir = path.resolve(process.env.BATTLEFIGHT_USER_DATA || path.resolve(__dirname, '../training-data'));
+		const selectionFile = process.env.BATTLEFIGHT_SELECTION_FILE;
+		const persistDesktopSelection = (selection) => {
+			if (!desktopMode || !selectionFile) return;
+			fs.mkdirSync(path.dirname(selectionFile), { recursive: true });
+			const temporaryFile = `${selectionFile}.${process.pid}.${require('crypto').randomUUID()}.tmp`;
+			try {
+				fs.writeFileSync(temporaryFile, JSON.stringify(selection), 'utf8');
+				fs.renameSync(temporaryFile, selectionFile);
+			} finally {
+				if (fs.existsSync(temporaryFile)) fs.rmSync(temporaryFile, { force: true });
+			}
+		};
 
 		app.get('/api/training/status', async (req, res) => {
+			if (desktopMode) return res.status(404).json({ ok: false, error: 'Training is unavailable in desktop mode' });
 			try {
 				const currentStatus = await trainingCli.status({ dataDir: trainingDataDir });
 				const registry = new PolicyRegistry(trainingDataDir);
@@ -372,9 +385,18 @@ var Server = IgeClass.extend({
 			const blue = registry.policy(blueVersion);
 			const red = registry.policy(redVersion);
 			if (!blue || !red) return res.status(400).json({ ok: false, error: 'Unknown or corrupt demo policy' });
-			ige.trainingPolicy = blue;
-			res.json({ ok: true, demo: ige.training.setPolicies(blue, red) });
+			try {
+				persistDesktopSelection({ blue: blue.version, red: red.version });
+				ige.trainingPolicy = blue;
+				res.json({ ok: true, demo: ige.training.setPolicies(blue, red) });
+			} catch (error) {
+				res.status(500).json({ ok: false, error: error.message });
+			}
 		});
+
+		if (desktopMode) {
+			app.use('/api/training', (_req, res) => res.status(404).json({ ok: false, error: 'Training is unavailable in desktop mode' }));
+		}
 
 		app.post('/api/training/start', async (req, res) => {
 			try {
@@ -829,12 +851,28 @@ var Server = IgeClass.extend({
 						// }
 
 						try {
-							var registry = new (require('./training/PolicyRegistry').PolicyRegistry)();
+							var desktopMode = process.env.BATTLEFIGHT_DESKTOP === '1';
+							var trainingDataDir = path.resolve(process.env.BATTLEFIGHT_USER_DATA || path.resolve(__dirname, '../training-data'));
+							var registry = new (require('./training/PolicyRegistry').PolicyRegistry)(trainingDataDir);
 							if (!(ige.training && ige.training.isTrainingMode)) {
 								var demo = require('./training/DemoRuntime');
 								var requestedPolicy = process.env.BATTLEFIGHT_DEMO_POLICY || 'latest';
-								ige.trainingPolicy = demo.resolveDemoPolicy(registry, requestedPolicy);
-								demo.installDemo(ige, ige.trainingPolicy);
+								if (desktopMode) {
+									var savedSelection = {};
+									try { savedSelection = JSON.parse(fs.readFileSync(process.env.BATTLEFIGHT_SELECTION_FILE, 'utf8')); } catch (error) {}
+									var resolveSavedPolicy = function (version) {
+										if (typeof version === 'string' && registry.policy(version)) return demo.resolveDemoPolicy(registry, version);
+										return demo.resolveDemoPolicy(registry, requestedPolicy);
+									};
+									var bluePolicy = resolveSavedPolicy(savedSelection.blue);
+									var redPolicy = resolveSavedPolicy(savedSelection.red);
+									ige.trainingPolicy = bluePolicy;
+									demo.installDemo(ige, bluePolicy);
+									if (redPolicy.version !== bluePolicy.version) ige.training.setPolicies(bluePolicy, redPolicy);
+								} else {
+									ige.trainingPolicy = demo.resolveDemoPolicy(registry, requestedPolicy);
+									demo.installDemo(ige, ige.trainingPolicy);
+								}
 								console.log('BattleFight active neural exhibition: 3v3, policy ' + ige.trainingPolicy.version);
 							} else {
 								ige.trainingPolicy = registry.policyForNewMatch();

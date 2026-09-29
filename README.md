@@ -64,6 +64,21 @@ Your game's Game ID can be found in your modd.io's game's sandbox ([example](htt
 
 <img src="./assets/images/gameid.png" width="600" alt="How to get game id">
 
+## BattleFight portable Windows app
+
+The Windows x64 portable Electron build runs the BattleFight game and its server on this computer. The packaged game assets and browser libraries are local, the app blocks renderer requests to non-local origins, and the standalone build contains no audio files or audio playback paths. Internet access is not required to play after the executable has been built.
+
+To build it on Windows, install the repository dependencies and run:
+
+```powershell
+npm install
+npm run desktop:build
+```
+
+The output is `dist/portable/BattleFight-Portable-1.0.0.exe` (the version follows `package.json`). The build stages a minimal runtime under `build/desktop-resources/` and uses lossless PNG recompression when the result is smaller; it does not modify the original game assets.
+
+The app keeps the Blue and Red AI selectors and game statistics. Training controls and training history are not included. On first launch, the bundled policy seed files are copied to `%APPDATA%\BattleFight\training-data\policies`; existing files are never overwritten. To add a policy manually, put its `n-<number>.json` file in that folder and restart the app. The selected Blue and Red policy versions are saved in `%APPDATA%\BattleFight\desktop-selection.json`. These writable files stay outside the executable so they persist across app updates.
+
 ## Quick start example - Run "Two Houses" locally
 
 Install [Node 14](https://nodejs.org) or later and then...

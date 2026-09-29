@@ -4,6 +4,8 @@ const { app, BrowserWindow, dialog, ipcMain, session, utilityProcess } = require
 const fs = require('fs');
 const path = require('path');
 
+app.setName('BattleFight');
+
 const LOG_LIMIT_BYTES = 1024 * 1024;
 const STARTUP_TIMEOUT_MS = 30000;
 const SHUTDOWN_TIMEOUT_MS = 4000;
@@ -57,12 +59,39 @@ function installRequestAllowlist (rendererSession) {
 	});
 }
 
+function initializeUserPolicyData (root) {
+	const sourceDirectory = path.join(root, 'training-data', 'policies');
+	const userTrainingDirectory = path.join(app.getPath('userData'), 'training-data');
+	const userPolicyDirectory = path.join(userTrainingDirectory, 'policies');
+	if (!fs.existsSync(sourceDirectory)) {
+		throw new Error(`Desktop policy seeds are missing: ${sourceDirectory}`);
+	}
+	const seeds = fs.readdirSync(sourceDirectory).filter(name => /^n-\d+\.json$/.test(name));
+	if (!seeds.length) throw new Error(`No desktop policy seeds were found in ${sourceDirectory}`);
+	fs.mkdirSync(userPolicyDirectory, { recursive: true });
+	for (const name of seeds) {
+		const source = path.join(sourceDirectory, name);
+		const destination = path.join(userPolicyDirectory, name);
+		if (!fs.existsSync(destination)) fs.copyFileSync(source, destination, fs.constants.COPYFILE_EXCL);
+	}
+	return {
+		trainingDirectory: userTrainingDirectory,
+		selectionFile: path.join(app.getPath('userData'), 'desktop-selection.json')
+	};
+}
+
 function startGameServer () {
 	return new Promise((resolve, reject) => {
 		const root = resourceRoot();
 		const entryPath = path.join(root, 'server', 'desktop-entry.js');
 		if (!fs.existsSync(entryPath)) {
 			return reject(new Error(`Desktop runtime is missing: ${entryPath}`));
+		}
+		let userDataPaths;
+		try {
+			userDataPaths = initializeUserPolicyData(root);
+		} catch (error) {
+			return reject(error);
 		}
 
 		const packagedModulesPath = path.join(app.getAppPath(), 'node_modules');
@@ -72,7 +101,8 @@ function startGameServer () {
 				...process.env,
 				BATTLEFIGHT_DESKTOP: '1',
 				BATTLEFIGHT_RESOURCE_ROOT: root,
-				BATTLEFIGHT_USER_DATA: path.join(app.getPath('userData'), 'training-data'),
+				BATTLEFIGHT_USER_DATA: userDataPaths.trainingDirectory,
+				BATTLEFIGHT_SELECTION_FILE: userDataPaths.selectionFile,
 				NODE_PATH: [packagedModulesPath, process.env.NODE_PATH].filter(Boolean).join(path.delimiter)
 			}
 		});

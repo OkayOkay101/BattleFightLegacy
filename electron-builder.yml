@@ -6,7 +6,6 @@ directories:
   output: dist/portable
 files:
   - desktop/**
-  - node_modules/**
   - package.json
 extraMetadata:
   main: desktop/main.js
