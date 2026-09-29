@@ -91,7 +91,7 @@
     <!-- Game Variables -->
     <script>
         var mode = 'play';
-        var gameId = '<%= gameId %>';
+        var gameId = <%- JSON.stringify(desktopMode ? '' : (gameId || '')) %>;
         var userId = '';
         var isLoggedIn = false;
         window.joinGameSent = {};
