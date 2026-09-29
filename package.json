@@ -25,7 +25,8 @@
     "build:gs": "cross-env TEST=true node server/ige.js -deploy ./src -to ../../be/assets",
     "build:git": "cross-env TEST=true node server/ige.js -deploy ./src -to ./build",
     "debug": "cross-env ENV=standalone node --inspect server/ige.js -g ./src",
-    "dev:lint": "eslint . --fix"
+    "dev:lint": "eslint . --fix",
+    "desktop:build": "node tools/prepare-desktop-package.js && electron-builder --win portable --x64"
   },
   "repository": {
     "type": "git",
@@ -48,9 +49,8 @@
     "express": "^4.18.1",
     "helmet": "^5.1.0",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.21",
-    "lz-string": "^1.4.4",
     "msgpack-lite": "^0.1.26",
+    "node-arguments": "0.0.1",
     "phaser": "^3.55.2",
     "public-ip": "^2.5.0",
     "q": "^1.5.1",
@@ -59,23 +59,34 @@
     "sanitizer": "^0.1.3",
     "validator": "^13.7.0",
     "ws": "^8.8.1",
-    "xss-filters": "^1.2.7"
+    "xss-filters": "^1.2.7",
+    "lodash": "4.17.21",
+    "lz-string": "1.4.4"
   },
   "devDependencies": {
     "@babel/core": "^7.18.9",
     "@babel/eslint-parser": "^7.18.9",
+    "@fortawesome/fontawesome-free": "5.15.4",
+    "@popperjs/core": "2.11.2",
     "@types/node": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.7",
     "babel-plugin-transform-remove-console": "^6.9.4",
+    "bootstrap": "5.1.3",
     "cross-env": "^7.0.3",
+    "electron": "44.3.0",
+    "electron-builder": "26.17.0",
     "eslint": "^8.20.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
-    "node-arguments": "^0.0.1",
+    "jquery": "3.6.0",
+    "jquery-contextmenu": "2.9.2",
+    "jquery-ui-dist": "1.12.1",
+    "pixi.js-legacy": "6.2.2",
     "rollbar": "^2.25.0",
+    "sweetalert2": "11.4.0",
     "typescript": "^4.7.4"
   }
 }

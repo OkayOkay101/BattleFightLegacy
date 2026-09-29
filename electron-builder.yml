@@ -1,0 +1,21 @@
+appId: io.battlefight.desktop
+productName: BattleFight
+asar: true
+compression: normal
+directories:
+  output: dist/portable
+files:
+  - desktop/**
+  - node_modules/**
+  - package.json
+extraMetadata:
+  main: desktop/main.js
+extraResources:
+  - from: build/desktop-resources
+    to: desktop-data
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+artifactName: BattleFight-Portable-${version}.${ext}
