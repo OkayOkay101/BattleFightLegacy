@@ -2,7 +2,7 @@
 
 ## Goal
 
-Package BattleFight as a Windows x64 portable Electron executable that runs the game locally on this computer. The desktop build includes the game and its visual assets, contains no sound or music files, makes no runtime requests to fetch game assets from the internet, and lets the player choose the included AI policies for Blue and Red. The packaging step removes unneeded assets and packages code efficiently without lossy image conversion or changing the source assets. It does not include the Python/PyTorch trainer or match-training history.
+Package BattleFight as a Windows x64 portable Electron executable that runs the game locally on this computer. The desktop product has no audio of any kind: it contains no audio files, audio references, audio engine, or audio event handlers. It includes the game and its visual assets, makes no runtime requests to fetch game assets from the internet, and lets the player choose the included AI policies for Blue and Red. The packaging step removes unneeded assets and packages code efficiently without lossy image conversion or changing the source assets. It does not include the Python/PyTorch trainer or match-training history.
 
 ## Confirmed Decisions
 
@@ -12,16 +12,15 @@ Package BattleFight as a Windows x64 portable Electron executable that runs the 
 - Include the application source/runtime, required Node dependencies, local visual assets, and the current selectable AI policy files.
 - Store writable policies, preferences, logs, and other runtime data under Electron's per-user `userData` directory, outside the packaged executable.
 - Do not package match/training history, Python, PyTorch, or a usable training control surface. Training controls in the desktop build are disabled or omitted.
-- Package no audio or music files and disable sound loading and playback in this desktop build.
+- Include no audio in the desktop product: no audio files, game-data references, sound event definitions or handlers, sound engine, preload path, or playback path.
 - Do not use online/CDN asset fallback. All visual assets needed to play must be present locally.
 
 ## Current State and Packaging Evidence
 
 - `npm run server` starts the standalone game server through `server/ige.js`; it currently uses HTTP port `80` and WebSocket port `2001`, and the client advertises `ws://localhost:2001`.
 - `server/server.js` serves visual assets from `assets/` and also has CDN proxy routes for `cache.modd.io` and `modd.s3.amazonaws.com`. The desktop build must bypass these routes and fail clearly when a required local asset is missing.
-- The game data references 1,200 distinct visual assets; the current `assets/` tree contains every referenced visual asset. The game data also contains 385 audio references, which must not cause preloads or network requests in the desktop build.
+- The game data references 1,200 distinct visual assets; the current `assets/` tree contains every referenced visual asset. The desktop build includes the visual assets and excludes all audio content and audio-related game data.
 - Current source-tree sizes are approximately 38.5 MiB for `src/`, 8.3 MiB for `engine/`, 0.2 MiB for `server/`, and 41.8 MiB for `assets/`, before dependencies and Electron. These are baseline measurements, not a final executable-size promise.
-- The 1,838 files under `assets/` total 43,835,795 bytes. Its 319 MP3 files and 144 M4A files account for 36,916,733 bytes (about 84.2%). Excluding those 463 audio files leaves 6,919,062 bytes of other assets (about 6.60 MiB), before filtering any unreferenced files.
 - PNG and JPEG are already compressed image formats; avoid converting them to a lossy format or recompressing all of them blindly. Keep the source assets unchanged and only run a lossless optimizer on a build staging copy if it produces smaller output.
 - `training-data/policies/` currently has 26 JSON policy files totaling about 8.9 MB. `training-data/matches.jsonl` is about 2.03 GB and is excluded along with other match logs, checkpoints, worker state, and training history.
 - The server currently resolves training data relative to its source directory. The packaged app must instead keep immutable seed policies with the application and place writable policy/registry data in the per-user data directory.
@@ -40,11 +39,11 @@ The Electron renderer loads only the local game page. Disable Node integration, 
 
 The portable package contains the local visual assets used by the packaged game data. Asset URLs resolve to the local server's asset route. Desktop mode does not register CDN proxy routes, rewrite missing local files to a CDN, or permit the game client to download assets from an external host. A missing local visual asset is logged and surfaced as a local asset error instead of being fetched online.
 
-Create the packaged asset tree from an allowlist of local visual files actually referenced by the desktop game. Exclude every audio/music file and every unreferenced asset from the portable package while leaving repository originals untouched. The current asset inventory indicates audio exclusion alone cuts the asset payload by about 84.2%; the final build should report its staged asset size and file count so future additions cannot silently inflate the package.
+Create the packaged asset tree from an allowlist of local visual assets and UI resources required by the desktop game. Exclude all audio and every unreferenced asset from the portable package while leaving repository originals untouched. The final build should report its staged asset size and file count so future additions cannot silently inflate the package.
 
 Use Electron's normal `asar` packaging for application files and the standard portable target compression. Do not force the `maximum` setting: electron-builder documents that it usually does not noticeably reduce package size and increases build time. PNG/JPEG visual assets are preserved as-is unless a lossless staging optimization measurably reduces their size. Compare the final artifact with the unfiltered input inventory and report the actual output size rather than promising a size based only on these source-tree measurements.
 
-The build excludes audio and music files. In desktop mode it also skips `SoundComponent` setup, sound/music preloading, and sound playback handlers, including server-originated sound events. Audio references in source game data must be ignored or filtered by the desktop runtime before asset loading; they must not trigger network requests or block game startup. These packaging rules apply to the portable desktop product and do not require deleting source assets or changing the browser game's source distribution.
+The desktop build removes all audio-related content from the packaged game data, including audio asset references and sound event definitions. It omits the sound engine, event handlers, preloading code, and playback code from the desktop runtime. It packages zero audio files and must make zero audio requests. These rules apply to the portable desktop product; repository originals and the separate browser build remain outside this package scope.
 
 The desktop app is intended to play locally. It must not connect to a remote game server or CDN for game operation. Any non-game telemetry or update request is outside this design and must not be added implicitly.
 
@@ -71,7 +70,7 @@ Match recording, training history, worker output, and training checkpoints are n
 - The app starts its local server, waits for both listeners, connects the game UI to the selected WebSocket port, and shuts the server down when the app exits.
 - Both listeners are loopback-only and use dynamically selected ports.
 - Blue and Red can independently use policies included with the desktop app; user policy changes persist outside the executable.
-- The package contains no audio/music files, and launching/playing does not preload or play sound.
+- The package and packaged game data contain zero audio files, references, components, event handlers, preloads, playback paths, or network requests.
 - The packaged asset manifest includes all referenced visual assets and excludes audio plus unreferenced files; its staged size and file count are recorded.
 - Packaging leaves repository source assets unchanged and does not use lossy image conversion.
 - All required visual assets load from the package on an offline machine; no asset CDN request is made, including for missing assets.
@@ -82,7 +81,7 @@ Match recording, training history, worker output, and training checkpoints are n
 ## Out of Scope
 
 - macOS/Linux builds, LAN hosting, public deployment, auto-updates, online matchmaking, bundled Python/PyTorch training, model retraining, and migration of the multi-gigabyte training archive.
-- Changing combat balance, game rules, AI policy behavior, or the browser version's general sound behavior.
+- Changing combat balance, game rules, or AI policy behavior, or changing the separate browser build.
 
 ## Official References
 
