@@ -546,7 +546,9 @@ NetIo.Server = NetIo.EventingClass.extend({
 
 	start: function (port, callback) {
 		var self = this;
-		this._port = port;
+		const listenOptions = port && typeof port === 'object' ? port : { port };
+		this._port = listenOptions.port;
+		this._host = listenOptions.host;
 		var secure = true; // to turn on/off https
 		if (process.env.ENV == 'local' || process.env.ENV == 'standalone' || process.env.ENV == 'standalone-remote') {
 			secure = false;
@@ -583,16 +585,20 @@ NetIo.Server = NetIo.EventingClass.extend({
 			}
 
 			console.log('websocket error', err);
+			if (typeof callback === 'function') callback(err);
 		});
 
-		this._httpServer.listen(this._port, function (err) {
+		const onListening = function () {
+			self._port = self._httpServer.address().port;
 			self.log(`Server is listening on port ${self._port}`);
 			if (!secure) {
 				if (typeof (callback) === 'function') {
 					callback();
 				}
 			}
-		});
+		};
+		if (this._host) this._httpServer.listen(this._port, this._host, onListening);
+		else this._httpServer.listen(this._port, onListening);
 
 		// https
 		if (secure) {
@@ -648,6 +654,28 @@ NetIo.Server = NetIo.EventingClass.extend({
 				}
 			});
 		}
+	},
+	stop: function (callback) {
+		const websocketServers = [this._socketServerHttp, this._socketServerHttps].filter(Boolean);
+		for (const websocketServer of websocketServers) {
+			if (websocketServer.clients) {
+				for (const client of websocketServer.clients) {
+					try { client.close(1001, 'BattleFight is shutting down'); } catch (error) {}
+				}
+			}
+		}
+
+		const closers = [];
+		for (const websocketServer of websocketServers) {
+			closers.push(new Promise((resolve) => {
+				try { websocketServer.close(() => resolve()); } catch (error) { resolve(); }
+			}));
+		}
+		for (const server of [this._httpServer, this._httpsServer].filter(Boolean)) {
+			if (!server.listening) continue;
+			closers.push(new Promise((resolve) => server.close(() => resolve())));
+		}
+		Promise.all(closers).then(() => { if (typeof callback === 'function') callback(); });
 	},
 
 	socketConnection: function (ws, request) {

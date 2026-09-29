@@ -93,7 +93,14 @@ function startGameServer () {
 		gameProcess.on('message', (event) => {
 			const message = event && Object.prototype.hasOwnProperty.call(event, 'data') ? event.data : event;
 			if (message && message.type === 'battlefight-error') {
-				fail(new Error(message.message || 'Local game server failed during startup'));
+				const error = new Error(message.message || 'Local game server failed during startup');
+				if (settled) {
+					appendLog(error.stack || error.message);
+					dialog.showErrorBox('BattleFight server stopped', `${error.message}\n\nDetails: ${path.join(app.getPath('userData'), 'desktop-startup.log')}`);
+					app.quit();
+				} else {
+					fail(error);
+				}
 				return;
 			}
 			if (!isReadyMessage(message)) {

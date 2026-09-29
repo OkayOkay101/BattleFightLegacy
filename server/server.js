@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const path = require('path');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const http = require('http');
 const cluster = require('cluster');
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 _ = require('lodash');
@@ -77,6 +78,10 @@ var Server = IgeClass.extend({
 		self.totalProjectilesCreated = 0;
 		self.retryCount = 0;
 		self.maxRetryCount = 3;
+		self._httpServer = null;
+		self.httpPort = null;
+		self.wsPort = null;
+		self._desktopReadySent = false;
 		self.postReqTimestamps = []
 		self.started_at = new Date();
 		self.lastSnapshot = [];
@@ -186,7 +191,7 @@ var Server = IgeClass.extend({
 		}
 
 		// periodicaly update user coins to db for inapp purchase
-		setInterval(function () {
+		self._coinUpdateInterval = setInterval(function () {
 			if (Object.keys(self.coinUpdate || {}).length > 0) {
 				self.postConsumeCoinsForUsers();
 			}
@@ -245,7 +250,8 @@ var Server = IgeClass.extend({
 	},
 	startWebServer: function () {
 		const app = express();
-		const port = 80;
+		const desktopMode = process.env.BATTLEFIGHT_DESKTOP === '1';
+		const port = desktopMode ? 0 : 80;
 
 		app.use(bodyParser.urlencoded({ extended: false }));
 		// parse application/json
@@ -292,29 +298,26 @@ var Server = IgeClass.extend({
 
 		app.use('/assets', express.static(path.resolve('./assets/'), { cacheControl: 7 * 24 * 60 * 60 * 1000 }));
 
-		// Proxy CDN assets: serve local file first, then fall back to real CDN
-		const http = require('http');
-		const https = require('https');
-		const makeCdnProxy = (cdnHost) => {
-			const localDir = path.resolve(`./assets/${cdnHost}`);
-			return (req, res, next) => {
-				const localFile = path.join(localDir, req.path);
-				// try local first
-				if (fs.existsSync(localFile) && fs.statSync(localFile).isFile()) {
-					return res.sendFile(localFile);
-				}
-				// fallback: proxy from real CDN
-				const cdnUrl = `https://${cdnHost}${req.path}`;
-				const client = cdnUrl.startsWith('https') ? https : http;
-				const proxyReq = client.get(cdnUrl, (proxyRes) => {
-					res.writeHead(proxyRes.statusCode, proxyRes.headers);
-					proxyRes.pipe(res);
-				});
-				proxyReq.on('error', () => res.status(404).send('Not found'));
+		if (!desktopMode) {
+			// Browser build retains the CDN proxy behavior.
+			const https = require('https');
+			const makeCdnProxy = (cdnHost) => {
+				const localDir = path.resolve(`./assets/${cdnHost}`);
+				return (req, res, next) => {
+					const localFile = path.join(localDir, req.path);
+					if (fs.existsSync(localFile) && fs.statSync(localFile).isFile()) {
+						return res.sendFile(localFile);
+					}
+					const proxyReq = https.get(`https://${cdnHost}${req.path}`, (proxyRes) => {
+						res.writeHead(proxyRes.statusCode, proxyRes.headers);
+						proxyRes.pipe(res);
+					});
+					proxyReq.on('error', () => res.status(404).send('Not found'));
+				};
 			};
-		};
-		app.use('/cache.modd.io', makeCdnProxy('cache.modd.io'));
-		app.use('/modd.s3.amazonaws.com', makeCdnProxy('modd.s3.amazonaws.com'));
+			app.use('/cache.modd.io', makeCdnProxy('cache.modd.io'));
+			app.use('/modd.s3.amazonaws.com', makeCdnProxy('modd.s3.amazonaws.com'));
+		}
 
 		const trainingCli = require('./training/TrainingCli');
 		const { PolicyRegistry } = require('./training/PolicyRegistry');
@@ -578,11 +581,12 @@ var Server = IgeClass.extend({
 				selectedServer: null,
 				servers: [{
 					ip: '127.0.0.1',
-					port: 2001,
+					port: ige.server.wsPort || ige.server.gameServerPort,
 					playerCount: 0,
 					maxPlayers: 32,
 					acceptingPlayers: true
 				}],
+				desktopMode: process.env.BATTLEFIGHT_DESKTOP === '1',
 				createdBy: '',
 				menudiv: false,
 				trainingDemoPolicy: (ige.trainingPolicy && ige.trainingPolicy.version) || process.env.BATTLEFIGHT_DEMO_POLICY || '',
@@ -615,7 +619,45 @@ var Server = IgeClass.extend({
 
 			return res.render('index.ejs', options);
 		});
-		app.listen(port, () => console.log(`Express listening on port ${port}!`));
+		if (desktopMode) {
+			this._httpServer = http.createServer(app);
+			this._httpServer.on('error', (error) => this._reportDesktopStartupError(error));
+			this._httpServer.listen(port, '127.0.0.1', () => {
+				this.httpPort = this._httpServer.address().port;
+				console.log(`Express listening on loopback port ${this.httpPort}!`);
+				this._trySendDesktopReady();
+			});
+		} else {
+			app.listen(port, () => console.log(`Express listening on port ${port}!`));
+		}
+	},
+	_reportDesktopStartupError: function (error) {
+		if (process.env.BATTLEFIGHT_DESKTOP !== '1' || !process.parentPort) return;
+		process.parentPort.postMessage({ type: 'battlefight-error', message: error.stack || error.message });
+	},
+	_trySendDesktopReady: function () {
+		if (
+			process.env.BATTLEFIGHT_DESKTOP !== '1' ||
+			this._desktopReadySent ||
+			!this.gameLoaded ||
+			!Number.isInteger(this.httpPort) ||
+			!Number.isInteger(this.wsPort)
+		) return;
+		this._desktopReadySent = true;
+		process.parentPort.postMessage({ type: 'battlefight-ready', httpPort: this.httpPort, wsPort: this.wsPort });
+	},
+	shutdown: function () {
+		this.status = 'stopping';
+		for (const timer of [this._coinUpdateInterval, this._gameStatusInterval, this._socketStatsInterval]) {
+			if (timer) clearInterval(timer);
+		}
+		const closeHttp = this._httpServer && this._httpServer.listening
+			? new Promise((resolve) => this._httpServer.close(resolve))
+			: Promise.resolve();
+		const closeNetwork = ige.network && typeof ige.network.stop === 'function'
+			? ige.network.stop()
+			: Promise.resolve();
+		return Promise.all([closeHttp, closeNetwork]).then(() => { this.status = 'stopped'; });
 	},
 
 	// run a specific game in this server
@@ -629,7 +671,9 @@ var Server = IgeClass.extend({
 		}
 
 		this.socket = {};
-		var port = process.env.PORT || 2001;
+		var desktopMode = process.env.BATTLEFIGHT_DESKTOP === '1';
+		var port = desktopMode ? 0 : (process.env.PORT || 2001);
+		self.port = port;
 
 		self.url = `http://${self.ip}:${port}`;
 
@@ -647,7 +691,14 @@ var Server = IgeClass.extend({
 		// Add the networking component
 		ige.network.debug(self.isDebugging);
 		// Start the network server
-		ige.network.start(self.port, function (data) {
+		ige.network.start(desktopMode ? { port: 0, host: '127.0.0.1' } : self.port, function (error) {
+			if (error) {
+				self._reportDesktopStartupError(error);
+				return;
+			}
+			self.wsPort = ige.network._port;
+			self.url = `ws://127.0.0.1:${self.wsPort}`;
+			self._trySendDesktopReady();
 
 			var domain = global.beUrl;
 
@@ -795,9 +846,10 @@ var Server = IgeClass.extend({
 						ige.game.start();
 
 						self.gameLoaded = true;
+						self._trySendDesktopReady();
 
 						// send dev logs to developer every second
-						var logInterval = setInterval(function () {
+						self._gameStatusInterval = setInterval(function () {
 							// send only if developer client is connect
 							if (ige.isServer && ((self.developerClientId && ige.server.clients[self.developerClientId]) || process.env.ENV == 'standalone')) {
 								ige.variable.devLogs.status = ige.server.getStatus();
@@ -812,7 +864,7 @@ var Server = IgeClass.extend({
 							ige.unitBehaviourCount = 0;
 						}, 1000);
 
-						setInterval(function () {
+						self._socketStatsInterval = setInterval(function () {
 							var copyCount = Object.assign({}, self.socketConnectionCount);
 							self.socketConnectionCount = {
 								connected: 0,
@@ -827,6 +879,7 @@ var Server = IgeClass.extend({
 			})
 				.catch((err) => {
 					console.log('got error while loading game json', err);
+					self._reportDesktopStartupError(err);
 					ige.clusterClient && ige.clusterClient.kill('got error while loading game json');
 				});
 		});
