@@ -2,7 +2,7 @@
 
 ## Goal
 
-Package BattleFight as a Windows x64 portable Electron executable that runs the game locally on this computer. The desktop build includes the game and its visual assets, contains no sound or music files, makes no runtime requests to fetch game assets from the internet, and lets the player choose the included AI policies for Blue and Red. It does not include the Python/PyTorch trainer or match-training history.
+Package BattleFight as a Windows x64 portable Electron executable that runs the game locally on this computer. The desktop build includes the game and its visual assets, contains no sound or music files, makes no runtime requests to fetch game assets from the internet, and lets the player choose the included AI policies for Blue and Red. The packaging step removes unneeded assets and packages code efficiently without lossy image conversion or changing the source assets. It does not include the Python/PyTorch trainer or match-training history.
 
 ## Confirmed Decisions
 
@@ -21,6 +21,8 @@ Package BattleFight as a Windows x64 portable Electron executable that runs the 
 - `server/server.js` serves visual assets from `assets/` and also has CDN proxy routes for `cache.modd.io` and `modd.s3.amazonaws.com`. The desktop build must bypass these routes and fail clearly when a required local asset is missing.
 - The game data references 1,200 distinct visual assets; the current `assets/` tree contains every referenced visual asset. The game data also contains 385 audio references, which must not cause preloads or network requests in the desktop build.
 - Current source-tree sizes are approximately 38.5 MiB for `src/`, 8.3 MiB for `engine/`, 0.2 MiB for `server/`, and 41.8 MiB for `assets/`, before dependencies and Electron. These are baseline measurements, not a final executable-size promise.
+- The 1,838 files under `assets/` total 43,835,795 bytes. Its 319 MP3 files and 144 M4A files account for 36,916,733 bytes (about 84.2%). Excluding those 463 audio files leaves 6,919,062 bytes of other assets (about 6.60 MiB), before filtering any unreferenced files.
+- PNG and JPEG are already compressed image formats; avoid converting them to a lossy format or recompressing all of them blindly. Keep the source assets unchanged and only run a lossless optimizer on a build staging copy if it produces smaller output.
 - `training-data/policies/` currently has 26 JSON policy files totaling about 8.9 MB. `training-data/matches.jsonl` is about 2.03 GB and is excluded along with other match logs, checkpoints, worker state, and training history.
 - The server currently resolves training data relative to its source directory. The packaged app must instead keep immutable seed policies with the application and place writable policy/registry data in the per-user data directory.
 
@@ -37,6 +39,10 @@ The Electron renderer loads only the local game page. Disable Node integration, 
 ## Local Assets and No-Audio Build
 
 The portable package contains the local visual assets used by the packaged game data. Asset URLs resolve to the local server's asset route. Desktop mode does not register CDN proxy routes, rewrite missing local files to a CDN, or permit the game client to download assets from an external host. A missing local visual asset is logged and surfaced as a local asset error instead of being fetched online.
+
+Create the packaged asset tree from an allowlist of local visual files actually referenced by the desktop game. Exclude every audio/music file and every unreferenced asset from the portable package while leaving repository originals untouched. The current asset inventory indicates audio exclusion alone cuts the asset payload by about 84.2%; the final build should report its staged asset size and file count so future additions cannot silently inflate the package.
+
+Use Electron's normal `asar` packaging for application files and the standard portable target compression. Do not force the `maximum` setting: electron-builder documents that it usually does not noticeably reduce package size and increases build time. PNG/JPEG visual assets are preserved as-is unless a lossless staging optimization measurably reduces their size. Compare the final artifact with the unfiltered input inventory and report the actual output size rather than promising a size based only on these source-tree measurements.
 
 The build excludes audio and music files. In desktop mode it also skips `SoundComponent` setup, sound/music preloading, and sound playback handlers, including server-originated sound events. Audio references in source game data must be ignored or filtered by the desktop runtime before asset loading; they must not trigger network requests or block game startup. These packaging rules apply to the portable desktop product and do not require deleting source assets or changing the browser game's source distribution.
 
@@ -66,6 +72,8 @@ Match recording, training history, worker output, and training checkpoints are n
 - Both listeners are loopback-only and use dynamically selected ports.
 - Blue and Red can independently use policies included with the desktop app; user policy changes persist outside the executable.
 - The package contains no audio/music files, and launching/playing does not preload or play sound.
+- The packaged asset manifest includes all referenced visual assets and excludes audio plus unreferenced files; its staged size and file count are recorded.
+- Packaging leaves repository source assets unchanged and does not use lossy image conversion.
 - All required visual assets load from the package on an offline machine; no asset CDN request is made, including for missing assets.
 - Training controls cannot start a trainer, and the package contains no match history, Python, or PyTorch.
 - Renderer navigation and preload capabilities remain restricted to the local game.
@@ -81,3 +89,4 @@ Match recording, training history, worker output, and training checkpoints are n
 - [Electron process model](https://www.electronjs.org/docs/latest/tutorial/process-model)
 - [Electron security](https://www.electronjs.org/docs/latest/tutorial/security)
 - [electron-builder Windows targets](https://www.electron.build/docs/win/)
+- [electron-builder configuration and compression](https://www.electron.build/docs/configuration/)
