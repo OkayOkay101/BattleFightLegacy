@@ -948,8 +948,19 @@
 					}
 
 					var center = this.parent.center;
-					var targetX = this.target.x;
-					var targetY = this.target.y;
+					// A tracked PIXI object may be destroyed between ticks (for example on death).
+					// Its x/y accessors then throw because its transform has been removed.
+					if (!this.target || this.target.destroyed || this.target._destroyed) {
+						return;
+					}
+					var targetX = void 0;
+					var targetY = void 0;
+					try {
+						targetX = this.target.x;
+						targetY = this.target.y;
+					} catch (error) {
+						return;
+					}
 
 					// if (this.radius) {
 					//     var distance = Math.sqrt(Math.pow(this.target.y - center.y, 2) + Math.pow(this.target.x - center.x, 2));

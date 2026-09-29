@@ -3,37 +3,44 @@
     <div id="training-demo-settings" data-policy="<%= trainingDemoPolicy %>">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="demo-kicker">⚔️ BATTLEFIGHT · AI LAB & CONTROL</span>
-            <span id="training-live-badge" class="badge badge-secondary px-2 py-1">Connecting...</span>
+            <span id="training-live-badge" class="badge badge-secondary px-2 py-1" data-i18n="training.connecting">Connecting...</span>
         </div>
         
-        <h2>สนามทดลอง & ควบคุม AI</h2>
-        <p>เลือกโหมดการเล่น ติดตามสถิติการฝึก และควบคุมการเทรน AI จากหน้านี้ได้ทันที</p>
+        <div class="menu-language-control">
+            <label for="menu-language-selector" data-i18n="settings.language">Language</label>
+            <select id="menu-language-selector" data-language-selector data-i18n-aria-label="settings.language" aria-label="Language">
+                <option value="en">English</option>
+                <option value="th">ไทย</option>
+            </select>
+        </div>
+        <h2 data-i18n="menu.trainingTitle">สนามทดลอง &amp; ควบคุม AI</h2>
+        <p data-i18n="menu.trainingDescription">เลือกโหมดการเล่น ติดตามสถิติการฝึก และควบคุมการเทรน AI จากหน้านี้ได้ทันที</p>
         
         <!-- Live AI Training Stats Dashboard -->
         <div class="train-dashboard mb-3">
             <div class="train-stat-grid">
                 <div class="stat-card">
-                    <span class="stat-label">สถานะการเทรน</span>
+                    <span class="stat-label" data-i18n="training.status">สถานะการเทรน</span>
                     <span class="stat-value text-primary" id="stat-train-state">-</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-label">โมเดลเซิร์ฟเวอร์</span>
-                    <span class="stat-value text-success" id="stat-server-policy"><%= trainingDemoPolicy || 'baseline' %></span>
+                    <span class="stat-label" data-i18n="training.models">โมเดล Blue / Red</span>
+                    <span class="stat-value text-success" id="stat-server-policy"><%= trainingDemoPolicy || 'baseline' %> / <%= trainingDemoPolicy || 'baseline' %></span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-label">Champion / Candidate</span>
+                    <span class="stat-label" data-i18n="training.versions">Champion / Candidate</span>
                     <span class="stat-value text-info" id="stat-versions">- / -</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-label">Win Rate ผู้ท้าชิง</span>
+                    <span class="stat-label" data-i18n="training.winRate">Win Rate ผู้ท้าชิง</span>
                     <span class="stat-value text-warning" id="stat-winrate">-</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-label">แมตช์เสร็จสิ้น</span>
+                    <span class="stat-label" data-i18n="training.completedMatches">แมตช์เสร็จสิ้น</span>
                     <span class="stat-value" id="stat-matches">-</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-label">ความเร็วเร่งจำลอง</span>
+                    <span class="stat-label" data-i18n="training.simulationSpeed">ความเร็วเร่งจำลอง</span>
                     <span class="stat-value" id="stat-speed">-</span>
                 </div>
             </div>
@@ -41,45 +48,89 @@
             <!-- Training Control Action Buttons -->
             <div class="train-controls mt-2 d-flex flex-wrap gap-2 align-items-center">
                 <button type="button" id="btn-train-toggle" class="btn btn-sm btn-outline-success font-weight-bold">
-                    ▶ เริ่มเทรน AI
+                    ▶ <span data-i18n="training.start">เริ่มเทรน AI</span>
                 </button>
                 <div class="d-inline-flex align-items-center ml-2">
-                    <label class="mr-2 mb-0 small text-muted font-weight-bold">Workers:</label>
+                    <label class="mr-2 mb-0 small text-muted font-weight-bold" data-i18n="training.workers">Workers:</label>
                     <button type="button" id="btn-web-w-minus" class="btn btn-sm btn-secondary py-0 px-2 font-weight-bold">-</button>
-                    <span id="stat-web-workers" class="badge badge-light border mx-1 font-weight-bold px-2 py-1" style="font-size: 0.9rem;">2</span>
+                    <span id="stat-web-workers" class="badge badge-light border mx-1 font-weight-bold px-2 py-1" style="font-size: 0.9rem;">4</span>
                     <button type="button" id="btn-web-w-plus" class="btn btn-sm btn-secondary py-0 px-2 font-weight-bold">+</button>
-                    <button type="button" id="btn-web-w-apply" class="btn btn-sm btn-info py-0 px-2 ml-2" style="font-size: 0.8rem;">ตั้งค่า</button>
+                    <button type="button" id="btn-web-w-apply" class="btn btn-sm btn-info py-0 px-2 ml-2" style="font-size: 0.8rem;" data-i18n="common.apply">ตั้งค่า</button>
                 </div>
-                <div class="d-inline-flex align-items-center ml-auto">
-                    <label class="mr-2 mb-0 small text-muted font-weight-bold">เลือกโมเดลเล่น:</label>
-                    <select id="select-active-policy" class="form-control form-control-sm" style="width: auto; height: 30px; padding: 2px 8px;">
-                        <option value="<%= trainingDemoPolicy %>"><%= trainingDemoPolicy %></option>
-                    </select>
-                </div>
+                <span id="web-workers-message" class="small ml-2" role="status" aria-live="polite"></span>
             </div>
+            <div class="demo-model-controls mt-2">
+                <label for="select-blue-policy" data-i18n="training.blueAi">🔵 Blue AI</label>
+                <select id="select-blue-policy" class="form-control form-control-sm">
+                    <option value="<%= trainingDemoPolicy %>"><%= trainingDemoPolicy %></option>
+                </select>
+                <label for="select-red-policy" data-i18n="training.redAi">🔴 Red AI</label>
+                <select id="select-red-policy" class="form-control form-control-sm">
+                    <option value="<%= trainingDemoPolicy %>"><%= trainingDemoPolicy %></option>
+                </select>
+                <button type="button" id="btn-apply-demo-policies" class="btn btn-sm btn-primary" data-i18n="training.applyModels">ใช้โมเดลคู่นี้</button>
+            </div>
+            <div id="demo-policy-message" class="small mt-1" role="status" aria-live="polite"></div>
         </div>
 
-        <div class="demo-options" role="radiogroup" aria-label="โหมดทดลอง">
-            <label><input type="radio" name="training-demo-mode" value="spectate" checked><span><strong>👁️ ดูบอทสู้ (Spectate)</strong><small>ชมการต่อสู้ 3v3 และสลับมุมกล้องตามบอท</small></span></label>
-            <label><input type="radio" name="training-demo-mode" value="fight"><span><strong>⚔️ ลงสู้เอง (Play Game)</strong><small>เลือกตัวละครแล้วร่วมทีมฟ้าต่อสู้กับทีมแดง</small></span></label>
+        <div class="demo-options" role="radiogroup" aria-label="โหมดทดลอง" data-i18n-aria-label="training.mode">
+            <label><input type="radio" name="training-demo-mode" value="spectate" checked><span><strong data-i18n="training.spectate">👁️ ดูบอทสู้ (Spectate)</strong><small data-i18n="training.spectateHelp">ชมการต่อสู้ 3v3 และสลับมุมกล้องตามบอท</small></span></label>
+            <label><input type="radio" name="training-demo-mode" value="fight"><span><strong data-i18n="training.play">⚔️ ลงสู้เอง (Play Game)</strong><small data-i18n="training.playHelp">เลือกตัวละครแล้วร่วมทีมฟ้าต่อสู้กับทีมแดง</small></span></label>
         </div>
     </div>
     
     <button id="play-game-button" type="button" class="btn btn-success" data-style="rotate-side-down" data-perspective data-horizontal>
         <div class="bg-success rounded">
             <i class="fa fa-gamepad pr-2 py-3" aria-hidden="true"></i>
-            เข้าสู่เกม (Enter Game)
+            <span data-i18n="menu.enterGame">เข้าสู่เกม (Enter Game)</span>
         </div>
     </button>
 </div>
 
 <div id="training-demo-spectator" hidden aria-live="polite">
-    <span id="training-demo-following">กำลังรอบอทลงสนาม…</span>
-    <button type="button" id="training-demo-next">ดูกล้องตัวถัดไป</button>
-    <button type="button" id="training-demo-exit">เปลี่ยนโหมด</button>
+    <div class="demo-camera-row">
+        <label for="training-demo-camera-mode" data-i18n="spectator.camera">กล้อง</label>
+        <select id="training-demo-camera-mode" data-i18n-aria-label="spectator.cameraMode" aria-label="โหมดกล้อง">
+            <option value="follow" data-i18n="spectator.followPlayer">ติดตามผู้เล่น</option>
+            <option value="overview" data-i18n="spectator.overview">ดูทั้งแมป</option>
+            <option value="free" data-i18n="spectator.freeCamera">กล้องอิสระ</option>
+        </select>
+        <label for="training-demo-watch-team" id="training-demo-watch-label" data-i18n="scoreboard.team">ทีม</label>
+        <select id="training-demo-watch-team" aria-label="เลือกทีมที่ติดตาม">
+            <option value="auto" data-i18n="spectator.allTeams">ทุกทีม</option>
+            <option value="blue" data-i18n="feed.team.blue">Blue</option>
+            <option value="red" data-i18n="feed.team.red">Red</option>
+        </select>
+        <label for="training-demo-camera-target" id="training-demo-target-label" data-i18n="spectator.followingLabel">ติดตาม</label>
+        <select id="training-demo-camera-target" aria-label="เลือกผู้เล่นที่ติดตาม">
+            <option value="auto" data-i18n="spectator.auto">อัตโนมัติ</option>
+        </select>
+        <button type="button" id="training-demo-next" data-i18n="spectator.nextPlayer">ตัวถัดไป</button>
+    </div>
+    <div class="demo-camera-row">
+        <span id="training-demo-following" data-i18n="spectator.waitingForPlayer">กำลังรอบอทลงสนาม…</span>
+        <span id="training-demo-quick-score">Blue 0 : 0 Red</span>
+        <button type="button" id="training-demo-stats-toggle" aria-controls="training-demo-stats" aria-expanded="false" data-i18n="training.stats">📊 สถิติ</button>
+        <button type="button" id="training-demo-exit" data-i18n="training.changeMode">เปลี่ยนโหมด</button>
+    </div>
 </div>
 
+<section id="training-demo-stats" hidden aria-label="สถิติการแข่งขัน AI" data-i18n-aria-label="training.matchStats">
+    <div class="demo-stats-header"><strong data-i18n="training.matchStats">สถิติการแข่งขัน AI</strong><span id="demo-round-clock">-</span></div>
+    <p class="demo-stats-caption" data-i18n="training.statsExplanation">Win rate นับจากช่วงแข่ง 5 นาทีที่จบแล้ว · KDA = (Kills + Assists) / max(1, Deaths)</p>
+    <div class="demo-team-stats">
+        <div class="demo-team-card blue"><strong>🔵 Blue <span id="demo-blue-model">-</span></strong><span id="demo-blue-stats">-</span></div>
+        <div class="demo-team-card red"><strong>🔴 Red <span id="demo-red-model">-</span></strong><span id="demo-red-stats">-</span></div>
+    </div>
+    <div class="demo-player-scroll"><table><thead><tr><th>AI</th><th data-i18n="training.currentCharacter">ตัวปัจจุบัน</th><th>K/D/A</th><th data-i18n="training.damageDealtTaken">Damage / รับ</th></tr></thead><tbody id="demo-player-stats"></tbody></table></div>
+    <p id="demo-stats-note" class="demo-stats-caption"></p>
+</section>
+
 <style>
+#training-live-badge { color: #14263e; background: #dce6f0; border: 1px solid #a9bfd5; }
+#training-live-badge.badge-success { color: #fff; background: #177b5e; }
+#training-live-badge.badge-warning { color: #14263e; background: #f7d273; }
+#training-live-badge.badge-danger { color: #fff; background: #c93853; }
 #play-game-button-wrapper:has(#training-demo-settings) { flex-direction: column; gap: 1.2rem; background: linear-gradient(145deg,rgba(10,20,38,.88),rgba(6,12,24,.75)); z-index: 100; }
 #training-demo-settings { width: min(94vw,700px); padding: 24px 26px; border: 1px solid #7eaed4; border-radius: 20px; background: #f8fbff; color: #14263e; box-shadow: 0 20px 60px rgba(4,12,24,0.6); }
 #training-demo-settings h2 { font-size: clamp(1.4rem,3.5vw,1.9rem); margin: .2rem 0; font-weight: 800; color: #0c2340; }
@@ -111,16 +162,61 @@
     #training-demo-spectator { flex-wrap: wrap; justify-content: center; width: 95vw; } 
     #game-div:has(#training-demo-spectator:not([hidden])) #counter { top: 112px; } 
 }
+.demo-model-controls { display: grid; grid-template-columns: auto minmax(105px,1fr) auto minmax(105px,1fr) auto; align-items: center; gap: .5rem; margin-top: .5rem; }
+.demo-model-controls label { margin: 0; font-size: .8rem; font-weight: 700; color: #475a75; white-space: nowrap; }
+.demo-model-controls select { min-width: 0; }
+#training-demo-settings select { border: 1px solid #c6d7e9; border-radius: 7px; padding: .42rem .5rem; background: #fff; color: #14263e; }
+#training-demo-spectator { flex-direction: column; width: min(96vw,1020px); max-width: none; }
+#training-demo-spectator .demo-camera-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .45rem .6rem; width: 100%; }
+#training-demo-following { flex: 1; min-width: 150px; color: #475a75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#training-demo-spectator label, #training-demo-spectator button, #training-demo-spectator select { flex: none; white-space: nowrap; margin: 0; }
+#training-demo-spectator label[hidden] { display: none; }
+#training-demo-spectator select { border: 1px solid #c6d7e9; border-radius: 7px; padding: .4rem .5rem; background: #fff; color: #14263e; }
+#training-demo-camera-target { max-width: min(220px,48vw); }
+#training-demo-quick-score { color: #0c2340; font-size: 1rem; font-weight: 800; white-space: nowrap; }
+#training-demo-stats { position: absolute; top: 112px; right: 14px; z-index: 51; width: min(450px,95vw); max-height: min(70vh,580px); overflow: auto; padding: 15px; border: 1px solid #c2d8ed; border-radius: 12px; color: #14263e; background: #f8fbff; box-shadow: 0 8px 28px rgba(7,19,36,.3); }
+#training-demo-stats[hidden] { display: none; }
+.demo-stats-header, .demo-team-card { display: flex; justify-content: space-between; gap: .5rem; }
+.demo-stats-header { align-items: center; color: #176bb3; }
+.demo-stats-caption { font-size: .75rem; color: #55677e; margin: .4rem 0; }
+.demo-team-stats { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin: .65rem 0; }
+.demo-team-card { flex-direction: column; padding: .7rem; border-radius: 9px; border: 1px solid #d2e2f2; background: #fff; font-size: .78rem; }
+.demo-team-card.blue { border-top: 3px solid #0869c2; }
+.demo-team-card.red { border-top: 3px solid #c93853; }
+.demo-team-card > span { color: #475a75; white-space: pre-line; }
+.demo-player-scroll { overflow-x: auto; }
+.demo-player-scroll table { width: 100%; color: #14263e; font-size: .75rem; }
+.demo-player-scroll th, .demo-player-scroll td { padding: .38rem; border-bottom: 1px solid #d2e2f2; white-space: nowrap; }
+.demo-player-scroll th { color: #617792; }
+#game-div:has(#training-demo-spectator:not([hidden])) #counter { top: 108px; }
+#game-div:has(#training-demo-spectator:not([hidden])) #toggle-dev-panels { top: auto !important; bottom: 10px; }
+@media (max-width: 600px) {
+    .demo-model-controls { grid-template-columns: auto minmax(0,1fr); }
+    .demo-model-controls button { grid-column: 1 / -1; }
+    #training-demo-spectator { top: 6px; width: 97vw; padding: .45rem; }
+    #training-demo-spectator .demo-camera-row { justify-content: flex-start; }
+    #training-demo-following { width: 100%; min-width: 0; }
+    #training-demo-stats { top: 142px; right: 1.5vw; }
+    #game-div:has(#training-demo-spectator:not([hidden])) #counter { top: 170px; }
+}
 </style>
 
 <script>
 window.trainingDemoMode = 'spectate';
 
 document.addEventListener('DOMContentLoaded', function () {
+    var i18n = window.gameI18n;
+    function tr(key, values) { return i18n ? i18n.t(key, values) : key; }
     var settings = document.getElementById('training-demo-settings');
     var badge = document.getElementById('training-live-badge');
     var btnTrainToggle = document.getElementById('btn-train-toggle');
-    var selectPolicy = document.getElementById('select-active-policy');
+    var selectBluePolicy = document.getElementById('select-blue-policy');
+    var selectRedPolicy = document.getElementById('select-red-policy');
+    var btnApplyPolicies = document.getElementById('btn-apply-demo-policies');
+    var policyMessage = document.getElementById('demo-policy-message');
+    var initialPolicy = settings ? settings.getAttribute('data-policy') || 'baseline' : 'baseline';
+    var activeModels = { blue: initialPolicy, red: initialPolicy };
+    var policyEditing = false;
     
     var statState = document.getElementById('stat-train-state');
     var statServerPolicy = document.getElementById('stat-server-policy');
@@ -143,43 +239,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (badge) {
                     if (currentTrainState === 'running') {
                         badge.className = 'badge badge-success px-2 py-1';
-                        badge.textContent = '● กำลังเทรน (Running)';
+                        badge.textContent = '● ' + tr('training.running');
                         btnTrainToggle.className = 'btn btn-sm btn-outline-danger font-weight-bold';
-                        btnTrainToggle.textContent = '⏹ หยุดเทรน (Stop)';
+                        btnTrainToggle.textContent = '⏹ ' + tr('training.stop');
                     } else if (currentTrainState === 'stopping') {
                         badge.className = 'badge badge-warning px-2 py-1';
-                        badge.textContent = '⏳ กำลังหยุด...';
+                        badge.textContent = '⏳ ' + tr('training.stopping');
                         btnTrainToggle.className = 'btn btn-sm btn-outline-secondary font-weight-bold disabled';
-                        btnTrainToggle.textContent = '⏳ กำลังหยุด...';
+                        btnTrainToggle.textContent = '⏳ ' + tr('training.stopping');
                     } else {
                         badge.className = 'badge badge-secondary px-2 py-1';
-                        badge.textContent = '○ หยุดอยู่ (Stopped)';
+                        badge.textContent = '○ ' + tr('training.stopped');
                         btnTrainToggle.className = 'btn btn-sm btn-outline-success font-weight-bold';
-                        btnTrainToggle.textContent = '▶ เริ่มเทรน AI (Start)';
+                        btnTrainToggle.textContent = '▶ ' + tr('training.start');
                     }
                 }
 
-                if (statState) statState.textContent = train.state ? (train.state.toUpperCase() + (train.phase ? ' (' + train.phase + ')' : '')) : 'STOPPED';
-                if (statServerPolicy) statServerPolicy.textContent = data.serverPolicy || 'baseline';
+                if (statState) statState.textContent = tr('training.state.' + (train.state || 'stopped')) + (train.phase ? ' (' + train.phase + ')' : '');
                 if (statVersions) statVersions.textContent = (train.championVersion || reg.championVersion || 'base') + ' / ' + (train.candidateVersion || '-');
                 
                 if (statWinrate) {
                     if (train.candidateValidationWinRate != null) {
                         var wr = (train.candidateValidationWinRate * 100).toFixed(1) + '%';
-                        statWinrate.textContent = wr + ' (' + train.candidateValidationGames + 'G)';
+                        statWinrate.textContent = tr('training.winRateGames', { rate: wr, games: train.candidateValidationGames });
                     } else if (train.phase === 'train') {
-                        statWinrate.textContent = (train.pendingDecisions || 0) + ' Decs';
+                        statWinrate.textContent = tr('training.pendingDecisions', { count: train.pendingDecisions || 0 });
                     } else {
                         statWinrate.textContent = '-';
                     }
                 }
 
-                if (statMatches) statMatches.textContent = (train.completed || 0) + ' (Fail: ' + (train.failed || 0) + ')';
+                if (statMatches) statMatches.textContent = tr('training.completedFailed', { completed: train.completed || 0, failed: train.failed || 0 });
                 if (statSpeed) {
                     var sp = train.simulatedSecondsPerWallSecond ? (train.simulatedSecondsPerWallSecond.toFixed(1) + 'x') : '1.0x';
                     var actW = train.active != null ? train.active : 0;
                     var cfgW = train.workers != null ? train.workers : webWorkersCount;
-                    statSpeed.textContent = actW + '/' + cfgW + ' W (' + sp + ')';
+                    statSpeed.textContent = tr('training.workerSpeed', { active: actW, total: cfgW, speed: sp });
                     if (train.state === 'running' && train.workers && spanWebWorkers && document.activeElement !== spanWebWorkers) {
                         webWorkersCount = train.workers;
                         spanWebWorkers.textContent = train.workers;
@@ -189,9 +284,83 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(function(err) {
                 if (badge) {
                     badge.className = 'badge badge-danger px-2 py-1';
-                    badge.textContent = 'ออฟไลน์';
+                    badge.textContent = tr('training.offline');
                 }
             });
+    }
+
+    function formatRatio(value) { return value == null ? '—' : value.toFixed(2); }
+    function formatWinRate(value) { return value == null ? '—' : (value * 100).toFixed(1) + '%'; }
+
+    function renderDemoStatus(demo) {
+        activeModels = demo.models;
+        if (statServerPolicy) statServerPolicy.textContent = demo.models.blue + ' / ' + demo.models.red;
+        if (!policyEditing && selectBluePolicy && selectRedPolicy) {
+            selectBluePolicy.value = demo.models.blue;
+            selectRedPolicy.value = demo.models.red;
+        }
+        var round = demo.round || { scores: { blue: 0, red: 0 }, remainingMs: 0, number: 1 };
+        var quickScore = document.getElementById('training-demo-quick-score');
+        if (quickScore) quickScore.textContent = tr('training.quickScore', { blue: round.scores.blue, red: round.scores.red });
+        var roundClock = document.getElementById('demo-round-clock');
+        if (roundClock) roundClock.textContent = tr('training.roundClock', { round: round.number, seconds: Math.ceil(round.remainingMs / 1000) });
+        ['blue', 'red'].forEach(function (teamId) {
+            var team = demo.teams && demo.teams[teamId];
+            if (!team) return;
+            var model = document.getElementById('demo-' + teamId + '-model');
+            var stats = document.getElementById('demo-' + teamId + '-stats');
+            if (model) model.textContent = team.model;
+            if (stats) stats.textContent = tr('training.teamSummary', {
+                rate: formatWinRate(team.winRate), wins: team.wins, losses: team.losses, draws: team.draws,
+                kda: formatRatio(team.kda), kills: team.kills, deaths: team.deaths, assists: team.assists,
+                dealt: Math.round(team.damageDealt), taken: Math.round(team.damageTaken)
+            });
+        });
+        var body = document.getElementById('demo-player-stats');
+        if (body) {
+            body.textContent = '';
+            ['blue', 'red'].forEach(function (teamId) {
+                var players = demo.teams && demo.teams[teamId] && demo.teams[teamId].players || [];
+                players.forEach(function (player) {
+                    var row = document.createElement('tr');
+                    [teamId.toUpperCase() + ' · ' + player.name, player.character || '—',
+                        player.kills + '/' + player.deaths + '/' + player.assists,
+                        Math.round(player.damageDealt) + ' / ' + Math.round(player.damageTaken)].forEach(function (value) {
+                        var cell = document.createElement('td');
+                        cell.textContent = value;
+                        row.appendChild(cell);
+                    });
+                    body.appendChild(row);
+                });
+            });
+        }
+        var note = document.getElementById('demo-stats-note');
+        if (note) note.textContent = demo.humanPresent ? tr('training.humanPresent') : tr('training.aiOnly');
+    }
+
+    function fetchDemoStatus() {
+        return fetch('/api/demo/status').then(function (res) { return res.json(); })
+            .then(function (data) { if (data.ok && data.demo) renderDemoStatus(data.demo); })
+            .catch(function () {});
+    }
+
+    function applyDemoPolicies() {
+        if (!selectBluePolicy || !selectRedPolicy || !btnApplyPolicies) return Promise.resolve(false);
+        btnApplyPolicies.disabled = true;
+        if (policyMessage) policyMessage.textContent = tr('training.selectingModel');
+        return fetch('/api/demo/policies', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ blue: selectBluePolicy.value, red: selectRedPolicy.value })
+        }).then(function (res) { return res.json(); }).then(function (data) {
+            if (!data.ok) throw new Error(data.error || '');
+            policyEditing = false;
+            renderDemoStatus(data.demo);
+            if (policyMessage) policyMessage.textContent = tr('training.modelsApplied', { blue: data.demo.models.blue, red: data.demo.models.red });
+            return true;
+        }).catch(function (error) {
+            if (policyMessage) policyMessage.textContent = tr('training.modelsFailed', { detail: error.message || '' });
+            return false;
+        }).then(function (ok) { btnApplyPolicies.disabled = false; return ok; });
     }
 
     function fetchPolicies() {
@@ -199,24 +368,34 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(function(res) { return res.json(); })
             .then(function(data) {
                 if (!data.ok || !data.policies) return;
-                var currentVal = selectPolicy.value;
-                selectPolicy.innerHTML = '';
-                data.policies.forEach(function(p) {
-                    var opt = document.createElement('option');
-                    opt.value = p;
-                    opt.textContent = p + (p === data.registry.championVersion ? ' 🏆 (Champ)' : '') + (p === data.registry.activeVersion ? ' ⭐' : '');
-                    if (p === data.registry.activeVersion || p === currentVal) opt.selected = true;
-                    selectPolicy.appendChild(opt);
+                [selectBluePolicy, selectRedPolicy].forEach(function (select, index) {
+                    if (!select) return;
+                    var currentVal = policyEditing ? select.value : activeModels[index === 0 ? 'blue' : 'red'];
+                    select.textContent = '';
+                    data.policies.forEach(function(p) {
+                        var opt = document.createElement('option');
+                        opt.value = p;
+                        opt.textContent = p + (p === data.registry.championVersion ? ' 🏆 ' + tr('training.champion') : '');
+                        select.appendChild(opt);
+                    });
+                    select.value = currentVal;
                 });
             })
             .catch(function() {});
     }
+
+    if (i18n) i18n.subscribe(function () {
+        fetchTrainingStatus();
+        fetchDemoStatus();
+        fetchPolicies();
+    });
 
     var webWorkersCount = 4;
     var spanWebWorkers = document.getElementById('stat-web-workers');
     var btnWMinus = document.getElementById('btn-web-w-minus');
     var btnWPlus = document.getElementById('btn-web-w-plus');
     var btnWApply = document.getElementById('btn-web-w-apply');
+    var workerMessage = document.getElementById('web-workers-message');
 
     if (btnWMinus) {
         btnWMinus.addEventListener('click', function () {
@@ -232,16 +411,26 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (btnWApply) {
         btnWApply.addEventListener('click', function () {
+            btnWApply.disabled = true;
             btnWApply.textContent = '...';
+            if (workerMessage) workerMessage.textContent = '';
             fetch('/api/training/workers', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ workers: webWorkersCount })
-            }).then(function() {
-                setTimeout(function() {
-                    btnWApply.textContent = 'ตั้งค่า';
-                    fetchTrainingStatus();
-                }, 600);
+            }).then(function (res) {
+                return res.json().then(function (data) {
+                    if (!res.ok || !data.ok) throw new Error(data.error || tr('training.workersFailed', { detail: '' }));
+                    return data;
+                });
+            }).then(function (data) {
+                if (workerMessage) workerMessage.textContent = tr('training.workersRequested', { count: data.workers });
+                fetchTrainingStatus();
+            }).catch(function (error) {
+                if (workerMessage) workerMessage.textContent = tr('training.workersFailed', { detail: error.message });
+            }).finally(function () {
+                btnWApply.textContent = tr('common.apply');
+                btnWApply.disabled = false;
             });
         });
     }
@@ -249,11 +438,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btnTrainToggle) {
         btnTrainToggle.addEventListener('click', function () {
             if (currentTrainState === 'running') {
-                btnTrainToggle.textContent = 'กำลังส่งคำสั่งหยุด...';
+                btnTrainToggle.textContent = tr('training.stopRequested');
                 fetch('/api/training/stop', { method: 'POST' })
                     .then(function() { setTimeout(fetchTrainingStatus, 800); });
             } else {
-                btnTrainToggle.textContent = 'กำลังเริ่มเทรน...';
+                btnTrainToggle.textContent = tr('training.starting');
                 fetch('/api/training/start', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -263,26 +452,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (selectPolicy) {
-        selectPolicy.addEventListener('change', function () {
-            var selected = selectPolicy.value;
-            fetch('/api/training/activate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ version: selected })
-            }).then(function(res) { return res.json(); })
-              .then(function(d) {
-                  if (d.ok) {
-                      statServerPolicy.textContent = selected;
-                      fetchPolicies();
-                  }
-              });
-        });
-    }
+    [selectBluePolicy, selectRedPolicy].forEach(function (select) {
+        if (select) select.addEventListener('change', function () { policyEditing = true; });
+    });
+    if (btnApplyPolicies) btnApplyPolicies.addEventListener('click', applyDemoPolicies);
 
     fetchTrainingStatus();
     fetchPolicies();
+    fetchDemoStatus();
     setInterval(fetchTrainingStatus, 3000);
+    setInterval(fetchDemoStatus, 1500);
 
     if (settings) {
         settings.addEventListener('change', function (event) {
@@ -292,57 +471,240 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var playBtn = document.getElementById('play-game-button');
     if (playBtn) {
+        playBtn.addEventListener('click', function (event) {
+            if (!selectBluePolicy || !selectRedPolicy ||
+                selectBluePolicy.value === activeModels.blue && selectRedPolicy.value === activeModels.red) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            applyDemoPolicies().then(function (ok) { if (ok) playBtn.click(); });
+        }, true);
         playBtn.addEventListener('click', function () {
-            if (window.trainingDemoMode === 'spectate') {
-                var spectatorBar = document.getElementById('training-demo-spectator');
-                if (spectatorBar) spectatorBar.hidden = false;
-            }
+            var spectatorBar = document.getElementById('training-demo-spectator');
+            if (spectatorBar) spectatorBar.hidden = false;
+            var watchTeam = document.getElementById('training-demo-watch-team');
+            var watchLabel = document.getElementById('training-demo-watch-label');
+            var cameraTarget = document.getElementById('training-demo-camera-target');
+            if (cameraTarget) cameraTarget.value = window.trainingDemoMode === 'fight' ? 'self' : 'auto';
+            updateCameraControls();
         });
     }
+
+    var statsPanel = document.getElementById('training-demo-stats');
+    var statsToggle = document.getElementById('training-demo-stats-toggle');
+    if (statsToggle && statsPanel) statsToggle.addEventListener('click', function () {
+        statsPanel.hidden = !statsPanel.hidden;
+        statsToggle.setAttribute('aria-expanded', String(!statsPanel.hidden));
+    });
 
     var exitBtn = document.getElementById('training-demo-exit');
     if (exitBtn) {
         exitBtn.addEventListener('click', function () { window.location.reload(); });
     }
 
-    var followedIndex = 0;
     var followedUnit = null;
-    var cameraTickerAttached = false;
+    var appliedCameraMode = null;
+    var normalCameraScale = null;
+    var overviewSize = '';
+    var targetOptionsSignature = '';
+    var cameraAnchor = { x: 0, y: 0 };
+    var cameraAnchorTickerAttached = false;
+    var cameraMode = document.getElementById('training-demo-camera-mode');
+    var cameraTarget = document.getElementById('training-demo-camera-target');
+    var cameraTargetLabel = document.getElementById('training-demo-target-label');
+    var followSpan = document.getElementById('training-demo-following');
+    var watchTeam = document.getElementById('training-demo-watch-team');
     var nextBtn = document.getElementById('training-demo-next');
-    if (nextBtn) {
-        nextBtn.addEventListener('click', function () { followedIndex++; });
+    function cameraPlayers() {
+        return ige.$$('player').filter(function (player) {
+            return player._stats && !player._stats.isSpectator &&
+                (player._stats.isBattleBot || player._stats.controlledBy === 'human');
+        });
     }
+    function liveCameraUnits() {
+        return ige.$$('unit').filter(function (unit) {
+            var owner = unit.getOwner && unit.getOwner();
+            return unit._alive !== false && owner && owner._stats && !owner._stats.isSpectator &&
+                (owner._stats.isBattleBot || owner._stats.controlledBy === 'human') &&
+                unit._stats?.attributes?.health?.value > 0 && unit._pixiContainer && !unit._pixiContainer._destroyed;
+        });
+    }
+    function cameraPlayerUnit(player, units) {
+        if (!player) return null;
+        var owned = units.filter(function (unit) { return unit.getOwner() === player; });
+        var selected = player.getSelectedUnit && player.getSelectedUnit();
+        return selected && owned.indexOf(selected) >= 0 ? selected : owned[0] || null;
+    }
+    function cameraCandidates(units) {
+        var requested = watchTeam && watchTeam.value;
+        var preferred = window.trainingDemoMode === 'spectate' && requested !== 'auto'
+            ? units.filter(function (unit) { return unit.getOwner()._stats.trainingTeamId === requested; }) : units;
+        return { units: preferred.length ? preferred : units, fallback: !!requested && requested !== 'auto' && !preferred.length };
+    }
+    function refreshCameraTargets() {
+        if (!cameraTarget) return;
+        var players = ige.$$('player').filter(function (player) {
+            return player._stats && !player._stats.isSpectator &&
+                (player._stats.isBattleBot || player._stats.controlledBy === 'human');
+        });
+        var signature = window.trainingDemoMode + '|' + players.map(function (player) {
+            return player.id() + ':' + (player._stats.name || '');
+        }).join('|') + '|' + (i18n ? i18n.language() : 'en');
+        if (signature === targetOptionsSignature) return;
+        targetOptionsSignature = signature;
+        var selected = cameraTarget.value;
+        cameraTarget.textContent = '';
+        function option(value, label) {
+            var item = document.createElement('option');
+            item.value = value;
+            item.textContent = label;
+            cameraTarget.appendChild(item);
+        }
+        option('auto', tr('spectator.auto'));
+        if (window.trainingDemoMode === 'fight') option('self', tr('spectator.myPlayer'));
+        players.forEach(function (player) {
+            var team = (player._stats.trainingTeamId || '').toUpperCase();
+            option(player.id(), (team ? team + ' · ' : '') + (player._stats.name || 'ผู้เล่น'));
+        });
+        cameraTarget.value = Array.from(cameraTarget.options).some(function (item) { return item.value === selected; })
+            ? selected : window.trainingDemoMode === 'fight' ? 'self' : 'auto';
+    }
+    function updateCameraControls() {
+        var following = cameraMode && cameraMode.value === 'follow';
+        var spectating = window.trainingDemoMode === 'spectate';
+        if (watchTeam) watchTeam.hidden = !following || !spectating;
+        var watchLabel = document.getElementById('training-demo-watch-label');
+        if (watchLabel) watchLabel.hidden = !following || !spectating;
+        if (cameraTarget) cameraTarget.hidden = !following;
+        if (cameraTargetLabel) cameraTargetLabel.hidden = !following;
+        if (nextBtn) nextBtn.hidden = !following || !spectating;
+    }
+    if (cameraMode) cameraMode.addEventListener('change', function () {
+        appliedCameraMode = null;
+        followedUnit = null;
+        updateCameraControls();
+    });
+    if (cameraTarget) cameraTarget.addEventListener('change', function () { followedUnit = null; });
+    if (nextBtn) nextBtn.addEventListener('click', function () {
+        if (!window.ige) return;
+        var units = liveCameraUnits();
+        var players = cameraPlayers().filter(function (player) { return !!cameraPlayerUnit(player, units); });
+        var requested = watchTeam && watchTeam.value;
+        if (requested && requested !== 'auto') {
+            var teamPlayers = players.filter(function (player) { return player._stats.trainingTeamId === requested; });
+            if (teamPlayers.length) players = teamPlayers;
+        }
+        if (!players.length) return;
+        var currentId = cameraTarget && cameraTarget.value;
+        if ((!currentId || currentId === 'auto') && followedUnit) currentId = followedUnit.getOwner().id();
+        var index = players.findIndex(function (player) { return player.id() === currentId; });
+        var next = players[(index + 1) % players.length];
+        if (cameraTarget) cameraTarget.value = next.id();
+        followedUnit = null;
+    });
+    if (watchTeam) watchTeam.addEventListener('change', function () {
+        if (cameraTarget) cameraTarget.value = 'auto';
+        followedUnit = null;
+    });
 
+    function setCameraMode(viewport, mode) {
+        if (appliedCameraMode === mode) return;
+        if (appliedCameraMode === null && normalCameraScale === null && viewport.scale.x > 0) normalCameraScale = viewport.scale.x;
+        if (appliedCameraMode === 'follow' && viewport.scale.x > 0) normalCameraScale = viewport.scale.x;
+        ['follow', 'drag', 'wheel', 'snap-zoom', 'clamp-zoom'].forEach(function (plugin) { viewport.removePlugin(plugin); });
+        if (mode === 'overview') {
+            viewport.fitWorld();
+            viewport.moveCenter(viewport.worldWidth / 2, viewport.worldHeight / 2);
+            overviewSize = viewport.screenWidth + 'x' + viewport.screenHeight;
+        } else {
+            var center = viewport.center;
+            if (normalCameraScale) viewport.scale.set(normalCameraScale);
+            viewport.moveCenter(center);
+            if (mode === 'free') {
+                viewport.drag({ mouseButtons: 'right' }).wheel({ percent: 0.1 });
+                viewport.clampZoom({ minWidth: 240, maxWidth: viewport.worldWidth });
+            }
+        }
+        followedUnit = null;
+        appliedCameraMode = mode;
+        viewport.dirty = true;
+    }
     window.setInterval(function () {
-        if (window.trainingDemoMode !== 'spectate' || !window.joinedGame || !window.ige || !ige.game || !ige.client || !ige.pixi) return;
-        if (!cameraTickerAttached && ige.pixi.ticker && ige.pixi.viewport) {
-            cameraTickerAttached = true;
-            ige.pixi.viewport.removePlugin('follow');
+        if (!window.joinedGame || !window.ige || !ige.game || !ige.client || !ige.pixi || !ige.pixi.viewport) return;
+        var viewport = ige.pixi.viewport;
+        if (!cameraAnchorTickerAttached && ige.pixi.ticker) {
+            cameraAnchorTickerAttached = true;
             ige.pixi.ticker.add(function () {
-                if (!followedUnit || !ige.pixi.viewport) return;
-                if (ige.pixi.viewport.plugins.follow) ige.pixi.viewport.removePlugin('follow');
-                var position = followedUnit._pixiContainer && !followedUnit._pixiContainer._destroyed
-                    ? followedUnit._pixiContainer : followedUnit._translate;
-                if (position && Number.isFinite(position.x) && Number.isFinite(position.y)) {
-                    ige.pixi.viewport.moveCenter(position.x, position.y);
+                if (followedUnit && followedUnit._translate) {
+                    cameraAnchor.x = followedUnit._translate.x;
+                    cameraAnchor.y = followedUnit._translate.y;
                 }
             });
         }
-        var bots = ige.$$('unit').filter(function (unit) {
-            var owner = unit.getOwner && unit.getOwner();
-            return owner && owner._stats && owner._stats.isBattleBot && owner.getSelectedUnit &&
-                owner.getSelectedUnit() === unit && unit._stats.attributes && unit._stats.attributes.health &&
-                unit._stats.attributes.health.value > 0 && unit._pixiContainer;
-        });
-        if (!bots.length) {
-            followedUnit = null;
-            var followSpan = document.getElementById('training-demo-following');
-            if (followSpan) followSpan.textContent = 'กำลังรอบอทลงสนาม…';
+        var mode = cameraMode ? cameraMode.value : 'follow';
+        setCameraMode(viewport, mode);
+        if (!viewport._trainingDemoContextMenuBound && ige.pixi.app && ige.pixi.app.view) {
+            viewport._trainingDemoContextMenuBound = true;
+            ige.pixi.app.view.addEventListener('contextmenu', function (event) {
+                if (cameraMode && cameraMode.value === 'free') event.preventDefault();
+            });
+        }
+        if (mode === 'overview') {
+            var size = viewport.screenWidth + 'x' + viewport.screenHeight;
+            if (overviewSize !== size || viewport.plugins.follow) {
+                viewport.removePlugin('follow');
+                viewport.fitWorld();
+                viewport.moveCenter(viewport.worldWidth / 2, viewport.worldHeight / 2);
+                overviewSize = size;
+            }
+            if (followSpan) followSpan.textContent = tr('spectator.overview');
             return;
         }
-        followedUnit = bots[followedIndex % bots.length];
-        var followSpan = document.getElementById('training-demo-following');
-        if (followSpan) followSpan.textContent = 'กำลังดู: ' + (followedUnit._stats.name || 'บอท');
+        if (mode === 'free') {
+            if (viewport.plugins.follow) viewport.removePlugin('follow');
+            if (followSpan) followSpan.textContent = tr('spectator.freeCameraHelp');
+            return;
+        }
+        var all = liveCameraUnits();
+        refreshCameraTargets();
+        var candidates = cameraCandidates(all);
+        var targetId = cameraTarget && cameraTarget.value;
+        var ownPlayer = ige.client.myPlayer;
+        var targetPlayer = targetId === 'self' ? ownPlayer
+            : targetId && targetId !== 'auto' ? ige.$(targetId) : null;
+        var target = targetPlayer ? cameraPlayerUnit(targetPlayer, all) : null;
+        if (!target && targetId === 'auto' && candidates.units.indexOf(followedUnit) >= 0) target = followedUnit;
+        if (!target && targetId === 'auto' && window.trainingDemoMode === 'fight') {
+            targetPlayer = ownPlayer;
+            target = cameraPlayerUnit(ownPlayer, all);
+        }
+        if (!target && targetId === 'auto') target = candidates.units[0];
+        if (!target) {
+            followedUnit = null;
+            viewport.removePlugin('follow');
+            if (followSpan) {
+                var waitingPlayer = targetPlayer || (targetId && targetId !== 'auto' && targetId !== 'self' ? ige.$(targetId) : null);
+                followSpan.textContent = waitingPlayer
+                    ? tr('spectator.waitingRespawn', { player: waitingPlayer._stats.name || tr('feed.unknownPlayer') })
+                    : tr('spectator.waitingForPlayer');
+            }
+            return;
+        }
+        if (target !== followedUnit || !viewport.plugins.follow || viewport.plugins.follow.target !== cameraAnchor) {
+            viewport.removePlugin('follow');
+            cameraAnchor.x = target._translate.x;
+            cameraAnchor.y = target._translate.y;
+            viewport.follow(cameraAnchor);
+            followedUnit = target;
+        }
+        if (followSpan) {
+            var owner = target.getOwner();
+            var teamId = owner._stats.trainingTeamId || '';
+            var teamName = teamId ? tr('feed.team.' + teamId) : '';
+            var playerName = target._stats.name || owner._stats.name || tr('feed.unknownPlayer');
+            followSpan.textContent = candidates.fallback
+                ? tr('spectator.fallbackFollowing', { team: teamName, player: playerName })
+                : tr('spectator.following', { team: teamName, player: playerName });
+        }
     }, 100);
 });
 </script>

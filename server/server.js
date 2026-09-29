@@ -353,6 +353,26 @@ var Server = IgeClass.extend({
 			}
 		});
 
+		app.get('/api/demo/status', (req, res) => {
+			if (!ige.training?.isExhibitionMode) return res.status(503).json({ ok: false, error: 'Exhibition is not running' });
+			res.json({ ok: true, demo: ige.training.status() });
+		});
+
+		app.post('/api/demo/policies', (req, res) => {
+			if (!ige.training?.isExhibitionMode) return res.status(503).json({ ok: false, error: 'Exhibition is not running' });
+			const blueVersion = req.body?.blue;
+			const redVersion = req.body?.red;
+			if (typeof blueVersion !== 'string' || typeof redVersion !== 'string') {
+				return res.status(400).json({ ok: false, error: 'Choose a model for both teams' });
+			}
+			const registry = new PolicyRegistry(trainingDataDir);
+			const blue = registry.policy(blueVersion);
+			const red = registry.policy(redVersion);
+			if (!blue || !red) return res.status(400).json({ ok: false, error: 'Unknown or corrupt demo policy' });
+			ige.trainingPolicy = blue;
+			res.json({ ok: true, demo: ige.training.setPolicies(blue, red) });
+		});
+
 		app.post('/api/training/start', async (req, res) => {
 			try {
 				const workers = req.body && req.body.workers ? Number(req.body.workers) : 4;
@@ -408,7 +428,8 @@ var Server = IgeClass.extend({
 				const pol = registry.policy(version);
 				if (pol) {
 					ige.trainingPolicy = pol;
-					if (ige.training) ige.training.policy = pol;
+					if (ige.training?.isExhibitionMode) ige.training.setPolicies(pol, pol);
+					else if (ige.training) ige.training.policy = pol;
 				}
 				res.json({ ok: true, registry: registry.status(), active: version });
 			} catch (error) {

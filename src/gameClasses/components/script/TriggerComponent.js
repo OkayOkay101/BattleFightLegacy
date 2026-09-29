@@ -184,8 +184,12 @@ var TriggerComponent = IgeEntity.extend({
 							break;
 
 						case 'projectile':
-							if (entityB._stats.sourceUnitId == entityA.id())
+							if (entityB._stats.sourceUnitId == entityA.id()) {
+								triggeredBy.projectileId = entityB.id();
+								triggeredBy.collidingEntity = entityA.id();
+								ige.script.triggerEntity(entityB, 'entityTouchesUnit', triggeredBy);
 								return;
+							}
 
 							var pSourceUnit = entityB._stats.sourceUnitId && ige.$(entityB._stats.sourceUnitId);
 							var pSourcePlayer = pSourceUnit && pSourceUnit.getOwner && pSourceUnit.getOwner();
@@ -302,6 +306,9 @@ var TriggerComponent = IgeEntity.extend({
 				var unit = ige.$(triggeredBy.unitId);
 				if (triggerName === 'unitUsesItem') ige.script.triggerEntity(unit, 'thisUnitUsesItem', triggeredBy);
 				if (triggerName === 'unitStartsUsingAnItem') ige.script.triggerEntity(unit, triggerName, triggeredBy);
+				if (triggerName === 'unitTouchesProjectile') {
+					ige.script.triggerEntity(ige.$(triggeredBy.projectileId), 'entityTouchesUnit', triggeredBy);
+				}
 				var attrMatch = /^(unit|item|projectile)AttributeBecomes(Zero|Full)$/.exec(triggerName);
 				if (attrMatch) ige.script.triggerEntity(ige.$(triggeredBy[attrMatch[1] + 'Id']), 'entityAttributeBecomes' + attrMatch[2], triggeredBy);
 			}
@@ -365,7 +372,7 @@ var TriggerComponent = IgeEntity.extend({
 						var restitution = Number(fixture && fixture.restitution) || 0;
 						var canBounce = restitution > 0 && body && body.collidesWith && body.collidesWith.walls;
 
-						if (ige.training && ige.training.isTrainingMode && ige.training.stats &&
+						if (ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode) && ige.training.stats &&
 							projectile._alive !== false && projectile._stats.destroyOnContactWith &&
 							projectile._stats.destroyOnContactWith.walls === false) {
 							if (restitution > 0) {

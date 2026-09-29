@@ -195,7 +195,7 @@ var AttributeComponent = IgeEntity.extend({
 
 				self._entity._stats.attributes[attributeTypeId].value = newValue;
 				if (ige.isServer && attributeTypeId === 'health' && self._entity._category === 'unit' &&
-					ige.training && ige.training.isTrainingMode && ige.training.stats && newValue < oldValue) {
+					ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode) && ige.training.stats && newValue < oldValue) {
 					var context = self._entity._trainingDamageContext || {};
 					var owner = self._entity.getOwner && self._entity.getOwner();
 					if (!owner || !owner.getSelectedUnit || owner.getSelectedUnit() === self._entity) {
@@ -257,6 +257,10 @@ var AttributeComponent = IgeEntity.extend({
 						triggeredBy[`${this._entity._category}Id`] = this._entity.id();
 						if (newValue <= 0 && oldValue > 0) // when attribute becomes zero, trigger attributeBecomesZero event
 						{
+							if (this._entity._category === 'unit' && attributeTypeId === 'health' && ige.game.recordKillFeedDeath) {
+								try { ige.game.recordKillFeedDeath(this._entity, triggeredBy); }
+								catch (error) { console.error('Could not record kill feed death:', error); }
+							}
 							// unit's health became 0. announce death
 							if (self._entity._category == 'unit' && attributeTypeId == 'health') {
 								self._entity._alive = false;

@@ -15,6 +15,7 @@ var GameComponent = IgeEntity.extend({
 		this.createdEntities = [];
 		this.gameOverModalIsShowing = false;
 		this.isGameStarted = false;
+		this.killFeed = ige.isServer ? new (require('../../../server/KillFeed').KillFeed)() : null;
 		this.battleBotRoster = [
 			{ id: 'r3dZTAf1qa', role: 'control', range: 430, slots: [1, 0, 2, 3] },
 			{ id: 'hlnCxD3Epn', role: 'zone', range: 330, slots: [1, 0, 2, 3] },
@@ -23,6 +24,42 @@ var GameComponent = IgeEntity.extend({
 			{ id: 'TRneecJl6K', role: 'ranged', range: 500, slots: [0, 1, 2, 3] },
 			{ id: 'AuD3DjTn9B', role: 'melee', range: 120, slots: [0, 1, 2, 3] }
 		];
+	},
+
+	recordKillFeedDeath: function (unit, eventContext) {
+		if (!ige.isServer || !this.killFeed || !unit || unit._category !== 'unit') return null;
+		var victimPlayer = unit.getOwner && unit.getOwner();
+		if (!victimPlayer || !victimPlayer.id || !victimPlayer._stats || victimPlayer._stats.isSpectator) return null;
+
+		function participant(player, ownedUnit) {
+			if (!player || !player.id || !player._stats) return null;
+			return {
+				id: player.id(),
+				name: player._stats.name,
+				teamId: player._stats.trainingTeamId || player._stats.teamId,
+				characterId: ownedUnit && ownedUnit._stats && ownedUnit._stats.type || null
+			};
+		}
+
+		var attackerUnit = eventContext && eventContext.attackingUnitId && ige.$(eventContext.attackingUnitId);
+		var attackerPlayer = attackerUnit && attackerUnit.getOwner && attackerUnit.getOwner();
+		var hostile = false;
+		if (attackerPlayer && attackerPlayer !== victimPlayer) {
+			try {
+				hostile = !!((victimPlayer.isHostileTo && victimPlayer.isHostileTo(attackerPlayer)) ||
+					(attackerPlayer.isHostileTo && attackerPlayer.isHostileTo(victimPlayer)));
+			} catch (_) { hostile = false; }
+		}
+
+		var event = this.killFeed.recordDeath({
+			lifeId: unit.id(),
+			victim: participant(victimPlayer, unit),
+			attacker: participant(attackerPlayer, attackerUnit),
+			hostile: hostile,
+			at: ige.training && ige.training.clock ? ige.training.clock.now() : Date.now()
+		});
+		if (event && ige.network && ige.network.send) ige.network.send('battleKillFeed', event);
+		return event;
 	},
 
 	start: function () {
@@ -186,7 +223,7 @@ var GameComponent = IgeEntity.extend({
 		var unit = player.createUnit(unitData);
 		if (unit) {
 			player.selectUnit(unit.id());
-			if (ige.training && ige.training.isTrainingMode && ige.training.stats) {
+			if (ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode) && ige.training.stats) {
 				ige.training.stats.startLife({ playerId: player.id(), lifeId: unit.id(), characterId: selected });
 			}
 			unit.addBehaviour('battleBotBrain', function () { ige.game._thinkBattleBot(player, unit); });
@@ -554,27 +591,36 @@ var GameComponent = IgeEntity.extend({
 	handleBattleBotDeath: function (unit, eventContext) {
 		var player = unit && unit.getOwner();
 		var state = player && player._battleBot;
-		if (ige.training && ige.training.isTrainingMode && player && player.getSelectedUnit && player.getSelectedUnit() !== unit) return;
+		if (ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode) && player && player.getSelectedUnit && player.getSelectedUnit() !== unit) return;
 		if (!state || state.respawnTimer || state.deadUnitId === unit.id()) return;
-		if (ige.training && ige.training.isTrainingMode) {
+		if (ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode)) {
 			var killerUnit = eventContext && eventContext.attackingUnitId && ige.$(eventContext.attackingUnitId);
 			var killerPlayer = killerUnit && killerUnit.getOwner && killerUnit.getOwner();
 			var death = {
 				lifeId: unit.id(),
 				victimTeamId: player._stats.trainingTeamId,
-				killerTeamId: killerPlayer && killerPlayer._stats.trainingTeamId || null,
+				killerTeamId: killerPlayer &&
+					(!ige.training.isExhibitionMode || killerPlayer._stats.isBattleBot) &&
+					killerPlayer._stats.trainingTeamId || null,
 				at: ige.training.clock ? ige.training.clock.now() : Date.now()
 			};
-			if (ige.training.match) ige.training.match.recordDeath(death);
-			if (ige.training.stats) ige.training.stats.recordDeath({
-				lifeId: death.lifeId,
-				victimId: player.id(),
-				killerId: killerPlayer && killerPlayer.id(),
-				at: death.at
-			});
+			if (ige.training.isExhibitionMode && ige.training.recordBotDeath) {
+				ige.training.recordBotDeath({ ...death, victimId: player.id(),
+					killerId: killerPlayer && killerPlayer._stats.isBattleBot ? killerPlayer.id() : null });
+			} else {
+				if (ige.training.match) ige.training.match.recordDeath(death);
+				if (ige.training.stats) ige.training.stats.recordDeath({
+					lifeId: death.lifeId,
+					victimId: player.id(),
+					killerId: killerPlayer && killerPlayer.id(),
+					at: death.at
+				});
+			}
 		}
 		state.deadUnitId = unit.id();
 		state.deathPosition = { x: unit._translate.x, y: unit._translate.y };
+		state.waitingAtDeath = !!(ige.training && ige.training.isExhibitionMode &&
+			ige.variable.getVariable('Current Game State') === 'Waiting');
 		state.path = null;
 		state.projectiles = null;
 		unit.stopMoving();
@@ -592,9 +638,10 @@ var GameComponent = IgeEntity.extend({
 			state.respawnTimer = null;
 			if (ige.training && ige.training.isExhibitionMode) {
 				var gameState = ige.variable.getVariable('Current Game State');
-				if (gameState && gameState !== 'Ongoing') state.sawRoundEnd = true;
-				if (!ige.game.isGameStarted || (gameState && gameState !== 'Ongoing') ||
-					(ige.variable.getVariable('Gamemode Random') === 3 && !state.sawRoundEnd)) {
+				var waitingBeforeMatch = state.waitingAtDeath && gameState === 'Waiting';
+				if (gameState && gameState !== 'Ongoing' && !state.waitingAtDeath) state.sawRoundEnd = true;
+				if (!ige.game.isGameStarted || (gameState && gameState !== 'Ongoing' && !waitingBeforeMatch) ||
+					(ige.variable.getVariable('Gamemode Random') === 3 && !state.sawRoundEnd && !state.waitingAtDeath)) {
 					state.respawnTimer = scheduleRespawn(1000);
 					return;
 				}
@@ -613,6 +660,7 @@ var GameComponent = IgeEntity.extend({
 			}
 			state.deadUnitId = null;
 			state.sawRoundEnd = false;
+			state.waitingAtDeath = false;
 			ige.game._spawnBattleBotUnit(player, position, Math.random() * Math.PI * 2);
 		}
 		state.respawnTimer = scheduleRespawn(3000);

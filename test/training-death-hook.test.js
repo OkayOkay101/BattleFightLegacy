@@ -51,6 +51,7 @@ test('exhibition bot waits through permadeath and respawns when the next round b
 	const game = { isGameStarted: true, _pickBattleBotSpawn: () => ({ x: 30, y: 40 }),
 		_spawnBattleBotUnit() { spawns++; } };
 	global.ige = { game, training: { isExhibitionMode: true, clock: {
+		now() { return Date.now(); },
 		schedule(callback) { scheduled.push(callback); return scheduled.length; }
 	} }, variable: { getVariable: name => name === 'Current Game State' ? gameState : 3 }, $: () => null };
 	GameComponent.handleBattleBotDeath.call(game, unit, {});

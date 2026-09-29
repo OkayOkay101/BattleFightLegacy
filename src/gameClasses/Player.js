@@ -371,7 +371,7 @@ var Player = IgeEntity.extend({
 	},
 
 	remove: function () {
-		if (this._stats.controlledBy == 'human' && ige.script) // do not send trigger for neutral player
+		if (this._stats.controlledBy == 'human' && !this._stats.isSpectator && ige.script) // spectators never entered the match
 		{
 			ige.trigger.fire('playerLeavesGame', { playerId: this.id() });
 		}

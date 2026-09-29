@@ -276,7 +276,7 @@ var Item = IgeEntityPhysics.extend({
 				}
 
 				self._stats.lastUsed = ige.now;
-				if (ige.isServer && ige.training && ige.training.isTrainingMode && ige.training.stats && player) {
+				if (ige.isServer && ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode) && ige.training.stats && player) {
 					ige.training.nextEventId = (ige.training.nextEventId || 0) + 1;
 					ige.training.stats.recordItemUse({
 						eventId: `${self.id()}:use:${ige.training.nextEventId}`,

@@ -51,16 +51,22 @@ test('demo opposition includes fight players but excludes spectators and allies'
 	assert.equal(demoIsOpponent(red, spectator), false);
 });
 
-test('demo spawns six combatants with the full training roster and does not collect training samples', () => {
+test('demo spawns six combatants and collects exhibition stats without training samples', () => {
 	const created = [], spawned = [];
 	const game = {
 		battleBotRoster: [],
 		createPlayer(data) {
 			created.push(data);
-			return { _stats: { ...data }, updatePlayerType() {} };
+			const botId = `bot-${created.length}`;
+			return { _stats: { ...data }, id: () => botId,
+				getSelectedUnit() { return this.selectedUnit; }, updatePlayerType() {} };
 		},
 		_pickBattleBotSpawn(leftSide) { return { x: leftSide ? 100 : 900, y: 200 }; },
-		_spawnBattleBotUnit(player) { spawned.push(player); }
+		_spawnBattleBotUnit(player) {
+			spawned.push(player);
+			player._battleBot.previousCharacter = ROSTER_IDS[0];
+			player.selectedUnit = { id: () => `unit-${spawned.length}` };
+		}
 	};
 	const ige = { game: { data: require('../src/game.json').data,
 		getAsset: () => ({ attributes: {}, variables: {} }) } };
@@ -71,5 +77,6 @@ test('demo spawns six combatants with the full training roster and does not coll
 	assert.equal(spawned.length, 6);
 	assert.equal(game.battleBotRoster.length, ROSTER_IDS.length);
 	assert.equal(demo.trajectory, undefined);
-	assert.equal(demo.stats, undefined);
+	assert.equal(Object.keys(demo.stats.finish().players).length, 6);
+	assert.equal(Object.keys(demo.stats.finish().characters).length, 6);
 });

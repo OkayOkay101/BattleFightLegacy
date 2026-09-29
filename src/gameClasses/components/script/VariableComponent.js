@@ -975,7 +975,8 @@ var VariableComponent = IgeEntity.extend({
 
 				case 'getPlayerCount':
 					returnValue = ige.$$('player').filter(function (player) {
-						return (player._stats.controlledBy == 'human' || player._stats.isBattleBot === true) && player._stats.playerJoined == true;
+						return (player._stats.controlledBy == 'human' || player._stats.isBattleBot === true) &&
+							player._stats.playerJoined == true && !player._stats.isSpectator;
 					}).length;
 					break;
 
@@ -1778,7 +1779,9 @@ var VariableComponent = IgeEntity.extend({
 					break;
 
 				case 'humanPlayers':
-					returnValue = ige.$$('player').filter(function (player) { return player._stats.controlledBy == 'human'; });
+					returnValue = ige.$$('player').filter(function (player) {
+						return player._stats.controlledBy == 'human' && !player._stats.isSpectator;
+					});
 					break;
 
 				case 'matchPlayers':

@@ -4,6 +4,8 @@ global.IgeEntity = { extend(definition) { function Entity() {} Entity.prototype 
 const KillFeedUiComponent = require('../src/gameClasses/components/ui/KillFeedUiComponent');
 const messages = require('../src/localization/messages');
 const { createGameI18n } = require('../src/localization/GameI18n');
+const { KillFeed } = require('../server/KillFeed');
+const GameComponent = require('../src/gameClasses/components/GameComponent').prototype;
 
 function makeNode(tagName) {
   const node = {
@@ -53,4 +55,27 @@ test('re-renders current entries when the selected language changes and ignores 
   assert.equal(container.children.length, 1);
   i18n.setLanguage('th');
   assert.equal(container.children[0].textContent, 'Blue (ทีมฟ้า) กำจัด Red');
+});
+
+test('a server-normalized death event renders as one live localized HUD row', () => {
+  const sent = [];
+  const red = { id: () => 'red-player', _stats: { name: 'Red', trainingTeamId: 'red' }, isHostileTo: other => other._stats.trainingTeamId !== 'red' };
+  const blue = { id: () => 'blue-player', _stats: { name: 'Blue', trainingTeamId: 'blue' }, isHostileTo: other => other._stats.trainingTeamId !== 'blue' };
+  const units = {
+    victim: { id: () => 'life-red-1', _category: 'unit', _stats: { type: 'ranger' }, getOwner: () => red },
+    attacker: { id: () => 'life-blue-1', getOwner: () => blue }
+  };
+  const serverGame = Object.create(GameComponent);
+  serverGame.killFeed = new KillFeed();
+  global.ige = { isServer: true, $(id) { return units[id] || null; }, network: { send(event, payload) { sent.push({ event, payload }); } } };
+  serverGame.recordKillFeedDeath(units.victim, { attackingUnitId: 'attacker' });
+
+  const { ui, container, i18n } = setup();
+  assert.equal(sent[0].event, 'battleKillFeed');
+  assert.equal(ui.add(sent[0].payload), true);
+  assert.equal(ui.add(sent[0].payload), false);
+  assert.equal(container.children.length, 1);
+  assert.equal(container.children[0].textContent, 'Blue (Blue) eliminated Red (Red · Ranger)');
+  i18n.setLanguage('th');
+  assert.equal(container.children[0].textContent, 'Blue (ทีมฟ้า) กำจัด Red (ทีมแดง · Ranger)');
 });

@@ -91,7 +91,8 @@ var ScriptComponent = IgeEntity.extend({
 	},
 
 	triggerEntity: function (entity, eventName, triggeredBy) {
-		if (!ige.isServer || !entity || entity._alive === false) return 0;
+		// Death handlers must run after AttributeComponent marks the unit dead.
+		if (!ige.isServer || !entity || (entity._alive === false && eventName !== 'entityAttributeBecomesZero')) return 0;
 		var scripts = this.getEntityScripts(entity);
 		var count = 0;
 		var context = { thisEntity: entity, triggeredBy: Object.assign({}, triggeredBy) };
