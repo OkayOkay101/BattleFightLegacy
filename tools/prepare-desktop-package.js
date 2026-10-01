@@ -7,7 +7,7 @@ const zlib = require('node:zlib');
 const AUDIO = new Set(['.aac', '.aif', '.aiff', '.caf', '.flac', '.m4a', '.mid', '.midi', '.mp3', '.oga', '.ogg', '.opus', '.wav', '.weba', '.wma']);
 const IMAGE = new Set(['.gif', '.jpeg', '.jpg', '.png', '.svg', '.webp']);
 const HOSTS = new Set(['cache.modd.io', 'modd.s3.amazonaws.com']);
-const TRAINING_RUNTIME = new Set(['DemoRuntime.js', 'NeuralActions.js', 'NeuralController.js', 'NeuralInference.js', 'NeuralObservation.js', 'PolicyRegistry.js', 'TrainingMatch.js', 'TrainingRoster.js', 'TrainingStats.js']);
+const TRAINING_RUNTIME = new Set(['DemoRuntime.js', 'DesktopSelection.js', 'NeuralActions.js', 'NeuralController.js', 'NeuralInference.js', 'NeuralObservation.js', 'NeuralSchema.js', 'neural-schema.json', 'NeuralCombatSnapshot.js', 'PolicyRegistry.js', 'TrainingMatch.js', 'TrainingRoster.js', 'TrainingStats.js']);
 const VENDOR = [
 	['node_modules/jquery/dist/jquery.min.js', 'assets/desktop-vendor/jquery/dist/jquery.min.js'],
 	['node_modules/jquery-ui-dist/jquery-ui.min.js', 'assets/desktop-vendor/jquery-ui/jquery-ui.min.js'],
@@ -124,7 +124,7 @@ function normalizeUrl(value) {
 			? new URL('https://' + value.slice('/assets/'.length))
 			: new URL(/^https?:\/\//i.test(value) ? value : 'https://' + value);
 		if (!HOSTS.has(url.hostname)) return null;
-		return { host: url.hostname, path: decodeURIComponent(url.pathname), key: url.hostname + decodeURIComponent(url.pathname) };
+		return { host: url.hostname, rawPath: url.pathname, path: decodeURIComponent(url.pathname), key: url.hostname + decodeURIComponent(url.pathname) };
 	} catch (error) { return null; }
 }
 
@@ -144,11 +144,15 @@ function sourceByManifest(entry, repoRoot) {
 }
 
 function sourceByUrl(reference, repoRoot) {
-	const filename = reference.path.split('/').filter(Boolean).map(part => part.replace(/[^A-Za-z0-9._-]/g, '_')).join(path.sep);
-	const candidate = path.resolve(repoRoot, 'assets', reference.host, filename);
-	if (!inside(path.resolve(repoRoot, 'assets'), candidate) || !fs.existsSync(candidate)) return null;
-	const stat = fs.lstatSync(candidate);
-	return stat.isFile() && !stat.isSymbolicLink() ? candidate : null;
+	const parts = reference.path.split('/').filter(Boolean);
+	const filenames = [(reference.rawPath || reference.path).split('/').filter(Boolean).join(path.sep), parts.join(path.sep), parts.map(part => part.replace(/[^A-Za-z0-9._-]/g, '_')).join(path.sep)];
+	for (const filename of filenames) {
+		const candidate = path.resolve(repoRoot, 'assets', reference.host, filename);
+		if (!inside(path.resolve(repoRoot, 'assets'), candidate) || !fs.existsSync(candidate)) continue;
+		const stat = fs.lstatSync(candidate);
+		if (stat.isFile() && !stat.isSymbolicLink() && validImage(fs.readFileSync(candidate), path.extname(candidate).toLowerCase())) return candidate;
+	}
+	return null;
 }
 
 function makeManifestIndex(manifest, repoRoot) {
@@ -168,12 +172,17 @@ function makeManifestIndex(manifest, repoRoot) {
 
 function resolveImage(value, context) {
 	if (!imageUrl(value)) return null;
-	if (value.startsWith('/assets/images/') || value.startsWith('/assets/fonts/')) {
-		const relative = path.join('assets', value.slice('/assets/'.length).split('/').join(path.sep));
-		const source = path.resolve(context.repoRoot, relative);
-		if (inside(path.resolve(context.repoRoot, 'assets'), source) && fs.existsSync(source) &&
-			validImage(fs.readFileSync(source), path.extname(source).toLowerCase())) return { source, relative, key: 'local:' + relative };
-		return { missing: true, expected: relative, key: 'local:' + relative };
+	if (value.startsWith('/assets/')) {
+		const segments = value.split(/[?#]/)[0].slice('/assets/'.length).split('/');
+		const host = segments.shift();
+		const rawPath = '/' + segments.join('/');
+		let decodedPath = rawPath;
+		try { decodedPath = decodeURIComponent(rawPath); } catch (error) {}
+		const source = sourceByUrl({ host, path: decodedPath, rawPath }, context.repoRoot);
+		if (source) {
+			const relative = path.relative(context.repoRoot, source);
+			return { source, relative, key: 'local:' + relative };
+		}
 	}
 	const ref = normalizeUrl(value);
 	if (!ref) {
@@ -243,7 +252,7 @@ function rewriteGameAssets(game, context, stats) {
 		if (!resolved) return node;
 		if (resolved.source) {
 			context.resolvedAssets.set(resolved.key, resolved);
-			return '/' + resolved.relative.split(path.sep).join('/');
+			return '/' + resolved.relative.split(path.sep).map(encodeURIComponent).join('/');
 		}
 		const pointers = context.missingAssets.get(resolved.expected) || new Set();
 		pointers.add(parts.join('.'));
@@ -444,7 +453,7 @@ function copyRuntime(repoRoot, stageRoot) {
 			fs.copyFileSync(source, destination);
 		}
 	}
-	for (const name of ['server', 'engine', 'src']) visit(path.join(repoRoot, name), path.join(stageRoot, name), name);
+	for (const name of ['server', 'engine', 'src', 'config']) visit(path.join(repoRoot, name), path.join(stageRoot, name), name);
 }
 
 function transformSources(stageRoot) {
@@ -526,12 +535,22 @@ function copyPolicies(repoRoot, stageRoot, stats) {
 	const sourceDir = path.join(repoRoot, 'training-data', 'policies');
 	if (!fs.existsSync(sourceDir)) throw new Error('Seed policies are missing: ' + sourceDir);
 	const files = fs.readdirSync(sourceDir).filter(name => /^n-\d+\.json$/.test(name)).sort();
-	if (files.length !== 26) throw new Error('Expected 26 seed policies, found ' + files.length);
+	if (!files.length) throw new Error('No seed policies found: ' + sourceDir);
 	const targetDir = path.join(stageRoot, 'training-data', 'policies');
 	fs.mkdirSync(targetDir, { recursive: true }); stats.policyFileCount = files.length; stats.policyBytes = 0;
 	for (const name of files) {
 		const target = path.join(targetDir, name); fs.copyFileSync(path.join(sourceDir, name), target); stats.policyBytes += fs.statSync(target).size;
 	}
+	const { PolicyRegistry } = require('../server/training/PolicyRegistry');
+	const registry = new PolicyRegistry(path.join(repoRoot, 'training-data'));
+	const approved = registry.status();
+	const available = version => version === 'baseline' || !!registry.policy(version);
+	const championVersion = available(approved.championVersion) ? approved.championVersion
+		: available(approved.previousVersion) ? approved.previousVersion : 'baseline';
+	const previousVersion = available(approved.previousVersion) ? approved.previousVersion : 'baseline';
+	fs.writeFileSync(path.join(stageRoot, 'training-data', 'approved-seed-manifest.json'), JSON.stringify({
+		autoUpdate: true, championVersion, previousVersion, activeVersion: championVersion
+	}, null, 2) + '\n');
 }
 
 function assertNoAudio(stageRoot, game) {
@@ -636,4 +655,4 @@ if (require.main === module) {
 	}
 }
 
-module.exports = { prepareDesktopPackage, optimizePng, crc32 };
+module.exports = { prepareDesktopPackage, optimizePng, crc32, copyRuntime, copyPolicies, sourceByUrl, rewriteGameAssets };

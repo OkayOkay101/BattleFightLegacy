@@ -321,18 +321,12 @@ var Server = IgeClass.extend({
 
 		const trainingCli = desktopMode ? null : require('./training/TrainingCli');
 		const { PolicyRegistry } = require('./training/PolicyRegistry');
+		const desktopSelection = require('./training/DesktopSelection');
 		const trainingDataDir = path.resolve(process.env.BATTLEFIGHT_USER_DATA || path.resolve(__dirname, '../training-data'));
 		const selectionFile = process.env.BATTLEFIGHT_SELECTION_FILE;
 		const persistDesktopSelection = (selection) => {
 			if (!desktopMode || !selectionFile) return;
-			fs.mkdirSync(path.dirname(selectionFile), { recursive: true });
-			const temporaryFile = `${selectionFile}.${process.pid}.${require('crypto').randomUUID()}.tmp`;
-			try {
-				fs.writeFileSync(temporaryFile, JSON.stringify(selection), 'utf8');
-				fs.renameSync(temporaryFile, selectionFile);
-			} finally {
-				if (fs.existsSync(temporaryFile)) fs.rmSync(temporaryFile, { force: true });
-			}
+			desktopSelection.saveSelection(selectionFile, selection);
 		};
 
 		app.get('/api/training/status', async (req, res) => {
@@ -382,15 +376,15 @@ var Server = IgeClass.extend({
 				return res.status(400).json({ ok: false, error: 'Choose a model for both teams' });
 			}
 			const registry = new PolicyRegistry(trainingDataDir);
-			const blue = registry.policy(blueVersion);
-			const red = registry.policy(redVersion);
-			if (!blue || !red) return res.status(400).json({ ok: false, error: 'Unknown or corrupt demo policy' });
 			try {
-				persistDesktopSelection({ blue: blue.version, red: red.version });
+				const { resolveDemoPolicy } = require('./training/DemoRuntime');
+				const blue = resolveDemoPolicy(registry, blueVersion);
+				const red = resolveDemoPolicy(registry, redVersion);
+				persistDesktopSelection({ blue: blueVersion, red: redVersion });
 				ige.trainingPolicy = blue;
-				res.json({ ok: true, demo: ige.training.setPolicies(blue, red) });
+				res.json({ ok: true, demo: ige.training.setPolicies(blue, red, { blue: blueVersion, red: redVersion }) });
 			} catch (error) {
-				res.status(500).json({ ok: false, error: error.message });
+				res.status(error.message.startsWith('Unknown demo policy:') ? 400 : 500).json({ ok: false, error: error.message });
 			}
 		});
 
@@ -407,6 +401,7 @@ var Server = IgeClass.extend({
 					dataDir: trainingDataDir,
 					workers,
 					neural,
+					schemaVersion: neural === 'on' ? 2 : 1,
 					speed
 				});
 				res.json({ ok: true, result });
@@ -856,22 +851,20 @@ var Server = IgeClass.extend({
 							var registry = new (require('./training/PolicyRegistry').PolicyRegistry)(trainingDataDir);
 							if (!(ige.training && ige.training.isTrainingMode)) {
 								var demo = require('./training/DemoRuntime');
-								var requestedPolicy = process.env.BATTLEFIGHT_DEMO_POLICY || 'latest';
+								var requestedPolicy = process.env.BATTLEFIGHT_DEMO_POLICY || 'champion';
 								if (desktopMode) {
-									var savedSelection = {};
-									try { savedSelection = JSON.parse(fs.readFileSync(process.env.BATTLEFIGHT_SELECTION_FILE, 'utf8')); } catch (error) {}
-									var resolveSavedPolicy = function (version) {
-										if (typeof version === 'string' && registry.policy(version)) return demo.resolveDemoPolicy(registry, version);
-										return demo.resolveDemoPolicy(registry, requestedPolicy);
+									var savedSelection = require('./training/DesktopSelection').loadSelection(process.env.BATTLEFIGHT_SELECTION_FILE);
+									var resolveSavedSelection = function (version) {
+										if (version === 'champion' || version === 'latest' || (typeof version === 'string' && registry.policy(version))) return version;
+										return requestedPolicy;
 									};
-									var bluePolicy = resolveSavedPolicy(savedSelection.blue);
-									var redPolicy = resolveSavedPolicy(savedSelection.red);
+									var selections = { blue: resolveSavedSelection(savedSelection.blue), red: resolveSavedSelection(savedSelection.red) };
+									var bluePolicy = demo.resolveDemoPolicy(registry, selections.blue);
 									ige.trainingPolicy = bluePolicy;
-									demo.installDemo(ige, bluePolicy);
-									if (redPolicy.version !== bluePolicy.version) ige.training.setPolicies(bluePolicy, redPolicy);
+									demo.installDemo(ige, bluePolicy, { registry, selections });
 								} else {
 									ige.trainingPolicy = demo.resolveDemoPolicy(registry, requestedPolicy);
-									demo.installDemo(ige, ige.trainingPolicy);
+									demo.installDemo(ige, ige.trainingPolicy, { registry, selections: { blue: requestedPolicy, red: requestedPolicy } });
 								}
 								console.log('BattleFight active neural exhibition: 3v3, policy ' + ige.trainingPolicy.version);
 							} else {

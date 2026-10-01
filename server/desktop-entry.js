@@ -4,6 +4,10 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
+// Electron utility processes do not initialize Node's global search paths.
+// Load the NODE_PATH supplied by the desktop launcher before loading the server.
+require('module')._initPaths();
+
 process.env.ENV = 'standalone';
 process.env.BATTLEFIGHT_DESKTOP = '1';
 

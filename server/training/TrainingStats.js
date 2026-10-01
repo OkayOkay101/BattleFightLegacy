@@ -62,7 +62,7 @@ class TrainingStats {
 		return true;
 	}
 
-	recordHealthChange({ eventId, projectileId, sourceId, targetId, itemTypeId, before, after, at }) {
+	recordHealthChange({ eventId, projectileId, sourceId, sourceCharacterId, targetId, itemTypeId, before, after, at }) {
 		if (!eventId || this.seenEvents.has(`health:${eventId}`)) return 0;
 		this.seenEvents.add(`health:${eventId}`);
 		const target = this.players.get(targetId);
@@ -75,7 +75,7 @@ class TrainingStats {
 		if (targetCharacter) targetCharacter.damageTaken += damage;
 		if (source && source !== target && source.teamId !== target.teamId) {
 			source.damageDealt += damage;
-			const sourceCharacter = this.activeCharacter(sourceId);
+			const sourceCharacter = sourceCharacterId ? this.characters.get(`${sourceId}:${sourceCharacterId}`) : this.activeCharacter(sourceId);
 			if (sourceCharacter) sourceCharacter.damageDealt += damage;
 			const projectile = this.projectiles.get(projectileId);
 			const effectiveItemTypeId = itemTypeId || projectile?.itemTypeId;
@@ -89,13 +89,13 @@ class TrainingStats {
 				}
 			}
 			const recent = this.recentDamage.get(targetId) || new Map();
-			recent.set(sourceId, { at, characterId: this.activeLives.get(sourceId)?.characterId });
+			recent.set(sourceId, { at, characterId: sourceCharacterId || this.activeLives.get(sourceId)?.characterId });
 			this.recentDamage.set(targetId, recent);
 		}
 		return damage;
 	}
 
-	recordDeath({ lifeId, victimId, killerId, at }) {
+	recordDeath({ lifeId, victimId, killerId, killerCharacterId, at }) {
 		const victim = this.players.get(victimId);
 		if (!lifeId || !victim || this.deadLives.has(lifeId)) return false;
 		this.deadLives.add(lifeId);
@@ -107,13 +107,14 @@ class TrainingStats {
 			this.activeLives.delete(victimId);
 		}
 		const killer = this.players.get(killerId);
-		if (killer && killer !== victim && killer.teamId !== victim.teamId) {
+		const creditedKill = killer && killer !== victim && killer.teamId !== victim.teamId;
+		if (creditedKill) {
 			killer.kills++;
-			const character = this.activeCharacter(killerId);
+			const character = killerCharacterId ? this.characters.get(`${killerId}:${killerCharacterId}`) : this.activeCharacter(killerId);
 			if (character) character.kills++;
 		}
 		const recent = this.recentDamage.get(victimId);
-		if (recent) {
+		if (recent && creditedKill) {
 			for (const [sourceId, damageEvent] of recent) {
 				const damageAt = typeof damageEvent === 'number' ? damageEvent : damageEvent.at;
 				const source = this.players.get(sourceId);

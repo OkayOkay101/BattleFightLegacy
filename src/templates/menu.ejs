@@ -49,6 +49,7 @@
             </div>
 
             <!-- Training Control Action Buttons -->
+            <div id="stat-v2-telemetry" class="small text-muted" style="white-space: pre-line" aria-live="polite"></div>
             <div class="train-controls mt-2 d-flex flex-wrap gap-2 align-items-center">
                 <button type="button" id="btn-train-toggle" class="btn btn-sm btn-outline-success font-weight-bold">
                     ▶ <span data-i18n="training.start">เริ่มเทรน AI</span>
@@ -205,6 +206,7 @@
 }
 </style>
 
+<script src="/src/localization/TrainingTelemetry.js"></script>
 <script>
 window.trainingDemoMode = 'spectate';
 
@@ -220,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var btnApplyPolicies = document.getElementById('btn-apply-demo-policies');
     var policyMessage = document.getElementById('demo-policy-message');
     var initialPolicy = settings ? settings.getAttribute('data-policy') || 'baseline' : 'baseline';
-    var activeModels = { blue: initialPolicy, red: initialPolicy };
+    var activeModels = { blue: 'champion', red: 'champion' };
     var policyEditing = false;
     
     var statState = document.getElementById('stat-train-state');
@@ -260,7 +262,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
-                if (statState) statState.textContent = tr('training.state.' + (train.state || 'stopped')) + (train.phase ? ' (' + train.phase + ')' : '');
+                if (statState) statState.textContent = tr('training.state.' + (train.state || 'stopped')) + (train.phase ? ' (' + tr('training.phase.' + train.phase) + ')' : '');
+                var telemetry = document.getElementById('stat-v2-telemetry');
+                if (telemetry && window.TrainingTelemetry) telemetry.textContent = window.TrainingTelemetry.formatTrainingTelemetry(train, tr);
                 if (statVersions) statVersions.textContent = (train.championVersion || reg.championVersion || 'base') + ' / ' + (train.candidateVersion || '-');
                 
                 if (statWinrate) {
@@ -298,11 +302,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function formatWinRate(value) { return value == null ? '—' : (value * 100).toFixed(1) + '%'; }
 
     function renderDemoStatus(demo) {
-        activeModels = demo.models;
+        activeModels = Object.assign({}, demo.requestedModels || demo.models);
+        ['blue', 'red'].forEach(function(team) { if (activeModels[team] === 'latest') activeModels[team] = 'champion'; });
         if (statServerPolicy) statServerPolicy.textContent = demo.models.blue + ' / ' + demo.models.red;
         if (!policyEditing && selectBluePolicy && selectRedPolicy) {
-            selectBluePolicy.value = demo.models.blue;
-            selectRedPolicy.value = demo.models.red;
+            selectBluePolicy.value = activeModels.blue;
+            selectRedPolicy.value = activeModels.red;
         }
         var round = demo.round || { scores: { blue: 0, red: 0 }, remainingMs: 0, number: 1 };
         var quickScore = document.getElementById('training-demo-quick-score');
@@ -314,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!team) return;
             var model = document.getElementById('demo-' + teamId + '-model');
             var stats = document.getElementById('demo-' + teamId + '-stats');
-            if (model) model.textContent = team.model;
+            if (model) model.textContent = tr('training.requestedResolved', { requested: team.requestedModel === 'champion' || team.requestedModel === 'latest' ? tr('training.autoChampion') : team.requestedModel || team.model, resolved: team.model, schema: team.schemaVersion || 1 });
             if (stats) stats.textContent = tr('training.teamSummary', {
                 rate: formatWinRate(team.winRate), wins: team.wins, losses: team.losses, draws: team.draws,
                 kda: formatRatio(team.kda), kills: team.kills, deaths: team.deaths, assists: team.assists,
@@ -340,7 +345,11 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
         var note = document.getElementById('demo-stats-note');
-        if (note) note.textContent = demo.humanPresent ? tr('training.humanPresent') : tr('training.aiOnly');
+        if (note) {
+            note.textContent = demo.humanPresent ? tr('training.humanPresent') : tr('training.aiOnly');
+            if (demo.executionTelemetry) note.textContent += ' · ' + tr('training.executionSummary', { count: demo.executionTelemetry.decisions, overrides: demo.executionTelemetry.overriddenDecisions });
+            if (demo.neuralError) note.textContent += ' · ' + tr('training.inferenceError', { detail: demo.neuralError });
+        }
     }
 
     function fetchDemoStatus() {
@@ -377,10 +386,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!select) return;
                     var currentVal = policyEditing ? select.value : activeModels[index === 0 ? 'blue' : 'red'];
                     select.textContent = '';
-                    data.policies.forEach(function(p) {
+                    ['champion'].concat(data.policies).forEach(function(p) {
                         var opt = document.createElement('option');
                         opt.value = p;
-                        opt.textContent = p + (p === data.registry.championVersion ? ' 🏆 ' + tr('training.champion') : '');
+                        opt.textContent = p === 'champion' ? tr('training.autoChampion') : p + (p === data.registry.championVersion ? ' 🏆 ' + tr('training.champion') : '');
                         select.appendChild(opt);
                     });
                     select.value = currentVal;
@@ -451,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch('/api/training/start', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ workers: webWorkersCount, neural: true, speed: 'max' })
+                    body: JSON.stringify({ workers: webWorkersCount, neural: true, schemaVersion: 3, speed: 'max' })
                 }).then(function() { setTimeout(fetchTrainingStatus, 1200); });
             }
         });

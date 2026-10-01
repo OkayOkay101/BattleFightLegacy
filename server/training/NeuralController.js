@@ -4,8 +4,9 @@ const { scoreActions } = require('./NeuralInference');
 
 function chooseNeuralAction({ weights, policyVersion, playerId, simulatedAt, snapshot,
 	training = true, random = Math.random }) {
-	const observation = buildObservation(snapshot);
-	const options = enumerateLegalActions(snapshot);
+	const schemaVersion = weights.schemaVersion || 1;
+	const observation = buildObservation(snapshot, schemaVersion);
+	const options = enumerateLegalActions(snapshot, schemaVersion);
 	const { logits, value } = scoreActions(weights, observation, options);
 	const max = Math.max(...logits);
 	if (!Number.isFinite(max)) throw new Error('No legal neural action');
@@ -25,6 +26,12 @@ function chooseNeuralAction({ weights, policyVersion, playerId, simulatedAt, sna
 		options: options.map(option => [...option.features]), options17: options.map(option => [...option.features]), options13: options.map(option => [...option.features]),
 		chosenIndex,
 		logProb: Math.log(exponentials[chosenIndex] / total), value, simulatedAt };
+	if (schemaVersion >= 2) {
+		delete record.observation86; delete record.observation82; delete record.options17; delete record.options13;
+		Object.assign(record, { schemaVersion, observationSchemaVersion: schemaVersion, actionSchemaVersion: schemaVersion,
+			schemaHash: weights.schemaHash, environmentHash: weights.environmentHash,
+			trainingProtocolVersion: weights.trainingProtocolVersion, requestedAction: { ...options[chosenIndex].action } });
+	}
 	return { action: options[chosenIndex].action, options, record };
 }
 

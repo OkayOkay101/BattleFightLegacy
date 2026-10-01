@@ -1600,6 +1600,7 @@ var ActionComponent = IgeEntity.extend({
 										sourceItemId: (vars && vars.triggeredBy) ? vars.triggeredBy.itemId : undefined,
 										sourceUnitId: unitId,
 										sourcePlayerId: ownerPlayerId,
+										combatSource: ige.isServer ? require('../CombatAttribution').forScript(ige, vars) : null,
 										damageData: {
 											sourceUnitId: unitId,
 											sourcePlayerId: ownerPlayerId,
@@ -1641,6 +1642,10 @@ var ActionComponent = IgeEntity.extend({
 							var ownerPlayer = (unit.getOwner) ? unit.getOwner() : undefined;
 							var ownerPlayerId = (ownerPlayer && ownerPlayer.id) ? ownerPlayer.id() : undefined;
 							projectile._stats.sourcePlayerId = ownerPlayerId;
+							if (ige.isServer) {
+								var sourceItemId = projectile._stats.sourceItemId || projectile._combatSource && projectile._combatSource.itemId;
+								projectile._combatSource = require('../CombatAttribution').fromEntity(ige, unit, sourceItemId);
+							}
 							if (!projectile._stats.damageData) projectile._stats.damageData = {};
 							projectile._stats.damageData.sourceUnitId = unit.id();
 							projectile._stats.damageData.sourcePlayerId = ownerPlayerId;
@@ -1652,6 +1657,10 @@ var ActionComponent = IgeEntity.extend({
 						var item = ige.variable.getValue(action.item, vars);
 						if (projectile && item) {
 							projectile._stats.sourceItemId = item.id();
+							if (ige.isServer && projectile._combatSource) {
+								projectile._combatSource = Object.assign({}, projectile._combatSource,
+									{ itemId: item.id(), itemTypeId: item._stats && item._stats.itemTypeId });
+							}
 							if (!projectile._stats.damageData) projectile._stats.damageData = {};
 							projectile._stats.damageData.sourceItemId = item.id();
 						}
@@ -2214,7 +2223,12 @@ var ActionComponent = IgeEntity.extend({
 								isAttributeVisible = attribute.isVisible instanceof Array && attribute.isVisible.length > 0;
 							}
 
-							entity.attribute.update(attrId, value, isAttributeVisible); // update attribute, and check for attribute becoming 0
+							var previousCombatContext = entity._combatDamageContext;
+							if (ige.isServer && attrId === 'health' && entity._category === 'unit' && !previousCombatContext) {
+								entity._combatDamageContext = require('../CombatAttribution').forScript(ige, vars);
+							}
+							try { entity.attribute.update(attrId, value, isAttributeVisible); }
+							finally { entity._combatDamageContext = previousCombatContext; }
 						}
 						break;
 

@@ -9,6 +9,13 @@ const { PolicyRegistry } = require('./PolicyRegistry');
 const { runNeuralPreflight } = require('./NeuralPreflight');
 const { runParitySuite } = require('./TrainingParity');
 const { NeuralTrainer } = require('./NeuralTrainer');
+const { environmentHash, buildEnvironmentDefinition, SEED_RANGES } = require('./TrainingProtocol');
+
+function neuralSchema(options) {
+	const version = Number(options['neural-schema'] ?? options.schemaVersion ?? (options.neural === 'on' ? 3 : 1));
+	if (![1, 2, 3].includes(version)) throw new RangeError('Use --neural-schema 1, 2 or 3');
+	return version;
+}
 
 function parseArgs(argv) {
 	const options = { command: argv[0] || 'status' };
@@ -18,6 +25,7 @@ function parseArgs(argv) {
 		options[key.slice(2)] = argv[++index];
 	}
 	options.dataDir = path.resolve(options['data-dir'] || path.join(__dirname, '../../training-data'));
+	options.schemaVersion = neuralSchema(options);
 	return options;
 }
 
@@ -60,9 +68,11 @@ async function daemon(options, { supervisorFactory = config => new TrainingSuper
 	const stopFile = path.join(options.dataDir, 'stop-request.json');
 	const controlFile = path.join(options.dataDir, 'control.json');
 	const runId = options['run-id'];
+	if (options.neural === 'on' && neuralSchema(options) >= 2) new PolicyRegistry(options.dataDir).setAutoUpdate(true);
 	const supervisor = supervisorFactory({ dataDir: options.dataDir, runId,
 		mode: options.neural === 'on' ? 'neural' : 'heuristic',
-		workers: Number(options.workers),
+		schemaVersion: neuralSchema(options), environmentHash: options['environment-hash'],
+		workers: options.workers === undefined ? undefined : Number(options.workers),
 		maxMatches: options.matches ? Number(options.matches) : Infinity,
 		maxDurationMs: options['duration-ms'] ? Number(options['duration-ms']) : 300000,
 		speedMode: options['speed-mode'] || 'realtime', parityStatus: options['parity-status'] || 'not-required' });
@@ -118,6 +128,9 @@ async function daemon(options, { supervisorFactory = config => new TrainingSuper
 }
 
 async function start(options) {
+	const schemaVersion = neuralSchema(options);
+	const envHash = options.neural === 'on' && schemaVersion >= 2 ? environmentHash(buildEnvironmentDefinition(undefined,
+		{maxDurationMs:options['duration-ms'] === undefined ? 300000 : Number(options['duration-ms'])})) : undefined;
 	if (options.neural === 'on') runNeuralPreflight();
 	if (options.neural && !['on', 'off'].includes(options.neural)) throw new Error('Use --neural on or --neural off');
 	workerCount(options.workers === undefined ? undefined : Number(options.workers));
@@ -139,11 +152,22 @@ async function start(options) {
 			try {
 				let policies = null;
 				if (options.neural === 'on') {
-					const trainer = new NeuralTrainer({ dataDir: options.dataDir });
+					const trainer = new NeuralTrainer({ dataDir: options.dataDir, schemaVersion, environmentHash: envHash });
 					const candidate = await trainer.initialize();
-					policies = { bluePolicy: candidate, redPolicy: new PolicyRegistry(options.dataDir).policy('baseline') };
+					policies = { bluePolicy: candidate, redPolicy: new PolicyRegistry(options.dataDir).policy('baseline'),
+						schemaVersion, environmentHash: envHash, trainingProtocolVersion: 2,
+						candidateVersion:candidate.version, learnerSide:'blue' };
 				}
-				const parity = runParitySuite([1, 2, 3], { durationMs: 3000, policies });
+				const seeds = schemaVersion >= 2 && options.neural === 'on' ? [SEED_RANGES.parity[0], SEED_RANGES.parity[0]+1, SEED_RANGES.parity[1]] : [1,2,3];
+				let parity = runParitySuite(seeds, { durationMs: 3000, policies });
+				if (policies && schemaVersion >= 2) {
+					const registry = new PolicyRegistry(options.dataDir);
+					const opponent = registry.policy(registry.status().championVersion) || registry.policy('baseline');
+					const championParity = runParitySuite(seeds, {durationMs:3000,policies:{...policies,redPolicy:opponent}});
+					parity = {ok:parity.ok && championParity.ok,cases:[
+						...parity.cases.map(entry=>({...entry,opponentVersion:'baseline'})),
+						...championParity.cases.map(entry=>({...entry,opponentVersion:opponent.version}))]};
+				}
 				({ speedMode, parityStatus, parityDetails } = resolveSpeed(requestedSpeed, parity));
 			} catch (error) {
 				parityStatus = 'error';
@@ -154,14 +178,18 @@ async function start(options) {
 	const args = [__filename, 'daemon', '--data-dir', options.dataDir, '--run-id', runId,
 		'--workers', String(workerCount(options.workers === undefined ? undefined : Number(options.workers))),
 		'--neural', options.neural || 'off',
+		'--neural-schema', String(schemaVersion),
 		'--speed-mode', speedMode, '--requested-speed', requestedSpeed, '--parity-status', parityStatus];
 	if (parityDetails) args.push('--parity-details', Buffer.from(JSON.stringify(parityDetails)).toString('base64'));
+	if (envHash) args.push('--environment-hash', envHash);
 	for (const key of ['matches', 'duration-ms']) if (options[key] !== undefined) args.push(`--${key}`, String(options[key]));
 	const child = spawn(process.execPath, args, { detached: true, stdio: 'ignore', windowsHide: true });
 	child.unref();
 		daemonStarted = true;
 	const statusFile = path.join(options.dataDir, 'status.json');
-	for (let attempt = 0; attempt < 100; attempt++) {
+	// Restoring a large match archive can exceed ten seconds before workers start.
+	const readyDeadline = Date.now() + 120000;
+	while (Date.now() < readyDeadline) {
 		const status = await readJson(statusFile);
 		if (status?.runId === runId && status.pid === child.pid && status.state !== 'starting') return status;
 		if (!processAlive(child.pid)) break;
@@ -192,6 +220,8 @@ async function status(options) {
 
 async function exportResults(options) {
 	const matches = await new TrainingStore(options.dataDir).readMatches();
+	matches.push(...await new TrainingStore(path.join(options.dataDir, 'neural-state-v2')).readMatches());
+	matches.push(...await new TrainingStore(path.join(options.dataDir, 'neural-state-v3')).readMatches());
 	const rows = exportTierStats(matches);
 	return options.format === 'json' ? JSON.stringify(rows, null, 2) : toCsv(rows);
 }
@@ -226,4 +256,4 @@ async function main(argv = process.argv.slice(2)) {
 
 if (require.main === module) main().catch(error => { console.error(error.stack || error); process.exitCode = 1; });
 
-module.exports = { parseArgs, start, stop, status, exportResults, processAlive, resolveSpeed, writeJsonAtomic, daemon };
+module.exports = { parseArgs, start, stop, status, exportResults, processAlive, resolveSpeed, writeJsonAtomic, daemon, neuralSchema };

@@ -192,6 +192,10 @@ var AttributeComponent = IgeEntity.extend({
 				var max = parseFloat(attribute.max);
 				var oldValue = parseFloat(attribute.value);
 				var newValue = Math.max(min, Math.min(max, parseFloat(newValue)));
+				var combatSource = null;
+				if (ige.isServer && attributeTypeId === 'health' && self._entity._category === 'unit' && newValue < oldValue) {
+					combatSource = require('../CombatAttribution').forHealthChange(ige, self._entity);
+				}
 
 				self._entity._stats.attributes[attributeTypeId].value = newValue;
 				if (ige.isServer && attributeTypeId === 'health' && self._entity._category === 'unit' &&
@@ -208,7 +212,7 @@ var AttributeComponent = IgeEntity.extend({
 						var projectileSourceItem = projectileSourceAllowed && ige.$(contactProjectile._stats.sourceItemId);
 						var recentAttackerUnit = self._entity.lastAttackedBy;
 						var recentOwner = recentAttackerUnit && recentAttackerUnit.getOwner && recentAttackerUnit.getOwner();
-						var sourceId = context.sourceId || (projectileSourceAllowed && projectileSourceOwner.id()) ||
+						var sourceId = combatSource && combatSource.participant && combatSource.participant.id || context.sourceId || (projectileSourceAllowed && projectileSourceOwner.id()) ||
 							(recentOwner && self._entity.lastAttackedAt &&
 							(ige.training.clock ? ige.training.clock.now() : Date.now()) - self._entity.lastAttackedAt <= 250 && owner &&
 							ige.training.isOpponent && ige.training.isOpponent(recentOwner, owner) ? recentOwner.id() : null);
@@ -216,10 +220,11 @@ var AttributeComponent = IgeEntity.extend({
 						ige.training.nextEventId = (ige.training.nextEventId || 0) + 1;
 						ige.training.stats.recordHealthChange({
 						eventId: `${self._entity.id()}:health:${ige.training.nextEventId}`,
-						projectileId: contactProjectileId,
-						itemTypeId: context.itemTypeId || (projectileSourceItem && projectileSourceItem._stats && projectileSourceItem._stats.itemTypeId) ||
+							projectileId: combatSource && combatSource.projectileId || contactProjectileId,
+							itemTypeId: combatSource && combatSource.itemTypeId || context.itemTypeId || (projectileSourceItem && projectileSourceItem._stats && projectileSourceItem._stats.itemTypeId) ||
 							(recentItem && recentItem._stats && recentItem._stats.itemTypeId),
 						sourceId: sourceId,
+							sourceCharacterId: combatSource && combatSource.participant && combatSource.participant.characterId,
 						targetId: owner && owner.id(),
 						before: oldValue,
 						after: newValue,
@@ -250,9 +255,9 @@ var AttributeComponent = IgeEntity.extend({
 
 						var triggeredBy = { attribute: attribute };
 						if (this._entity._category === 'unit') {
-							var recentAttacker = self._entity.lastAttackedAt &&
-								(ige.training && ige.training.clock ? ige.training.clock.now() : Date.now()) - self._entity.lastAttackedAt < 10000 ? self._entity.lastAttackedBy : null;
-							triggeredBy.attackingUnitId = recentAttacker && recentAttacker.id();
+							// Only the damage that caused this health transition can earn kill credit.
+							triggeredBy.attackingUnitId = combatSource && combatSource.unitId || null;
+							triggeredBy.attackingPlayer = combatSource && combatSource.participant || null;
 						}
 						triggeredBy[`${this._entity._category}Id`] = this._entity.id();
 						if (newValue <= 0 && oldValue > 0) // when attribute becomes zero, trigger attributeBecomesZero event
@@ -268,7 +273,7 @@ var AttributeComponent = IgeEntity.extend({
 								self._entity.ai.announceDeath();
 							}
 							ige.trigger.fire(`${this._entity._category}AttributeBecomesZero`, triggeredBy);
-							if (this._entity._category === 'unit' && ige.game.handleBattleBotDeath) ige.game.handleBattleBotDeath(this._entity, triggeredBy);
+							if (this._entity._category === 'unit' && attributeTypeId === 'health' && ige.game.handleBattleBotDeath) ige.game.handleBattleBotDeath(this._entity, triggeredBy);
 						} else if (newValue >= attribute.max) // when attribute becomes full, trigger attributeBecomesFull event
 						{
 							// console.log("update attr fire!")

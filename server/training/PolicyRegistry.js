@@ -63,7 +63,41 @@ class PolicyRegistry {
 	savePolicy(value) {
 		value = { kind: 'heuristic', ...value };
 		if (!validPolicy(value) || value.version === 'baseline') throw new TypeError('Invalid training policy');
-		writeAtomic(path.join(this.directory, 'policies', `${value.version}.json`), value);
+		const file = path.join(this.directory, 'policies', `${value.version}.json`);
+		if (/^n-\d{6}$/.test(value.version) && fs.existsSync(file)) {
+			if (JSON.stringify(unseal(fs.readFileSync(file, 'utf8'))) === JSON.stringify(value)) return;
+			throw new Error(`Cannot overwrite numbered policy ${value.version}`);
+		}
+		if (/^n-\d{6}$/.test(value.version)) {
+			fs.mkdirSync(path.dirname(file), { recursive: true });
+			const temporary = `${file}.${crypto.randomUUID()}.tmp`;
+			fs.writeFileSync(temporary, sealed(value));
+			try { fs.linkSync(temporary, file); }
+			catch (error) { if (error.code === 'EEXIST') throw new Error(`Cannot overwrite numbered policy ${value.version}`); throw error; }
+			finally { fs.rmSync(temporary, { force: true }); }
+			return;
+		}
+		writeAtomic(file, value);
+	}
+
+	nextNeuralVersion() {
+		let maximum = -1;
+		const folders = ['policies', 'neural'];
+		try {
+			// Reserve published optimizer/weight numbers even if a crash prevented
+			// publication in the policy registry. Only canonical local directories count.
+			for (const entry of fs.readdirSync(this.directory, { withFileTypes: true })) {
+				if (entry.isDirectory() && /^neural-v[1-9]\d*$/.test(entry.name)) folders.push(entry.name);
+			}
+		} catch (error) { if (error.code !== 'ENOENT') throw error; }
+		for (const folder of folders) {
+			let files; try { files = fs.readdirSync(path.join(this.directory, folder)); }
+			catch (error) { if (error.code === 'ENOENT') continue; throw error; }
+			for (const file of files) { const match = file.match(/(?:^|-)n-(\d{6})(?:\.|$)/);
+				if (match) maximum = Math.max(maximum, Number(match[1])); }
+		}
+		if (maximum >= 999999) throw new RangeError('Neural policy numbering exhausted');
+		return `n-${String(maximum + 1).padStart(6, '0')}`;
 	}
 
 	_saveConfig() { writeAtomic(this.configFile, this.config); }
@@ -80,10 +114,16 @@ class PolicyRegistry {
 		this._saveConfig();
 	}
 
-	promote(version) {
+	promote(version, { evaluation } = {}) {
 		if (!this.policy(version)) throw new Error(`Unknown or corrupt policy ${version}`);
+		if (version === this.config.championVersion) return;
+		const oldChampion = this.config.championVersion;
+		this.config.approvedArchives = [...new Set([oldChampion, this.config.previousVersion,
+			...(this.config.approvedArchives || [])])].filter(value => value !== version).slice(0, 3);
 		this.config.previousVersion = this.config.championVersion;
 		this.config.championVersion = version;
+		if (this.config.autoUpdate) this.config.activeVersion = version;
+		if (evaluation) this.config.lastPromotion = evaluation;
 		this._saveConfig();
 	}
 

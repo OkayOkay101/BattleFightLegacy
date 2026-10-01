@@ -59,6 +59,16 @@ class TrainingStore {
 			const id = report?.result?.matchId;
 			if (typeof id !== 'string' || !id || report.result.status !== 'complete') throw new TypeError('Invalid complete training result');
 			if (report.speedMode === 'max' && report.parityStatus !== 'passed') throw new Error('Accelerated training result has not passed parity');
+			if (report.schemaVersion >= 2) {
+				if (!['train','selection','final-test'].includes(report.split) ||
+					!['schemaHash','environmentHash'].every(key => /^[a-f0-9]{64}$/.test(report[key] || '')) ||
+					report.trainingProtocolVersion !== 2 || report.schemaHash !== require('./NeuralSchema').getSchema(report.schemaVersion).schemaHash) throw new Error('Invalid neural match metadata');
+				if ((report.trajectory || []).some(row => row.schemaVersion !== report.schemaVersion ||
+					row.schemaHash !== report.schemaHash || row.environmentHash !== report.environmentHash ||
+					row.trainingProtocolVersion !== 2 || row.policyVersion !== report.evaluation?.candidateVersion)) {
+					throw new Error('Incompatible neural match trajectory');
+				}
+			}
 			if (!this.matchIds) {
 				const ids = new Set();
 				await this.scanMatches(entry => { ids.add(entry.result.matchId); });

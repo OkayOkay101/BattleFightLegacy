@@ -30,6 +30,8 @@ var GameComponent = IgeEntity.extend({
 		if (!ige.isServer || !this.killFeed || !unit || unit._category !== 'unit') return null;
 		var victimPlayer = unit.getOwner && unit.getOwner();
 		if (!victimPlayer || !victimPlayer.id || !victimPlayer._stats || victimPlayer._stats.isSpectator) return null;
+		if (victimPlayer.getSelectedUnit && victimPlayer.getSelectedUnit() !== unit) return null;
+		if (unit._stats && unit._stats.type === 'hLrbyj6dKv') return null;
 
 		function participant(player, ownedUnit) {
 			if (!player || !player.id || !player._stats) return null;
@@ -43,6 +45,8 @@ var GameComponent = IgeEntity.extend({
 
 		var attackerUnit = eventContext && eventContext.attackingUnitId && ige.$(eventContext.attackingUnitId);
 		var attackerPlayer = attackerUnit && attackerUnit.getOwner && attackerUnit.getOwner();
+		var attacker = eventContext && eventContext.attackingPlayer || participant(attackerPlayer, attackerUnit);
+		if (!attackerPlayer && attacker && ige.$) attackerPlayer = ige.$(attacker.id);
 		var hostile = false;
 		if (attackerPlayer && attackerPlayer !== victimPlayer) {
 			try {
@@ -50,11 +54,15 @@ var GameComponent = IgeEntity.extend({
 					(attackerPlayer.isHostileTo && attackerPlayer.isHostileTo(victimPlayer)));
 			} catch (_) { hostile = false; }
 		}
+		if (!attackerPlayer && attacker) {
+			hostile = attacker.id !== victimPlayer.id() && attacker.teamId &&
+				attacker.teamId !== (victimPlayer._stats.trainingTeamId || victimPlayer._stats.teamId);
+		}
 
 		var event = this.killFeed.recordDeath({
 			lifeId: unit.id(),
 			victim: participant(victimPlayer, unit),
-			attacker: participant(attackerPlayer, attackerUnit),
+			attacker: attacker,
 			hostile: hostile,
 			at: ige.training && ige.training.clock ? ige.training.clock.now() : Date.now()
 		});
@@ -341,6 +349,113 @@ var GameComponent = IgeEntity.extend({
 		}
 	},
 
+	_forecastBattleBotHazard: function (known, now, parentPresent) {
+		var source = known.hazard, age = Math.max(0, (now - known.at) / 1000);
+		var explosions = source.explosions || (source.explosionRadius > 0 ? [{ at: source.explosionAt,
+			radius: source.explosionRadius, damage: source.explosionDamage, lifeSeconds: source.explosionLifeSeconds,
+			onTouch: source.explosionOnTouch, onWall: source.explosionOnWall }] : []);
+		explosions = explosions.flatMap(function (blast) {
+			var at = blast.at - age;
+			if (Number.isFinite(at) && at <= 0) {
+				var remaining = Math.max(0, (blast.lifeSeconds || 0) + at);
+				return remaining > 0 ? [{ ...blast, at: 0, onTouch: false, onWall: false, lifeSeconds: remaining,
+					position: blast.position || { x: known.x + source.velocity.x * blast.at, y: known.y + source.velocity.y * blast.at } }] : [];
+			}
+			return parentPresent ? [{ ...blast, at: at }] : [];
+		});
+		var life = parentPresent ? Math.max(0, source.lifeSeconds - age) : 0;
+		if (!(life > 0)) life = Math.max(0, ...explosions.filter(blast => blast.position).map(blast => blast.lifeSeconds));
+		if (!(life > 0)) return null;
+		return { ...source, position: { x: known.x + source.velocity.x * age, y: known.y + source.velocity.y * age },
+			damage: parentPresent && source.lifeSeconds > age ? source.damage : 0, lifeSeconds: life,
+			explosionAt: source.explosionAt - age, explosions: explosions };
+	},
+
+	_updateBattleBotDodge: function (player, unit, map, tileWidth, tileHeight, now) {
+		var planner = require('./unit/BattleBotDodge');
+		var state = player._battleBot;
+		var scale = Number(ige.physics?._scaleRatio) || 30;
+		var radius = Math.hypot(unit.width?.() || 40, unit.height?.() || 40) / 2;
+		var speed = unit._stats.isStunned ? 0 : Math.max(0, Number(unit._stats.attributes?.speed?.value) || 0) * scale;
+		if (!state.projectiles) state.projectiles = new Map();
+		var seen = new Set();
+		var present = new Set();
+		var self = this;
+		function observe(entity) {
+			var id = entity.id(), previous = state.projectiles.get(id);
+			var dt = previous && now > previous.at ? (now - previous.at) / 1000 : 0;
+			var physical = entity.body?.getLinearVelocity?.();
+			var velocity = physical && Number.isFinite(physical.x) && Number.isFinite(physical.y) ?
+				{ x: physical.x * scale, y: physical.y * scale } :
+				{ x: dt ? (entity._translate.x - previous.x) / dt : 0, y: dt ? (entity._translate.y - previous.y) / dt : 0 };
+			entity._battleBotVelocity = velocity; entity._battleBotScaleRatio = scale;
+			seen.add(id);
+			state.projectiles.set(id, { x: entity._translate.x, y: entity._translate.y, at: now, firstSeen: previous?.firstSeen ?? now,
+				previous: previous ? { x: previous.x, y: previous.y, at: previous.at } : null });
+			var hazard = planner.describeHazard(entity, id => ige.game?.getAsset?.('projectileTypes', id) || ige.game?.data?.projectileTypes?.[id], now);
+			state.projectiles.get(id).hazard = hazard;
+			return hazard;
+		}
+		function hostile(entity) {
+			var source = entity._category === 'unit' ? entity : ige.$?.(entity._stats?.sourceUnitId);
+			var owner = source?.getOwner?.() || ige.$?.(entity._combatSource?.participant?.id);
+			if (owner) return ige.training?.isOpponent ? ige.training.isOpponent(player, owner) : !!player.isHostileTo?.(owner);
+			var team = entity._combatSource?.participant?.teamId;
+			return !!team && !!player._stats.trainingTeamId && team !== player._stats.trainingTeamId;
+		}
+		var hazards = [];
+		var entities = this._getBattleBotProjectiles(now).concat(typeof ige.$$ === 'function' ? this._getBattleBotUnits(now).filter(function (candidate) {
+			return candidate !== unit && candidate.getOwner?.()?.getSelectedUnit?.() !== candidate;
+		}) : []);
+		for (var entity of entities) {
+			if (!entity?._translate || !hostile(entity)) continue;
+			present.add(entity.id());
+			// Occluded wall-passing hazards use only the last observed state, never hidden physics.
+			if (!unit.ai.battleBotHasLineOfSight(map, 1, 1, tileWidth, unit._translate, entity._translate)) {
+				var known = state.projectiles.get(entity.id());
+				if (known?.hazard?.canIgnoreWalls) {
+					var retained = this._forecastBattleBotHazard(known, now, true);
+					if (retained) { hazards.push(retained); seen.add(entity.id()); }
+				}
+				continue;
+			}
+			var hazard = observe(entity);
+			if (hazard && (hazard.damage > 0 || hazard.explosionDamage > 0)) hazards.push(hazard);
+		}
+		state.projectiles.forEach(function (known, id) {
+			if (!seen.has(id) && !present.has(id) && known.hazard?.canIgnoreWalls) {
+				// Only already elapsed, supported literal blasts survive a missing parent.
+				var active = self._forecastBattleBotHazard(known, now, false);
+				if (active) { hazards.push(active); seen.add(id); }
+			}
+			if (!seen.has(id)) state.projectiles.delete(id);
+		});
+		var physical = unit.body?.getLinearVelocity?.();
+		var dt = state.lastPosition && now > state.lastPositionAt ? (now - state.lastPositionAt) / 1000 : 0;
+		var velocity = physical ? { x: physical.x * scale, y: physical.y * scale } :
+			{ x: dt ? (unit._translate.x - state.lastPosition.x) / dt : 0, y: dt ? (unit._translate.y - state.lastPosition.y) / dt : 0 };
+		state.dodgeMoveSpeed = speed;
+		state.dodgePlan = planner.planDodge({ position: unit._translate, velocity, speed, radius, hazards, now,
+			previous: { direction: state.dodgeDirection, until: state.dodgeUntil },
+			isClear: (position, margin) => unit.ai.battleBotPositionIsClear(map, tileWidth, tileHeight, position, margin) });
+		if (state.dodgePlan.imminent && state.dodgePlan.best?.clear) {
+			var best = state.dodgePlan.best;
+			if (state.dodgeDirection !== best.direction || !(state.dodgeUntil > now)) state.dodgeUntil = now + 250;
+			state.dodgeDirection = best.direction; state.dodgeAngle = best.angle; state.dodgeMoving = best.moving;
+		}
+		return state.dodgePlan;
+	},
+
+	_executeBattleBotDodge: function (state, action, reasons) {
+		var plan = state.dodgePlan;
+		var selected = Number.isInteger(action?.dodgeDirection) ? plan?.candidates.find(c => c.direction === action.dodgeDirection && c.clear) : plan?.best;
+		if (!selected?.clear) {
+			reasons.push('dodge-route-unavailable');
+			selected = plan?.best?.clear ? plan.best : { moving: false, angle: null, direction: 8 };
+		}
+		return { moving: !!selected.moving, angle: selected.angle, direction: selected.direction };
+	},
+
 	_battleBotNeuralDecision: function (player, unit, targets, map, tileWidth, tileHeight, now, profile) {
 		if (!ige.training?.decideNeural) return null;
 		var policy = ige.training.policyForPlayer(player);
@@ -385,7 +500,7 @@ var GameComponent = IgeEntity.extend({
 			return owner && ige.training.isOpponent(player, owner) &&
 				unit.ai.battleBotHasLineOfSight(map, 1, 1, tileWidth, unit._translate, projectile._translate);
 		}).map(function (projectile) {
-			var previous = state.projectiles?.get(projectile.id());
+			var previous = state.projectiles?.get(projectile.id())?.previous;
 			var dt = previous && now > previous.at ? (now - previous.at) / 1000 : 0;
 			return { id: projectile.id(), distance: Math.hypot(projectile._translate.x - unit._translate.x,
 				projectile._translate.y - unit._translate.y),
@@ -394,6 +509,11 @@ var GameComponent = IgeEntity.extend({
 					dt ? (projectile._translate.x - previous.x) / dt / 1000 : 0,
 					dt ? (projectile._translate.y - previous.y) / dt / 1000 : 0] };
 		}).sort(function (a, b) { return a.distance - b.distance; }).slice(0, 4);
+		if (policy.weights.schemaVersion >= 3 && state.dodgePlan) projectiles = state.dodgePlan.threats.slice(0, 4).map(function (hazard) {
+			return { id: hazard.id, distance: Math.hypot(hazard.position.x - unit._translate.x, hazard.position.y - unit._translate.y),
+				threat: hazard.risk > 0, features: [(hazard.position.x - unit._translate.x) / mapWidth,
+					(hazard.position.y - unit._translate.y) / mapHeight, hazard.velocity.x / 1000, hazard.velocity.y / 1000] };
+		});
 		var weapons = [], weaponReady = [0, 0, 0, 0];
 		for (var slot of profile.slots || [0, 1, 2, 3]) {
 			if (slot < 0 || slot > 3) continue;
@@ -417,13 +537,18 @@ var GameComponent = IgeEntity.extend({
 				if (options[0]) entry.ricochetAims[slot] = options[0].aim;
 			}
 		}
-		return ige.training.decideNeural(player, { self: { health: health.value / Math.max(1, health.max),
+		var snapshot = { self: { health: health.value / Math.max(1, health.max),
 			x: unit._translate.x / mapWidth, y: unit._translate.y / mapHeight,
 			vx: selfDt ? (unit._translate.x - state.lastPosition.x) / selfDt / 1000 : 0,
 			vy: selfDt ? (unit._translate.y - state.lastPosition.y) / selfDt / 1000 : 0,
 			attackRange: profile.range,
 			characterId: unit._stats.type }, allies, enemies, projectiles,
-			weaponReady, targets: enemies, weapons }, now);
+			weaponReady, targets: enemies, weapons };
+		if (policy.weights.schemaVersion >= 2) snapshot = require('../../../server/training/NeuralCombatSnapshot').extendSnapshot({
+			ige: ige, game: this, player: player, unit: unit, map: map, tileWidth: tileWidth, tileHeight: tileHeight, now: now, snapshot: snapshot
+		});
+		if (policy.weights.schemaVersion >= 3) { snapshot.dodge = state.dodgePlan; snapshot.self.moveSpeed = state.dodgeMoveSpeed; }
+		return ige.training.decideNeural(player, snapshot, now);
 	},
 
 	_thinkBattleBot: function (player, unit) {
@@ -432,32 +557,55 @@ var GameComponent = IgeEntity.extend({
 		var now = ige.training && ige.training.clock ? ige.training.clock.now() : Date.now();
 		if (now - state.thinkingAt < 100) return;
 		state.thinkingAt = now;
+		var map = ige.map && ige.map.data;
+		var tileWidth = ige.scaleMapDetails?.tileWidth || map.tilewidth;
+		var tileHeight = ige.scaleMapDetails?.tileHeight || map.tileheight;
+		this._updateBattleBotDodge(player, unit, map, tileWidth, tileHeight, now);
 		var targets = this._battleBotTargets(player, unit, now);
 		var target = targets[0];
 		if (!target) {
+			var waitingPolicy = ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode) ?
+				ige.training.policyForPlayer(player) : ige.trainingPolicy;
+			var waitingEscape = null, waitingReasons = [];
+			if (waitingPolicy?.weights?.schemaVersion >= 2) {
+				var waitingMap = ige.map && ige.map.data;
+				var waitingProfile = this.battleBotRoster.find(function (entry) { return entry.id === unit._stats.type; }) || { range: 350, slots: [0, 1, 2, 3] };
+				var waitingAction = this._battleBotNeuralDecision(player, unit, targets, waitingMap,
+					ige.scaleMapDetails?.tileWidth || waitingMap.tilewidth,
+					ige.scaleMapDetails?.tileHeight || waitingMap.tileheight, now, waitingProfile);
+				if (waitingAction && Number.isInteger(waitingAction.dodgeDirection)) waitingEscape = this._executeBattleBotDodge(state, waitingAction, waitingReasons);
+				if (waitingAction && ige.training.recordExecution) ige.training.recordExecution(player,
+					{ ...waitingAction, ...(waitingEscape ? { dodgeDirection: waitingEscape.direction } : {}), fire: false, moving: !!waitingEscape?.moving, movementAngle: waitingEscape?.angle ?? null }, waitingReasons);
+			}
+			if (!waitingEscape && (!waitingPolicy?.weights || waitingPolicy.weights.schemaVersion === 1) && state.dodgePlan?.imminent)
+				waitingEscape = this._executeBattleBotDodge(state, null, waitingReasons);
+			if (waitingEscape?.moving) { unit.movementAngle = waitingEscape.angle; unit.startMoving(); unit.ability.stopUsingItem(); return; }
 			unit.stopMoving();
 			if (unit._stats.controls && unit._stats.controls.movementMethod === 'velocity') unit.setLinearVelocity(0, 0);
 			unit.ability.stopUsingItem();
 			return;
 		}
-		var map = ige.map && ige.map.data;
-		var tileWidth = ige.scaleMapDetails && ige.scaleMapDetails.tileWidth || map.tilewidth;
-		var tileHeight = ige.scaleMapDetails && ige.scaleMapDetails.tileHeight || map.tileheight;
 		var radius = Math.max(12, Math.min(unit.width() || 40, unit.height() || 40) * 0.35);
 		var visible = unit.ai.battleBotHasLineOfSight(map, 1, 1, tileWidth, unit._translate, target.unit._translate);
 		var profile = this.battleBotRoster.find(function (entry) { return entry.id === unit._stats.type; }) || { range: 350, slots: [0, 1, 2, 3] };
 		var policy = ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode) ? ige.training.policyForPlayer(player) : ige.trainingPolicy;
 		var neuralAction = this._battleBotNeuralDecision(player, unit, targets, map, tileWidth, tileHeight, now, profile);
+		var neuralV2 = neuralAction && typeof neuralAction.fire === 'boolean';
+		var explicitDodge = neuralV2 && Number.isInteger(neuralAction.dodgeDirection);
+		var executedDodgeDirection;
+		var overrideReasons = [];
 		if (neuralAction && neuralAction.targetId === null) {
 			unit.stopMoving();
 			unit.ability.stopUsingItem();
+			if (neuralV2 && ige.training.recordExecution) ige.training.recordExecution(player,
+				{ ...neuralAction, fire: false, moving: false, movementAngle: null }, ['no-target']);
 			return;
 		}
 		if (neuralAction?.targetId) target = targets.find(function (entry) { return entry.unit.id() === neuralAction.targetId; }) || target;
+		if (neuralV2) visible = unit.ai.battleBotHasLineOfSight(map, 1, 1, tileWidth, unit._translate, target.unit._translate);
 		var params = policy && policy.params || {};
 		var tacticalRange = profile.range * (params.rangeScale || 1);
 		var weaponSwitchMs = 900 * (params.switchScale || 1);
-		var dodgeScale = params.dodgeScale || 1;
 		var currentSlot = unit._stats.currentItemIndex || 0;
 		var preferredSlot = currentSlot;
 		if (state.weaponSwitchAt && now >= state.weaponSwitchAt) {
@@ -482,11 +630,12 @@ var GameComponent = IgeEntity.extend({
 				radius: Math.max(1, Math.min(radius, 8))
 			})[0] || null;
 		};
-		var weapon = this._selectBattleBotWeapon(unit,
+		var weapon = neuralV2 && (!neuralAction.fire || !Number.isInteger(neuralAction.slot) || neuralAction.slot < 0 || neuralAction.slot > 3) ? null : this._selectBattleBotWeapon(unit,
 			neuralAction?.slot !== null && neuralAction?.slot !== undefined ? { slots: [neuralAction.slot] } : profile,
 			target.distance, visible, ige.now || now,
 			neuralAction?.slot !== null && neuralAction?.slot !== undefined ? neuralAction.slot : preferredSlot,
 			ige.physics, neuralAction?.aimMode === 'direct' ? null : ricochetForItem);
+		if (neuralV2 && neuralAction.fire && !weapon) overrideReasons.push('weapon-unavailable');
 		if (weapon && neuralAction?.aimMode === 'ricochet' && !weapon.ricochet) weapon.ricochet = ricochetForItem(weapon.item);
 		var projectileSpeed = weapon ? this._battleBotProjectileSpeed(weapon.item, ige.physics) : 360;
 		var aim = weapon && weapon.ricochet ? weapon.ricochet.aim :
@@ -524,7 +673,7 @@ var GameComponent = IgeEntity.extend({
 		}
 		var lookAhead = { x: unit._translate.x + Math.cos(unit.movementAngle) * 96, y: unit._translate.y + Math.sin(unit.movementAngle) * 96 };
 		var directIsClear = unit.ai.battleBotPositionIsClear(map, tileWidth, tileHeight, lookAhead, radius);
-		if ((!neuralAction || moving) && (!visible || moving && !directIsClear || state.path && state.path.length)) {
+		if (!explicitDodge && (!neuralAction || moving) && (!visible || moving && !directIsClear || state.path && state.path.length)) {
 			if (!state.path || state.pathTargetId !== target.unit.id() || now - state.lastPathAt > 750) {
 				state.path = unit.ai.findBattleBotPath(map, tileWidth, tileHeight, unit._translate, target.unit._translate, radius);
 				state.pathTargetId = target.unit.id();
@@ -534,33 +683,16 @@ var GameComponent = IgeEntity.extend({
 			if (state.path && state.path.length) {
 				unit.movementAngle = Math.atan2(state.path[0].y - unit._translate.y, state.path[0].x - unit._translate.x);
 				moving = true;
-			} else if (!directIsClear) moving = false;
+				if (neuralV2) overrideReasons.push('path');
+			} else if (!directIsClear) { moving = false; if (neuralV2) overrideReasons.push('collision'); }
 		} else state.path = null;
-		if (!state.projectiles) state.projectiles = new Map();
-		var seen = new Set(), dodgeAngle;
-		this._getBattleBotProjectiles(now).forEach(function (projectile) {
-			var source = projectile._stats && ige.$(projectile._stats.sourceUnitId);
-			var owner = source && source.getOwner && source.getOwner();
-			if (!owner || !player.isHostileTo(owner) ||
-				(!(ige.training?.isTrainingMode || ige.training?.isExhibitionMode) && owner._stats.controlledBy !== 'human')) return;
-			if (Math.hypot(projectile._translate.x - unit._translate.x, projectile._translate.y - unit._translate.y) > 650 * dodgeScale ||
-				!unit.ai.battleBotHasLineOfSight(map, 1, 1, tileWidth, unit._translate, projectile._translate)) return;
-			var id = projectile.id(), previous = state.projectiles.get(id);
-			seen.add(id);
-			state.projectiles.set(id, { x: projectile._translate.x, y: projectile._translate.y, at: now, firstSeen: previous ? previous.firstSeen : now });
-			if (!previous || now - previous.firstSeen < 50 || now <= previous.at) return;
-			var delta = (now - previous.at) / 1000;
-			var velocity = { x: (projectile._translate.x - previous.x) / delta, y: (projectile._translate.y - previous.y) / delta };
-			var candidate = unit.ai.chooseBattleBotDodge(map, tileWidth, tileHeight, unit._translate, projectile._translate, velocity, radius);
-			if (candidate !== undefined) dodgeAngle = candidate;
-		});
-		state.projectiles.forEach(function (_, id) { if (!seen.has(id)) state.projectiles.delete(id); });
-		if (dodgeAngle !== undefined) { state.dodgeAngle = dodgeAngle; state.dodgeUntil = now + 350 * dodgeScale; }
-		if (state.dodgeUntil > now && state.dodgeAngle !== undefined) {
-			unit.movementAngle = state.dodgeAngle;
-			moving = true;
+		if (explicitDodge || neuralV2 && neuralAction.movement === 'dodge' && state.dodgePlan?.imminent) {
+			var escape = this._executeBattleBotDodge(state, neuralAction, overrideReasons);
+			unit.movementAngle = escape.angle; moving = escape.moving; executedDodgeDirection = escape.direction;
+		} else if (state.dodgeUntil > now && (state.dodgeAngle !== undefined || state.dodgeMoving === false) && !neuralV2) {
+			unit.movementAngle = state.dodgeAngle; moving = state.dodgeMoving !== false;
 		}
-		if (state.lastPosition && Math.hypot(unit._translate.x - state.lastPosition.x, unit._translate.y - state.lastPosition.y) < 3 && moving) {
+		if (!explicitDodge && state.lastPosition && Math.hypot(unit._translate.x - state.lastPosition.x, unit._translate.y - state.lastPosition.y) < 3 && moving) {
 			state.stuckAt = state.stuckAt || now;
 			if (now - state.stuckAt > 600) {
 				state.path = null;
@@ -570,6 +702,7 @@ var GameComponent = IgeEntity.extend({
 				if (!unit.ai.battleBotPositionIsClear(map, tileWidth, tileHeight, sidestepPoint, radius)) sidestep -= Math.PI;
 				unit.movementAngle = sidestep;
 				state.stuckAt = now;
+				if (neuralV2) overrideReasons.push('stuck');
 			}
 		} else state.stuckAt = 0;
 		state.lastPosition = { x: unit._translate.x, y: unit._translate.y };
@@ -586,6 +719,9 @@ var GameComponent = IgeEntity.extend({
 			} else if (!state.weaponSwitchAt) state.weaponSwitchAt = now + weaponSwitchMs;
 			if (!weapon.item._stats.isBeingUsed) unit.ability.startUsingItem();
 		} else unit.ability.stopUsingItem();
+		if (neuralV2 && ige.training.recordExecution) ige.training.recordExecution(player,
+			{ ...neuralAction, ...(executedDodgeDirection !== undefined ? { dodgeDirection: executedDodgeDirection } : {}), fire: !!weapon, slot: weapon ? weapon.slot : null, moving: moving,
+				movementAngle: Number.isFinite(unit.movementAngle) ? unit.movementAngle : null }, overrideReasons);
 	},
 
 	handleBattleBotDeath: function (unit, eventContext) {
@@ -596,23 +732,27 @@ var GameComponent = IgeEntity.extend({
 		if (ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode)) {
 			var killerUnit = eventContext && eventContext.attackingUnitId && ige.$(eventContext.attackingUnitId);
 			var killerPlayer = killerUnit && killerUnit.getOwner && killerUnit.getOwner();
+			var killer = eventContext && eventContext.attackingPlayer || null;
+			if (!killerPlayer && killer) killerPlayer = ige.$(killer.id);
 			var death = {
 				lifeId: unit.id(),
 				victimTeamId: player._stats.trainingTeamId,
 				killerTeamId: killerPlayer &&
 					(!ige.training.isExhibitionMode || killerPlayer._stats.isBattleBot) &&
-					killerPlayer._stats.trainingTeamId || null,
+					killerPlayer._stats.trainingTeamId || (!ige.training.isExhibitionMode && killer && killer.teamId) || null,
 				at: ige.training.clock ? ige.training.clock.now() : Date.now()
 			};
 			if (ige.training.isExhibitionMode && ige.training.recordBotDeath) {
 				ige.training.recordBotDeath({ ...death, victimId: player.id(),
-					killerId: killerPlayer && killerPlayer._stats.isBattleBot ? killerPlayer.id() : null });
+					killerId: killerPlayer && killerPlayer._stats.isBattleBot ? killerPlayer.id() : null,
+					killerCharacterId: killer && killer.characterId });
 			} else {
 				if (ige.training.match) ige.training.match.recordDeath(death);
 				if (ige.training.stats) ige.training.stats.recordDeath({
 					lifeId: death.lifeId,
 					victimId: player.id(),
-					killerId: killerPlayer && killerPlayer.id(),
+						killerId: killer && killer.id || killerPlayer && killerPlayer.id(),
+						killerCharacterId: killer && killer.characterId,
 					at: death.at
 				});
 			}

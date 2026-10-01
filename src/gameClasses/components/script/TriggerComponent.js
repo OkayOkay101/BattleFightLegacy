@@ -293,6 +293,14 @@ var TriggerComponent = IgeEntity.extend({
 	*/
 	fire: function (triggerName, triggeredBy) {
 		// if (triggerName === 'projectileTouchesWall') console.log("trigger fire", triggerName, triggeredBy)
+		var isProjectileContact = ige.isServer && triggerName === 'unitTouchesProjectile';
+		var previousProjectileId = ige.game && ige.game.currentProjectileId;
+		var previousTrainingProjectileId = ige.training && ige.training.currentProjectileId;
+		if (isProjectileContact) {
+			if (ige.game) ige.game.currentProjectileId = triggeredBy && triggeredBy.projectileId;
+			if (ige.training) ige.training.currentProjectileId = triggeredBy && triggeredBy.projectileId;
+		}
+		try {
 
 		if (ige.isServer && ige.script) {
 			if (triggerName === 'frameTick' || triggerName === 'secondTick') {
@@ -314,11 +322,6 @@ var TriggerComponent = IgeEntity.extend({
 			}
 		}
 		if (ige.isServer || (ige.isClient && ige.physics)) {
-			var previousTrainingProjectileId = ige.training && ige.training.currentProjectileId;
-			if (ige.training && ige.training.isTrainingMode && triggerName === 'unitTouchesProjectile') {
-				ige.training.currentProjectileId = triggeredBy && triggeredBy.projectileId;
-			}
-			try {
 			let scriptIds = this.triggeredScripts[triggerName]
 			for (let i in scriptIds) {
 				let scriptId = scriptIds[i]
@@ -329,9 +332,6 @@ var TriggerComponent = IgeEntity.extend({
 				};
 				ige.script.runScript(scriptId, localVariables);
 			}
-			} finally {
-				if (ige.training && ige.training.isTrainingMode) ige.training.currentProjectileId = previousTrainingProjectileId;
-			}
 		}
 
 		if (triggeredBy && triggeredBy.projectileId) {
@@ -341,7 +341,7 @@ var TriggerComponent = IgeEntity.extend({
 					case 'unitTouchesProjectile':
 						var attackedUnit = ige.$(triggeredBy.collidingEntity || ige.game.lastAttackedUnitId);
 						if (attackedUnit) {
-							if (ige.training && ige.training.isTrainingMode && projectile._stats.damageData) {
+							if (projectile._stats.damageData) {
 								projectile._stats.damageData.sourceProjectileId = projectile.id();
 							}
 							var damageHasBeenInflicted = attackedUnit.inflictDamage(projectile._stats.damageData);
@@ -391,6 +391,12 @@ var TriggerComponent = IgeEntity.extend({
 						}
 						break;
 				}
+			}
+		}
+		} finally {
+			if (isProjectileContact) {
+				if (ige.game) ige.game.currentProjectileId = previousProjectileId;
+				if (ige.training) ige.training.currentProjectileId = previousTrainingProjectileId;
 			}
 		}
 	}

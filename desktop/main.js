@@ -3,6 +3,7 @@
 const { app, BrowserWindow, dialog, ipcMain, session, utilityProcess } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const { initializeUserPolicyData } = require('./policy-data');
 
 app.setName('BattleFight');
 
@@ -59,27 +60,6 @@ function installRequestAllowlist (rendererSession) {
 	});
 }
 
-function initializeUserPolicyData (root) {
-	const sourceDirectory = path.join(root, 'training-data', 'policies');
-	const userTrainingDirectory = path.join(app.getPath('userData'), 'training-data');
-	const userPolicyDirectory = path.join(userTrainingDirectory, 'policies');
-	if (!fs.existsSync(sourceDirectory)) {
-		throw new Error(`Desktop policy seeds are missing: ${sourceDirectory}`);
-	}
-	const seeds = fs.readdirSync(sourceDirectory).filter(name => /^n-\d+\.json$/.test(name));
-	if (!seeds.length) throw new Error(`No desktop policy seeds were found in ${sourceDirectory}`);
-	fs.mkdirSync(userPolicyDirectory, { recursive: true });
-	for (const name of seeds) {
-		const source = path.join(sourceDirectory, name);
-		const destination = path.join(userPolicyDirectory, name);
-		if (!fs.existsSync(destination)) fs.copyFileSync(source, destination, fs.constants.COPYFILE_EXCL);
-	}
-	return {
-		trainingDirectory: userTrainingDirectory,
-		selectionFile: path.join(app.getPath('userData'), 'desktop-selection.json')
-	};
-}
-
 function startGameServer () {
 	return new Promise((resolve, reject) => {
 		const root = resourceRoot();
@@ -89,7 +69,7 @@ function startGameServer () {
 		}
 		let userDataPaths;
 		try {
-			userDataPaths = initializeUserPolicyData(root);
+			userDataPaths = initializeUserPolicyData(root, app.getPath('userData'));
 		} catch (error) {
 			return reject(error);
 		}

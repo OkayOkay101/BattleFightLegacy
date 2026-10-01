@@ -25,19 +25,50 @@ test('new exhibition spectator keeps spectator state when player is created', ()
 	}
 });
 
-test('demo chooses the newest valid trained policy without changing active champion', () => {
+test('demo aliases choose approved champion and never the newest unapproved candidate', () => {
 	const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'battlefight-demo-'));
 	try {
 		const registry = new PolicyRegistry(directory);
 		registry.savePolicy({ version: 'n-000002', params: { rangeScale: 1, dodgeScale: 1, switchScale: 1 } });
 		registry.savePolicy({ version: 'n-000010', params: { rangeScale: 1, dodgeScale: 1, switchScale: 1 } });
+		registry.promote('n-000002');
 		fs.writeFileSync(path.join(directory, 'policies', 'n-000011.json'), 'corrupt');
 		const policy = resolveDemoPolicy(registry, 'latest');
-		assert.equal(policy.version, 'n-000010');
+		assert.equal(policy.version, 'n-000002');
+		assert.equal(resolveDemoPolicy(registry, 'champion').version, 'n-000002');
+		assert.equal(resolveDemoPolicy(registry, 'n-000010').version, 'n-000010');
 		assert.equal(registry.status().activeVersion, 'baseline');
-		assert.equal(registry.status().championVersion, 'baseline');
+		assert.equal(registry.status().championVersion, 'n-000002');
 		assert.throws(() => resolveDemoPolicy(registry, '../secret'), /Unknown demo policy/);
 	} finally { fs.rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('champion follows only at round boundary while fixed team remains pinned', () => {
+	const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'battlefight-round-'));
+	const realNow = Date.now;
+	let now = 1000;
+	Date.now = () => now;
+	try {
+		const registry = new PolicyRegistry(directory);
+		for (const version of ['n-000001', 'n-000002']) registry.savePolicy({ version, params: { rangeScale: 1, dodgeScale: 1, switchScale: 1 } });
+		registry.promote('n-000001');
+		const ige = { $$: () => [], $: () => null };
+		const demo = installDemo(ige, registry.policy('n-000001'), { registry, selections: { blue: 'champion', red: 'n-000001' } });
+		new PolicyRegistry(directory).promote('n-000002');
+		now += 299999;
+		assert.deepEqual(demo.status().models, { blue: 'n-000001', red: 'n-000001' });
+		now++;
+		assert.equal(demo.policyForPlayer({ _stats: { trainingTeamId: 'blue' } }).version, 'n-000002');
+		const status = demo.status();
+		assert.deepEqual(status.models, { blue: 'n-000002', red: 'n-000001' });
+		assert.deepEqual(status.requestedModels, { blue: 'champion', red: 'n-000001' });
+		assert.deepEqual(status.resolvedModels, status.models);
+		assert.equal(status.round.number, 2);
+		assert.equal(demo.match.startedAt, 301000);
+		demo.recordExecution({ id: () => 'blue-player' }, { fire: false }, ['wall']);
+		assert.deepEqual(demo.status().executionTelemetry, { decisions: 1, overriddenDecisions: 1, overrideReasons: { wall: 1 } });
+		assert.equal(demo.trajectory, undefined);
+	} finally { Date.now = realNow; fs.rmSync(directory, { recursive: true, force: true }); }
 });
 
 test('demo opposition includes fight players but excludes spectators and allies', () => {

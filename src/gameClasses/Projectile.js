@@ -21,6 +21,11 @@ var Projectile = IgeEntityPhysics.extend({
 			data,
 			projectileData
 		);
+		if (ige.isServer) {
+			self._combatSource = data.combatSource || require('./components/CombatAttribution').fromEntity(
+				ige, ige.$(self._stats.sourceUnitId), self._stats.sourceItemId);
+			delete self._stats.combatSource;
+		}
 
 		// dont save variables in _stats as _stats is stringified and synced
 		// and some variables of type unit, item, projectile may contain circular json objects

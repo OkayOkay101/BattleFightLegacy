@@ -1329,6 +1329,10 @@ var Unit = IgeEntityPhysics.extend({
 					unitId: ige.game.lastAttackingUnitId,
 					itemId: ige.game.lastAttackingItemId
 				};
+				var previousCombatContext = self._combatDamageContext;
+				var combatSource = require('./components/CombatAttribution').fromEntity(ige,
+					damageData.sourceProjectileId && ige.$(damageData.sourceProjectileId) || sourceUnit, damageData.sourceItemId);
+				self._combatDamageContext = combatSource;
 				if (trainingMode) {
 					var attackSourceItem = ige.$(damageData.sourceItemId);
 					self._trainingDamageContext = {
@@ -1340,7 +1344,7 @@ var Unit = IgeEntityPhysics.extend({
 				try {
 					ige.trigger && ige.trigger.fire('unitAttacksUnit', triggeredBy);
 					if (ige.script) ige.script.triggerEntity(self, 'entityGetsAttacked', triggeredBy);
-				} finally { self._trainingDamageContext = null; }
+				} finally { self._trainingDamageContext = null; self._combatDamageContext = previousCombatContext; }
 
 				var armor = this._stats.attributes.armor && this._stats.attributes.armor.value || 0;
 				var damageReduction = (0.05 * armor) / (1.5 + 0.04 * armor);
@@ -1362,8 +1366,9 @@ var Unit = IgeEntityPhysics.extend({
 									projectileId: damageData.sourceProjectileId
 								};
 							}
+							self._combatDamageContext = combatSource;
 							try { self.attribute.update(damageAttrKey, newValue, true); }
-							finally { self._trainingDamageContext = null; }
+							finally { self._trainingDamageContext = null; self._combatDamageContext = previousCombatContext; }
 						}
 					});
 				}

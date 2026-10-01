@@ -31,7 +31,8 @@ function loadEngineClasses() {
 }
 
 function bootTrainingGame({ matchId = 'training-smoke', seed = 1, maxDurationMs = 300000, bluePolicy, redPolicy,
-	split = 'train', candidateVersion = null, manualSteps = false } = {}) {
+	split = 'train', candidateVersion = null, manualSteps = false, schemaVersion, schemaHash,
+	environmentHash, trainingProtocolVersion, phase = split, opponentVersion, learnerSide, sideSwap } = {}) {
 	process.env.ENV = 'standalone';
 	if (require.main === module) seedRandom(seed);
 	loadEngineClasses();
@@ -75,7 +76,14 @@ function bootTrainingGame({ matchId = 'training-smoke', seed = 1, maxDurationMs 
 	ige.physics.start();
 	const match = new TrainingMatch({ matchId, startedAt: clock ? clock.now() : Date.now(), maxDurationMs });
 	const stats = new TrainingStats();
-	TrainingRuntime.install(ige, { seed, match, stats, bluePolicy, redPolicy, clock, split, candidateVersion });
+	const learner = [bluePolicy, redPolicy].find(policy => policy?.version === candidateVersion) ||
+		[bluePolicy, redPolicy].find(policy => policy?.kind === 'neural');
+	const metadata = { schemaVersion: schemaVersion || learner?.weights?.schemaVersion || 1,
+		schemaHash: schemaHash || learner?.weights?.schemaHash,
+		environmentHash: environmentHash || learner?.weights?.environmentHash,
+		trainingProtocolVersion: trainingProtocolVersion || learner?.weights?.trainingProtocolVersion };
+	TrainingRuntime.install(ige, { seed, matchId, match, stats, bluePolicy, redPolicy, clock, split,
+		candidateVersion, phase, opponentVersion, learnerSide, sideSwap, ...metadata });
 	return new Promise((resolve, reject) => {
 		ige.start(success => {
 			if (!success) return reject(new Error('Taro engine did not start'));
@@ -101,20 +109,26 @@ function runMatch(options, onResult) {
 		const started = Date.now();
 		let result;
 		while (!result) {
+			if (ige.training.neuralError) throw new Error(`Neural worker inference failed: ${ige.training.neuralError}`);
 			if (options.speedMode !== 'max') {
 				const delay = started + (stepper.steps + 1) * 1000 / 60 - Date.now();
 				if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
 			}
 			stepper.step();
+			if (ige.training.neuralError) throw new Error(`Neural worker inference failed: ${ige.training.neuralError}`);
 			result = match.finish(clock.now());
 			if (options.speedMode === 'max' && stepper.steps % 60 === 0) await new Promise(resolve => setImmediate(resolve));
 		}
 		stepper.dispose();
 		const finalStats = stats.finish();
 		const trajectory = ige.training.trajectory.finish(result, finalStats, {
-			split: options.split, speedMode: options.speedMode, parityStatus: options.parityStatus
+			split: options.split, speedMode: options.speedMode, parityStatus: options.parityStatus,
+			endedAt: match.startedAt + result.durationMs
 		});
 		onResult({ result, stats: finalStats, trajectory, neuralError: ige.training.neuralError,
+			schemaVersion: ige.training.config.schemaVersion, schemaHash: ige.training.config.schemaHash,
+			environmentHash: ige.training.config.environmentHash, trainingProtocolVersion: ige.training.config.trainingProtocolVersion,
+			phase: options.phase || options.split || 'train', opponentVersion: options.opponentVersion,
 			speedMode: options.speedMode || 'realtime',
 			simulatedMs: result.durationMs, wallMs: Date.now() - started,
 			parityStatus: options.parityStatus || 'not-required', policyVersion: options.policyVersion || 'baseline',
@@ -154,12 +168,14 @@ if (require.main === module && process.send) {
 			const paceRealtime = process.argv.includes('--pace-realtime');
 			let result;
 			while (!result) {
+				if (ige.training.neuralError) throw new Error(`Neural parity inference failed: ${ige.training.neuralError}`);
 				if (paceRealtime) {
 					const delay = started + (stepper.steps + 1) * 1000 / 60 - Date.now();
 					if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
 				}
 				trace.beginStep(stepper.steps + 1);
 				stepper.step();
+				if (ige.training.neuralError) throw new Error(`Neural parity inference failed: ${ige.training.neuralError}`);
 				if (stepper.steps % 6 === 0) trace.capturePositions(ige.$$('player').filter(player => player._stats.isBattleBot)
 					.map(player => ({ playerId: player.id(), unit: player.getSelectedUnit() }))
 					.filter(entry => entry.unit && entry.unit._stats.attributes.health.value > 0)

@@ -30,7 +30,9 @@ class TrainingTrace {
 
 	recordNeuralAction({ actorId, chosenIndex, action }) {
 		this.neuralActions.push({ tick: this.tick, actor: this.participant(actorId), choice: chosenIndex,
-			slot: action.slot, movement: action.movement, aimMode: action.aimMode });
+			slot: action.slot, movement: action.movement, aimMode: action.aimMode,
+			...(typeof action.fire === 'boolean' ? { fire: action.fire } : {}),
+			...(Number.isInteger(action.dodgeDirection) ? { dodgeDirection: action.dodgeDirection } : {}) });
 	}
 
 	recordContact({ projectileId, targetCategory, targetType, targetPlayerId }) {
