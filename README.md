@@ -1,3 +1,51 @@
+# BattleFight
+
+BattleFight is a local web game and offline Windows portable game built on the Taro engine, with team AI model selection, spectator cameras, a live kill feed, and English/Thai UI.
+
+The updated game source and full documentation are on [codex/battlefight-bots](https://github.com/OkayOkay101/BattleFightPrivate/tree/codex/battlefight-bots). This main-branch page links to that edition.
+
+## Documentation — English first
+
+- [Documentation index](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/index.md)
+- [Player guide](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/player-guide.md)
+- [Architecture and combat](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/architecture.md)
+- [AI and training](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/ai-training.md)
+- [Development and standalone packaging](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/development.md)
+- [Licenses and redistribution evidence](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/licenses.md)
+- [Component inventory](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/license-inventory.md)
+- [Credits](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/credits.md)
+
+### AI-Assisted Development
+
+BattleFight was developed with assistance from Gemini Flash and ChatGPT Sol.
+
+This development credit is separate from the heuristic and Neural bots that run inside the game. It does not imply provider endorsement or assign ownership. Upstream engine credit and third-party licenses remain separate; see the license guide before assuming the game assets share the engine license.
+
+โค้ดเกมและเอกสารล่าสุดอยู่ในสาขา [codex/battlefight-bots](https://github.com/OkayOkay101/BattleFightPrivate/tree/codex/battlefight-bots) หน้าหลักนี้ลิงก์ไปยังเวอร์ชันดังกล่าว
+
+## เอกสารภาษาไทย
+
+BattleFight เป็นเกมเว็บในเครื่องและเกม Windows แบบ portable ออฟไลน์ที่พัฒนาบน Taro มีระบบเลือกโมเดล AI แยกทีม กล้องผู้ชม kill feed สด และ UI อังกฤษ–ไทย
+
+- [สารบัญเอกสาร](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/index.md)
+- [คู่มือผู้เล่น](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/player-guide.md)
+- [โครงสร้างและการต่อสู้](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/architecture.md)
+- [AI และการฝึก](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/ai-training.md)
+- [การพัฒนาและแพ็กเกจ standalone](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/development.md)
+- [License และหลักฐานสิทธิ์เผยแพร่](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/licenses.md)
+- [ทะเบียนส่วนประกอบ](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/license-inventory.md)
+- [เครดิต](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/credits.md)
+
+### การพัฒนาโดยใช้ AI ช่วย
+
+BattleFight พัฒนาโดยใช้ Gemini Flash และ ChatGPT Sol ช่วยในการพัฒนา
+
+เครดิตการพัฒนานี้แยกจากบอท heuristic และ Neural ในเกม ไม่สื่อถึงการรับรองจากผู้ให้บริการหรือกำหนดความเป็นเจ้าของ เครดิตเอนจินและ license ของส่วนประกอบอื่นยังคงแยกกัน โปรดอ่านคู่มือ license ก่อนตีความว่าภาพในเกมใช้สิทธิ์เดียวกับเอนจิน
+
+---
+
+## Original upstream documentation / เอกสาร Taro ต้นฉบับ
+
 # Taro (Archived)
 
 **⚠️ Important Notice: This Taro repository is now archived and no longer actively maintained.**
