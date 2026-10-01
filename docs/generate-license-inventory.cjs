@@ -17,8 +17,8 @@ const safe = s => s.replace(/[^a-zA-Z0-9._-]/g,'_');
 function collect(directory, destination) {
   if(!fs.existsSync(directory))return [];
   const files=fs.readdirSync(directory,{withFileTypes:true}).filter(e=>e.isFile()&&textNames.test(e.name)).map(e=>path.join(directory,e.name));
-  for(const name of ['licenses','license','LICENSES']) if(fs.existsSync(path.join(directory,name))&&fs.statSync(path.join(directory,name)).isDirectory())files.push(...walk(path.join(directory,name)));
-  return [...new Set(files)].map(source=>{const target=destination+'/'+posix(path.relative(directory,source));write(target,fs.readFileSync(source));return {source:relative(source),copy:target,sha256:crypto.createHash('sha256').update(fs.readFileSync(source)).digest('hex')};});
+  for(const entry of fs.readdirSync(directory,{withFileTypes:true}).filter(e=>e.isDirectory()&&/^licenses?$/i.test(e.name)))files.push(...walk(path.join(directory,entry.name)));
+  return [...new Set(files)].map(source=>{const parts=posix(path.relative(directory,source)).split('/');if(parts.length>1&&/^licenses?$/i.test(parts[0]))parts[0]='licenses';const target=destination+'/'+parts.join('/');write(target,fs.readFileSync(source));return {source:relative(source),copy:target,sha256:crypto.createHash('sha256').update(fs.readFileSync(source)).digest('hex')};});
 }
 const pkg=json(path.join(root,'package.json')),lock=json(path.join(root,'package-lock.json'));
 const prepare=fs.readFileSync(path.join(root,'tools/prepare-desktop-package.js'),'utf8');
