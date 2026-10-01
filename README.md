@@ -1,3 +1,47 @@
+# BattleFight
+
+BattleFight is a local web game and offline Windows portable game built on the Taro engine, with team AI model selection, spectator cameras, a live kill feed, and English/Thai UI.
+
+## Documentation — English first
+
+- [Documentation index](docs/en/index.md)
+- [Player guide](docs/en/player-guide.md)
+- [Architecture and combat](docs/en/architecture.md)
+- [AI and training](docs/en/ai-training.md)
+- [Development and standalone packaging](docs/en/development.md)
+- [Licenses and redistribution evidence](docs/en/licenses.md)
+- [Component inventory](docs/en/license-inventory.md)
+- [Credits](docs/en/credits.md)
+
+### AI-Assisted Development
+
+BattleFight was developed with assistance from Gemini Flash and ChatGPT Sol.
+
+This development credit is separate from the heuristic and Neural bots that run inside the game. It does not imply provider endorsement or assign ownership. Upstream engine credit and third-party licenses remain separate; see the license guide before assuming the game assets share the engine license.
+
+## เอกสารภาษาไทย
+
+BattleFight เป็นเกมเว็บในเครื่องและเกม Windows แบบ portable ออฟไลน์ที่พัฒนาบน Taro มีระบบเลือกโมเดล AI แยกทีม กล้องผู้ชม kill feed สด และ UI อังกฤษ–ไทย
+
+- [สารบัญเอกสาร](docs/th/index.md)
+- [คู่มือผู้เล่น](docs/th/player-guide.md)
+- [โครงสร้างและการต่อสู้](docs/th/architecture.md)
+- [AI และการฝึก](docs/th/ai-training.md)
+- [การพัฒนาและแพ็กเกจ standalone](docs/th/development.md)
+- [License และหลักฐานสิทธิ์เผยแพร่](docs/th/licenses.md)
+- [ทะเบียนส่วนประกอบ](docs/th/license-inventory.md)
+- [เครดิต](docs/th/credits.md)
+
+### การพัฒนาโดยใช้ AI ช่วย
+
+BattleFight พัฒนาโดยใช้ Gemini Flash และ ChatGPT Sol ช่วยในการพัฒนา
+
+เครดิตการพัฒนานี้แยกจากบอท heuristic และ Neural ในเกม ไม่สื่อถึงการรับรองจากผู้ให้บริการหรือกำหนดความเป็นเจ้าของ เครดิตเอนจินและ license ของส่วนประกอบอื่นยังคงแยกกัน โปรดอ่านคู่มือ license ก่อนตีความว่าภาพในเกมใช้สิทธิ์เดียวกับเอนจิน
+
+---
+
+## Original upstream documentation / เอกสาร Taro ต้นฉบับ
+
 # Taro (Archived)
 
 **⚠️ Important Notice: This Taro repository is now archived and no longer actively maintained.**
