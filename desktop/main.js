@@ -18,8 +18,11 @@ let stopPromise = null;
 let quitAfterStop = false;
 let readyHttpOrigin = null;
 let readyWebSocketOrigin = null;
+const sandboxWindows = new Map();
+const sandboxConnections = new Map();
 
 function resourceRoot () {
+	if (!app.isPackaged && process.env.BATTLEFIGHT_RESOURCE_ROOT) return path.resolve(process.env.BATTLEFIGHT_RESOURCE_ROOT);
 	return app.isPackaged
 		? path.join(process.resourcesPath, 'desktop-data')
 		: path.resolve(__dirname, '..', 'build', 'desktop-resources');
@@ -175,10 +178,45 @@ function createGameWindow (httpUrl) {
 
 ipcMain.handle('desktop:get-connection-config', (event) => {
 	const senderUrl = event.senderFrame && event.senderFrame.url;
+	const sandbox = sandboxConnections.get(event.sender.id);
+	if (sandbox && senderUrl && new URL(senderUrl).origin === sandbox.origin) return { webSocketUrl: sandbox.webSocketUrl };
 	if (!connectionConfig || !senderUrl || new URL(senderUrl).origin !== readyHttpOrigin) {
 		throw new Error('Local game connection is not ready');
 	}
 	return connectionConfig;
+});
+
+ipcMain.handle('desktop:open-custom-sandbox', async (event, id) => {
+	if (event.sender !== gameWindow?.webContents || new URL(event.senderFrame.url).origin !== readyHttpOrigin || !/^[a-f0-9]{32}$/.test(id)) throw new Error('Invalid sandbox request');
+	const state = await (await fetch(readyHttpOrigin + '/api/custom-units/sandbox/status')).json();
+	const active = state.session;
+	if (!active || active.id !== id || !isPort(active.httpPort) || !isPort(active.wsPort)) throw new Error('Sandbox is not running');
+	const origin = `http://127.0.0.1:${active.httpPort}`, wsOrigin = `ws://127.0.0.1:${active.wsPort}`;
+	if (sandboxWindows.has(id)) { sandboxWindows.get(id).focus(); return; }
+	const partition = 'custom-sandbox-' + id;
+	session.fromPartition(partition).webRequest.onBeforeRequest((details, callback) => {
+		let allowed = false;
+		try { allowed = [origin, wsOrigin].includes(new URL(details.url).origin); } catch (_) {}
+		callback({ cancel: !allowed });
+	});
+	const window = new BrowserWindow({ width: 1280, height: 850, show: false, backgroundColor: '#101a27',
+		webPreferences: { partition, preload: path.join(__dirname, 'preload.js'), nodeIntegration: false, contextIsolation: true, sandbox: true } });
+	sandboxWindows.set(id, window);
+	const contentsId = window.webContents.id;
+	sandboxConnections.set(contentsId, { origin, webSocketUrl: wsOrigin });
+	window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+	window.webContents.on('will-navigate', (navigation, url) => { if (new URL(url).origin !== origin) navigation.preventDefault(); });
+	window.once('ready-to-show', () => window.show());
+	window.on('closed', async () => {
+		sandboxWindows.delete(id); sandboxConnections.delete(contentsId);
+		try {
+			const editor = await (await fetch(readyHttpOrigin + '/api/custom-units')).json();
+			await fetch(readyHttpOrigin + '/api/custom-units/sandbox/' + id + '/stop', { method: 'POST',
+				headers: { 'Content-Type': 'application/json', 'X-Custom-Unit-Token': editor.token }, body: '{}' });
+		} catch (_) {}
+	});
+	try { await window.loadURL(origin + '/#custom-session=' + active.token); }
+	catch (error) { window.close(); throw error; }
 });
 
 function stopGameServer () {

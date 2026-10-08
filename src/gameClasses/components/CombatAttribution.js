@@ -3,7 +3,8 @@ function participant(player, unit) {
 	if (!player || !player.id || !player._stats) return null;
 	return { id: player.id(), name: player._stats.name,
 		teamId: player._stats.trainingTeamId || player._stats.teamId,
-		characterId: unit && unit._stats && unit._stats.type || null };
+		characterId: global.ige?.training?.isCustomSandbox && global.ige.training.resolveCombatCharacterId
+			? global.ige.training.resolveCombatCharacterId(player, unit) : unit && unit._stats && unit._stats.type || null };
 }
 
 function fromEntity(ige, entity, itemId) {

@@ -6,6 +6,7 @@ English is the default documentation language. Every guide has a corresponding T
 
 | Guide | Contents |
 |---|---|
+| [Custom Units](custom-units.md) | Local editor, supported prototypes, equipment and separate test arena |
 | [Player guide](player-guide.md) | Starting a game, controls, teams, cameras, language, kill feed and statistics |
 | [Architecture](architecture.md) | Client/server, game definitions, physics, skills, projectiles and attribution |
 | [AI and training](ai-training.md) | Heuristic/Neural models, observations, PPO, checkpoints and promotion |

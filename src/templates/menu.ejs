@@ -17,6 +17,7 @@
         </div>
         <h2 data-i18n="menu.trainingTitle">สนามทดลอง &amp; ควบคุม AI</h2>
         <p data-i18n="menu.trainingDescription">เลือกโหมดการเล่น ติดตามสถิติการฝึก และควบคุมการเทรน AI จากหน้านี้ได้ทันที</p>
+        <button type="button" id="custom-unit-open" class="btn btn-outline-info mb-3" data-i18n="custom.title">Custom Units</button>
         
         <!-- Live AI Training Stats Dashboard -->
         <div class="train-dashboard mb-3">
@@ -206,6 +207,7 @@
 }
 </style>
 
+<%- include('custom-units.ejs') %>
 <script src="/src/localization/TrainingTelemetry.js"></script>
 <script>
 window.trainingDemoMode = 'spectate';
@@ -486,6 +488,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var playBtn = document.getElementById('play-game-button');
     if (playBtn) {
         playBtn.addEventListener('click', function (event) {
+            if (window.isCustomSandbox) return;
             if (!selectBluePolicy || !selectRedPolicy ||
                 selectBluePolicy.value === activeModels.blue && selectRedPolicy.value === activeModels.red) return;
             event.preventDefault();

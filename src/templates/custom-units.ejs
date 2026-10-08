@@ -1,0 +1,35 @@
+<dialog id="custom-unit-editor" aria-labelledby="custom-unit-title">
+ <header><div><small>BATTLEFIGHT · UNIT LAB</small><h2 id="custom-unit-title" data-i18n="custom.title">Custom Units</h2></div><button type="button" id="custom-unit-close" data-i18n="custom.close">Close</button></header>
+ <p data-i18n="custom.help">Clone a character, adjust its stats and equipment, then try it in a separate arena.</p>
+ <div class="custom-editor-grid">
+  <aside><h3 data-i18n="custom.saved">Saved units</h3><div id="custom-unit-list"></div><button type="button" id="custom-unit-new" data-i18n="custom.new">New from prototype</button></aside>
+  <form id="custom-unit-form">
+   <label><span data-i18n="custom.prototype">Prototype</span><select id="custom-unit-base" required></select></label>
+   <p id="custom-unit-reason"></p>
+   <div class="custom-prototype"><img id="custom-unit-image" alt="" width="80" height="80"><span id="custom-unit-defaults"></span></div>
+   <p id="custom-unit-hints" style="white-space:pre-line;color:#a5d7ff"></p>
+   <label><span data-i18n="custom.name">Name</span><input id="custom-unit-name" maxlength="80" required></label>
+   <div class="custom-stats-fields"><label><span data-i18n="custom.health">Health</span><input id="custom-unit-health" type="number" min="1" max="100000" step="any" required></label>
+   <label><span data-i18n="custom.speed">Speed</span><input id="custom-unit-speed" type="number" min="0" max="100" step="any" required></label></div>
+   <fieldset><legend data-i18n="custom.weapons">Equipment</legend><div id="custom-unit-weapons"></div></fieldset>
+   <div class="custom-actions"><button type="submit" data-i18n="custom.save">Save</button><button type="button" id="custom-unit-copy" data-i18n="custom.copy">Duplicate</button><button type="button" id="custom-unit-delete" data-i18n="custom.delete">Delete</button></div>
+  </form>
+  <section><h3 data-i18n="custom.arena">Separate test arena</h3>
+   <p data-i18n="custom.arenaHelp">Saved changes apply when starting a new test. Neural training is unchanged.</p>
+   <label><span data-i18n="custom.controller">Controller</span><select id="custom-unit-controller"><option value="human" data-i18n="custom.human">Player</option><option value="heuristic">Heuristic</option></select></label>
+   <label><span data-i18n="custom.opponent">Opponent</span><select id="custom-unit-opponent"></select></label>
+   <div class="custom-actions"><button type="button" id="custom-unit-start" data-i18n="custom.start">Start test</button><button type="button" id="custom-unit-stop" data-i18n="custom.stop">End test</button></div>
+   <p data-i18n="custom.controls">WASD to move, mouse to aim, left click to fire, 1–4 to select equipment. Use the existing camera and stats controls.</p>
+  </section>
+ </div>
+ <p id="custom-unit-message" role="status" aria-live="polite"></p>
+</dialog>
+<div id="custom-sandbox-controls" hidden><strong data-i18n="custom.arena">Separate test arena</strong><button id="custom-sandbox-reset" data-i18n="custom.reset">Restart</button><button id="custom-sandbox-stop" data-i18n="custom.stop">End test</button><span id="custom-sandbox-message" role="status"></span></div>
+<style>
+ #custom-unit-editor{color:#dbeafe;background:#111f31;border:1px solid #47617e;border-radius:16px;padding:24px;width:min(1100px,94vw);max-height:90vh;overflow:auto;box-shadow:0 24px 80px #0009}
+ #custom-unit-editor::backdrop{background:#050e1cd9}#custom-unit-editor header{display:flex;justify-content:space-between;align-items:center}#custom-unit-editor small{color:#7dd3fc;letter-spacing:.12em}#custom-unit-editor h2{margin:5px 0 14px}#custom-unit-editor h3{font-size:1.1rem;color:#a5d7ff}
+ .custom-editor-grid{display:grid;grid-template-columns:210px minmax(240px,1fr) 260px;gap:24px}#custom-unit-editor label{display:flex;flex-direction:column;gap:5px;margin:12px 0}#custom-unit-editor input,#custom-unit-editor select{width:100%;background:#0a1626;color:#e2e8f0;border:1px solid #47617e;border-radius:6px;padding:8px}#custom-unit-editor button,#custom-sandbox-controls button{background:#1a4260;color:white;border:1px solid #5783a5;border-radius:6px;padding:8px 12px;cursor:pointer}#custom-unit-editor button:disabled{opacity:.45;cursor:default}#custom-unit-editor button:focus-visible{outline:3px solid #38bdf8;outline-offset:2px}
+ #custom-unit-list{max-height:390px;overflow:auto}#custom-unit-list button{display:block;width:100%;text-align:left;margin:6px 0;overflow-wrap:anywhere}#custom-unit-list button[aria-current=true]{border-color:#38bdf8;background:#1b5770}.custom-stats-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.custom-prototype{display:flex;gap:16px;align-items:center}.custom-prototype img{object-fit:contain;image-rendering:pixelated}.custom-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}#custom-unit-message,#custom-unit-reason{color:#fcd34d;white-space:pre-wrap}#custom-sandbox-controls{position:fixed;z-index:10000;bottom:12px;left:12px;padding:8px;background:#111f31ee;color:white;border-radius:8px;max-width:85vw}#custom-sandbox-controls[hidden]{display:none}
+ @media(max-width:900px){.custom-editor-grid{grid-template-columns:1fr}#custom-unit-list{max-height:130px}}
+</style>
+<script src="/src/custom-units/CustomUnitEditor.js"></script>

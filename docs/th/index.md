@@ -6,6 +6,7 @@
 
 | คู่มือ | เนื้อหา |
 |---|---|
+| [ยูนิตสร้างเอง](custom-units.md) | editor ในเครื่อง ต้นแบบ อาวุธ และสนามทดลองแยก |
 | [คู่มือผู้เล่น](player-guide.md) | เปิดเกม การควบคุม ทีม กล้อง ภาษา kill feed และสถิติ |
 | [โครงสร้างระบบ](architecture.md) | Client/server ข้อมูลเกม ฟิสิกส์ สกิล กระสุน และเครดิตการต่อสู้ |
 | [AI และการฝึก](ai-training.md) | Heuristic/Neural, observation, PPO, checkpoint และ promotion |

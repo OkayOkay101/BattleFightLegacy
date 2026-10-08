@@ -1442,6 +1442,20 @@ var Unit = IgeEntityPhysics.extend({
 	// update unit's stats in the server side first, then update client side as well.
 	streamUpdateData: function (queuedData) {
 		var self = this;
+		// The base class processes the whole batch before Unit applies type.
+		// A custom form must load its definition before retained cap/value updates.
+		if (ige.isClient && typeof window !== 'undefined' && window.isCustomSandbox && self._stats.customUnit &&
+			queuedData.some(function (data) { return data.type; }) &&
+			(queuedData.length > 1 || Object.keys(queuedData[0]).length > 1)) {
+			for (var update of queuedData) {
+				if (update.type && Object.keys(update).length > 1) {
+					self.streamUpdateData([{ type: update.type }]);
+					var remainder = Object.assign({}, update); delete remainder.type;
+					self.streamUpdateData([remainder]);
+				} else self.streamUpdateData([update]);
+			}
+			return;
+		}
 		// Unit.prototype.log("unit streamUpdateData", data)
 		IgeEntity.prototype.streamUpdateData.call(this, queuedData);
 

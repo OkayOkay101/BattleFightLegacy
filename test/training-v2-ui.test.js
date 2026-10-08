@@ -11,7 +11,7 @@ const ejs = require('ejs');
 test('web and desktop menu scripts compile with requested model and schema telemetry controls', () => {
 	const source = fs.readFileSync(path.join(__dirname, '../src/templates/menu.ejs'), 'utf8');
 	for (const desktopMode of [false, true]) {
-		const html = ejs.render(source, { desktopMode, trainingDemoPolicy: 'n-000001' });
+		const html = ejs.render(source, { desktopMode, trainingDemoPolicy: 'n-000001' }, { filename: path.join(__dirname, '../src/templates/menu.ejs') });
 		for (const script of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) new vm.Script(script[1]);
 		assert.match(html, /TrainingTelemetry.js/);
 		assert.match(html, /requestedModels/);

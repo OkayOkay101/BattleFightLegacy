@@ -10,6 +10,8 @@ Choose **Spectate** to watch Blue and Red bots, or **Play Game** to select a cha
 
 ## Controls and cameras
 
+The web game and the current portable build also provide [Custom Units](custom-units.md), an editor with a separate player/heuristic test arena. Older portable executables do not include this feature.
+
 - Default movement uses WASD or arrow keys; aim with the mouse and use the active item with the primary mouse button. Character-specific controls/skills are configured in the game data; do not assume every character shares the same skill keys or conditions.
 - **Follow player** tracks the selected player. **Auto** chooses an available target; **Next player** changes the target. Team and target selectors help choose Blue/Red participants.
 - **Overview** shows the map. **Free camera** uses right-button dragging to pan and the mouse wheel to zoom; switch back to Follow to resume tracking. Camera controls are available in both play and spectator modes.

@@ -10,6 +10,7 @@ commands
 deployment/
 sslcert/
 training-data/
+/custom-units/
 training-data-backup-legacy/
 training-data-archive/
 training-python/.venv/

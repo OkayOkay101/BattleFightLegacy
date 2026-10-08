@@ -256,6 +256,16 @@ var Server = IgeClass.extend({
 		app.use(bodyParser.urlencoded({ extended: false }));
 		// parse application/json
 		app.use(bodyParser.json());
+		require('./custom-units/CustomUnitRoutes').registerCustomRoutes(app, this);
+		// Source checkouts use installed vendor files; packaged builds carry these
+		// assets already. Keep the sandbox offline in both environments.
+		if (desktopMode) {
+			const vendors = { bootstrap: 'bootstrap/dist', jquery: 'jquery', 'jquery-ui': 'jquery-ui-dist',
+				'jquery-contextmenu': 'jquery-contextmenu', fontawesome: '@fortawesome/fontawesome-free',
+				popper: '@popperjs/core/dist', 'lz-string': 'lz-string', lodash: 'lodash',
+				sweetalert2: 'sweetalert2/dist', pixi: 'pixi.js-legacy/dist/browser' };
+			for (const [name, folder] of Object.entries(vendors)) app.use('/assets/desktop-vendor/' + name, express.static(path.resolve('node_modules', folder)));
+		}
 
 		app.set('view engine', 'ejs');
 		app.set('views', path.resolve('src'));
@@ -272,6 +282,11 @@ var Server = IgeClass.extend({
 		];
 		// Fast loading: serve pre-compressed gzip game.json (280KB instead of 12MB)
 		app.get('/src/game.json', (req, res) => {
+			if (process.env.BATTLEFIGHT_SANDBOX) {
+				const document = JSON.parse(fs.readFileSync(path.resolve('./src/game.json'), 'utf8'));
+				require('./custom-units/SandboxRuntime').loadSnapshot(document.data, process.env.BATTLEFIGHT_SANDBOX);
+				return res.json(document);
+			}
 			const acceptEncoding = req.headers['accept-encoding'] || '';
 			const gzPath = path.resolve('./src/game.json.gz');
 			if (acceptEncoding.includes('gzip') && fs.existsSync(gzPath)) {
@@ -369,6 +384,7 @@ var Server = IgeClass.extend({
 		});
 
 		app.post('/api/demo/policies', (req, res) => {
+			if (ige.training?.isCustomSandbox) return res.status(403).json({ ok: false, error: 'The custom arena uses heuristic only' });
 			if (!ige.training?.isExhibitionMode) return res.status(503).json({ ok: false, error: 'Exhibition is not running' });
 			const blueVersion = req.body?.blue;
 			const redVersion = req.body?.red;
@@ -661,7 +677,9 @@ var Server = IgeClass.extend({
 			!Number.isInteger(this.wsPort)
 		) return;
 		this._desktopReadySent = true;
-		process.parentPort.postMessage({ type: 'battlefight-ready', httpPort: this.httpPort, wsPort: this.wsPort });
+		const ready = { type: 'battlefight-ready', httpPort: this.httpPort, wsPort: this.wsPort };
+		if (process.parentPort) process.parentPort.postMessage(ready);
+		else if (process.send) process.send(ready);
 	},
 	shutdown: function () {
 		this.status = 'stopping';
@@ -674,7 +692,7 @@ var Server = IgeClass.extend({
 		const closeNetwork = ige.network && typeof ige.network.stop === 'function'
 			? ige.network.stop()
 			: Promise.resolve();
-		return Promise.all([closeHttp, closeNetwork]).then(() => { this.status = 'stopped'; });
+		return Promise.all([closeHttp, closeNetwork, this.customUnitManager?.close()]).then(() => { this.status = 'stopped'; });
 	},
 
 	// run a specific game in this server
@@ -750,6 +768,7 @@ var Server = IgeClass.extend({
 				self.gameStartedAt = new Date();
 
 				ige.game.data = game.data;
+				if (process.env.BATTLEFIGHT_SANDBOX) self.customSandboxSnapshot = require('./custom-units/SandboxRuntime').loadSnapshot(game.data, process.env.BATTLEFIGHT_SANDBOX);
 				ige.game.cspEnabled = !!ige.game.data.defaultData.clientSidePredictionEnabled;
 
 				global.standaloneGame = game.data;
@@ -849,7 +868,9 @@ var Server = IgeClass.extend({
 							var desktopMode = process.env.BATTLEFIGHT_DESKTOP === '1';
 							var trainingDataDir = path.resolve(process.env.BATTLEFIGHT_USER_DATA || path.resolve(__dirname, '../training-data'));
 							var registry = new (require('./training/PolicyRegistry').PolicyRegistry)(trainingDataDir);
-							if (!(ige.training && ige.training.isTrainingMode)) {
+							if (self.customSandboxSnapshot) {
+								require('./custom-units/SandboxRuntime').installSandbox(ige, self.customSandboxSnapshot);
+							} else if (!(ige.training && ige.training.isTrainingMode)) {
 								var demo = require('./training/DemoRuntime');
 								var requestedPolicy = process.env.BATTLEFIGHT_DEMO_POLICY || 'champion';
 								if (desktopMode) {

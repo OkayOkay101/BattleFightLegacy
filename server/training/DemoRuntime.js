@@ -84,6 +84,14 @@ function installDemo(ige, policy, options = {}) {
 				(runtime.executionTelemetry.overrideReasons[reason] || 0) + 1;
 		},
 		policyForPlayer(player) { advance(); return runtime.policies[player?._stats?.trainingTeamId] || runtime.policies.blue; },
+		resetExhibition() {
+			runtime.stats = new TrainingStats();
+			roundStartedAt = Date.now();
+			roundNumber = 0;
+			round = new TrainingMatch({ matchId: `demo-${++roundNumber}`, startedAt: roundStartedAt, maxDurationMs: MATCH_DURATION_MS });
+			results = { blue: 0, red: 0, draws: 0 };
+			runtime.executionTelemetry = { decisions: 0, overriddenDecisions: 0, overrideReasons: {} };
+		},
 		setPolicies(blue, red, selections = { blue: blue?.version, red: red?.version }) {
 			if (!blue || !red) throw new TypeError('Both demo policies are required');
 			runtime.requestedModels = { ...selections };

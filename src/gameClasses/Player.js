@@ -62,7 +62,8 @@ var Player = IgeEntity.extend({
 		}
 
 		if (self._stats.playerJoined != true) {
-			if (self._stats.controlledBy == 'human' && !self._stats.isSpectator && ige.script) // spectators never enter match scripts
+			if (ige.training?.isCustomSandbox) ige.training.joinHuman(self);
+			else if (self._stats.controlledBy == 'human' && !self._stats.isSpectator && ige.script) // spectators never enter match scripts
 			{
 				ige.trigger.fire('playerJoinsGame', { playerId: self.id() });
 			}

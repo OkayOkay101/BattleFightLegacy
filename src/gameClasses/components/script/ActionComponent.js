@@ -21,6 +21,10 @@ var ActionComponent = IgeEntity.extend({
 			if (!action || action.disabled == true || (ige.isClient && ige.physics && !action.runOnClient)) {
 				continue;
 			}
+			if (ige.training && ige.training.isCustomSandbox && ige.training.adaptSandboxAction) {
+				action = ige.training.adaptSandboxAction(action, vars);
+				if (!action) continue;
+			}
 			var params = {};
 			var entity = ige.variable.getValue(action.entity, vars);
 			ige.script.currentActionName = action.type;
@@ -73,7 +77,9 @@ var ActionComponent = IgeEntity.extend({
 						// Preserve loop selections without cloning live engine entities.
 						const setTimeoutVars = Object.assign({}, vars, { triggeredBy: Object.assign({}, vars.triggeredBy) });
 						const timeoutDuration = ige.variable.getValue(action.duration, vars);
-						if (ige.training && ige.training.clock) {
+						if (ige.training && ige.training.isCustomSandbox) {
+							ige.training.scheduleSandboxAction(function () { self.run(setTimeOutActions, setTimeoutVars); }, timeoutDuration);
+						} else if (ige.training && ige.training.clock) {
 							ige.training.clock.schedule(function () { self.run(setTimeOutActions, setTimeoutVars); }, timeoutDuration);
 						} else {
 							setTimeout(function (actions) { self.run(actions, setTimeoutVars); }, timeoutDuration, setTimeOutActions);

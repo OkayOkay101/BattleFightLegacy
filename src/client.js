@@ -85,9 +85,9 @@ const Client = IgeEventingClass.extend({
 				url: 'ws://localhost:2001'
 			}
 		];
-		const desktopConnectionPromise = window.isDesktopApp
+		const desktopConnectionPromise = window.isDesktopApp && window.battleFightDesktop
 			? window.battleFightDesktop.getConnectionConfig()
-			: Promise.resolve(null);
+			: Promise.resolve(window.battleFightLocalConnection || null);
 
 		this.cellSheets = {};
 
@@ -196,6 +196,8 @@ const Client = IgeEventingClass.extend({
 				if (wsUrl.protocol !== 'ws:' || wsUrl.hostname !== '127.0.0.1' || !Number.isInteger(Number(wsUrl.port))) {
 					throw new Error('Desktop game server returned an invalid WebSocket address');
 				}
+				const sandboxToken = new URLSearchParams(window.location.hash.slice(1)).get('custom-session');
+				if (/^[a-f0-9]{64}$/.test(sandboxToken || '')) wsUrl.searchParams.set('custom-session', sandboxToken);
 				this.servers = [{
 					ip: '127.0.0.1',
 					port: Number(wsUrl.port),
@@ -203,7 +205,7 @@ const Client = IgeEventingClass.extend({
 					maxPlayers: 32,
 					acceptingPlayers: true,
 					gameId: gameId,
-					url: desktopConnection.webSocketUrl
+					url: wsUrl.toString()
 				}];
 			}
 			ige.game.data = game.data;

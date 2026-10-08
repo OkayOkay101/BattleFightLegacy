@@ -163,6 +163,7 @@
         var igeRoot = './engine/';
         window.isStandalone = true;
         window.isDesktopApp = <%- JSON.stringify(!!desktopMode) %>;
+        window.battleFightLocalConnection = <%- JSON.stringify(desktopMode ? { webSocketUrl: 'ws://127.0.0.1:' + servers[0].port } : null) %>;
         gameStarted = false;
     </script>
     <script>

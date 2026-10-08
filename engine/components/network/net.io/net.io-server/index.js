@@ -680,6 +680,11 @@ NetIo.Server = NetIo.EventingClass.extend({
 
 	socketConnection: function (ws, request) {
 		var self = this;
+		if (ige.server.customSandboxSnapshot && !require('../../../../../server/custom-units/SandboxAccess').allowSandboxSocket(
+			request, ige.server.customSandboxSnapshot.token, ige.server.httpPort)) {
+			ws.close(1008, 'Invalid sandbox session');
+			return;
+		}
 		var jwt = require('jsonwebtoken');
 		var PING_SERVICE_HEADER = 'x-ping-service';
 		console.log('Client connecting...');
