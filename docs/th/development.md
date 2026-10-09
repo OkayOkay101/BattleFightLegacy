@@ -46,7 +46,23 @@ node tools/stop-training-after-evaluation.js
 
 ภาพหายหรือ origin ที่ไม่รองรับอาจทำให้ preparation ล้มเหลว ไม่ควรเปลี่ยน error ให้พึ่งอินเทอร์เน็ตแบบเงียบ Browser vendor และ Font Awesome webfonts ถูกคัดลอกในเครื่อง แต่ README/license ต้นทางไม่ได้ถูกฝังอัตโนมัติเพียงเพราะอยู่ในรีโป ดู [ช่องว่าง notice](licenses.md)
 
-## คำสั่งตรวจที่มีอยู่
+## พัฒนา editor Custom
+
+เซิร์ฟเวอร์ source ปกติมี `/api/custom-units` และ `/api/custom-weapons` ทั้งสอง editor ไม่ต้องใช้ Python Source เก็บข้อมูลใน `custom-units/` หรือพาธ `BATTLEFIGHT_CUSTOM_UNITS` ที่ตั้งไว้ Electron เก็บ `custom-units/` ใน user-data ของผู้ใช้และคงข้อมูลเมื่อเปลี่ยน EXE ไฟล์ผู้ใช้ snapshot สนามชั่วคราวและ build/log ที่สร้างเป็นข้อมูลในเครื่อง ไม่ใช่แอสเซ็ตสำหรับส่งใน source release
+
+ดู [API และการบันทึก](custom-units.md) สำหรับ token/origin, revision และวงจรสนาม Main server เปิดสนาม custom พร้อมกันได้หนึ่งสนาม เมื่อแก้ catalog/compiler ฝั่ง server ให้รีสตาร์ตเซิร์ฟเวอร์ และ reload browser เมื่อแก้ UI
+
+## เอกสารและการตรวจเฉพาะส่วน
+
+```powershell
+node docs/generate-license-inventory.cjs
+node docs/verify-documentation.cjs
+node --test test/custom-units.test.js test/custom-all-units.test.js test/custom-weapons.test.js test/custom-weapon-ui.test.js
+```
+
+Generator refresh หลักฐานในเครื่องและลงวันที่ตาม Asia/Bangkok ตั้ง `BATTLEFIGHT_DOCUMENTATION_DATE=YYYY-MM-DD` เพื่อระบุวันที่ทำซ้ำ เก็บ bytes ของ notices เดิม Verifier ตรวจหน้าคู่สองภาษา ลิงก์ เครดิต AI แฮช notices รายการ lockfile และตาราง schema/สถิติ การตรวจ runtime/UI/portable เป็นขั้นแยก ดู [บันทึกการตรวจ](release-notes.md)
+
+## คำสั่งตรวจ runtime
 
 ใช้เมื่อต้องการตรวจ implementation/release การเขียนเอกสารไม่ได้เปิดคำสั่งเหล่านี้:
 

@@ -6,6 +6,8 @@
 
 Heuristic bots use game-state rules rather than learned network weights. Neural bots score a set of legal candidate actions: the policy does not directly overwrite physics, HP or skill rules. Gemini Flash and ChatGPT Sol are development assistants, not the in-game inference service.
 
+Updated 2026-10-09. Custom Units/Weapons use the isolated arena's player or heuristic controller; they do not join production Neural training. Sandbox heuristic reads the selected custom weapon range and finishes an accepted burst before switching equipment. Character-specific skill hints apply only in that arena; they do not alter production policy schemas, checkpoints or Champion gates.
+
 | Schema | Observations | Action features | Maximum options | Actor | Critic |
 |---|---:|---:|---:|---|---|
 | V1 | 86 | 17 | 16 | 103 → 64 → 64 → 1 | 86 → 64 → 1 |

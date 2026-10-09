@@ -2,7 +2,7 @@
 
 [English](../en/licenses.md) · [สารบัญ](index.md) · [ทะเบียนส่วนประกอบ](license-inventory.md)
 
-ข้อมูล ณ **2026-10-01** นี่เป็นทะเบียนหลักฐานจากไฟล์ ไม่ใช่การยืนยันว่าแอสเซ็ตทั้งหมดผ่านสิทธิ์แจกจ่ายแล้ว เก็บ license เดิมไว้ เอกสารนี้ไม่เปลี่ยนเงื่อนไขหรือกำหนดสิทธิ์ให้เนื้อหาที่แก้ไข
+ข้อมูล ณ **2026-10-09** นี่เป็นทะเบียนหลักฐานจากไฟล์ ไม่ใช่การยืนยันว่าแอสเซ็ตทั้งหมดผ่านสิทธิ์แจกจ่ายแล้ว เก็บ license เดิมไว้ เอกสารนี้ไม่เปลี่ยนเงื่อนไขหรือกำหนดสิทธิ์ให้เนื้อหาที่แก้ไข
 
 ## แยกสิทธิ์ตามส่วนประกอบ
 
@@ -21,6 +21,8 @@
 | เสียง | มีรายการใน manifest เก่า แต่ standalone ลบเสียงและอ้างอิง การนำออกไม่ได้ยืนยัน license ของสำเนาที่อยู่ที่อื่น | ไม่รวมใน standalone ออฟไลน์ปัจจุบัน |
 
 Phaser ถูกประกาศใน dependencies แต่การประกาศอย่างเดียวไม่พิสูจน์ว่าเกมบน browser เรียกใช้ ต้องตรวจ imports/vendor แยก Renderer ปัจจุบันใช้ Pixi งานเอกสารนี้ไม่ upgrade หรือลบ dependency
+
+ข้อมูลยูนิต/อาวุธ custom เป็นชื่อและชุดค่าตัวเลขที่อ้างภาพกับกลไกเดิม Editor ไม่อัปโหลดภาพใหม่หรือรันสคริปต์จากผู้ใช้ เป็น user-data ในเครื่อง ไม่ใช่แอสเซ็ต seed ของ portable การสร้างชุดค่าไม่กำหนด license ใหม่ให้ภาพที่นำมาใช้หรือเพิ่มสิทธิ์แจกจ่าย
 
 ## Notice ต้นฉบับและที่มา
 
@@ -41,7 +43,7 @@ Phaser ถูกประกาศใน dependencies แต่การปร�
 
 ## ช่องว่าง notice ของ standalone ปัจจุบัน
 
-Release ที่ unpack ไว้วันที่ 2026-10-01 มี `LICENSE.electron.txt` และ `LICENSES.chromium.html` ที่ application root แต่ preparer ปัจจุบัน **ไม่คัดลอก Taro `LICENSE` ลง desktop-data** ส่วน root app.asar มี desktop code/package/dependencies แทนเอกสารทั้งรีโป จากการตรวจไม่พบไฟล์ vendor `LICENSE` ใต้ `assets/desktop-vendor` ที่คัดลอก Header ใน JS/CSS และ module notice บางส่วนอาจยังอยู่ แต่ไม่ใช่ audit notices รวมที่สมบูรณ์
+Release ที่ unpack ไว้วันที่ 2026-10-09 มี `LICENSE.electron.txt` และ `LICENSES.chromium.html` ที่ application root แต่ preparer ปัจจุบัน **ไม่คัดลอก Taro `LICENSE` ลง desktop-data** ส่วน root app.asar มี desktop code/package/dependencies แทนเอกสารทั้งรีโป จากการตรวจไม่พบไฟล์ vendor `LICENSE` ใต้ `assets/desktop-vendor` ที่คัดลอก Header ใน JS/CSS และ module notice บางส่วนอาจยังอยู่ แต่ไม่ใช่ audit notices รวมที่สมบูรณ์
 
 เอกสาร `docs/licenses` ที่เพิ่มครั้งนี้ **ไม่ได้ถูกฝังใน EXE เดิมอัตโนมัติ** งาน packaging ถัดไปควรแนบ notices ของ engine/เกม/dependencies/ฟอนต์ที่เกี่ยวข้องและแก้สิทธิ์แอสเซ็ตที่ยังไม่ทราบ ก่อนอ้างว่าแพ็กเกจผ่านสิทธิ์เผยแพร่ครบ งานนี้บันทึกช่องว่าง ไม่ rebuild หรือเปลี่ยนแพ็กเกจ
 

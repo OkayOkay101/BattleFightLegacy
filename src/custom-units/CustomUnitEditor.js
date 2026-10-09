@@ -25,8 +25,13 @@
     var label = document.createElement('label'), text = document.createElement('span'), select = document.createElement('select');
     text.textContent = tr('custom.slot', { number: index + 1 }); select.dataset.customSlot = String(index);
     weapons.forEach(function (weapon) { option(select, weapon.id, weapon.name); });
+    var savedLegacy = (base.legacyWeapons?.[index] || []).find(function (weapon) { return weapon.id === values[index]; });
+    if (savedLegacy && !weapons.some(function (weapon) { return weapon.id === savedLegacy.id; })) option(select, savedLegacy.id, savedLegacy.name + ' — ' + tr('custom.savedEquipment'));
     select.value = values[index]; label.append(text, select);
     if(base.weaponRestrictions?.[index]) {var note=document.createElement('small');note.dataset.customRestriction=base.weaponRestrictions[index];note.textContent=tr(note.dataset.customRestriction);label.appendChild(note);}
+    var warning=document.createElement('small');warning.className='custom-warning';warning.dataset.customReplacement='true';label.appendChild(warning);
+    function updateWarning(){warning.textContent=select.value.startsWith('cw-')?tr('weapon.replaceWarning'):'';}
+    select.onchange=updateWarning;updateWarning();
     el('weapons').appendChild(label);
    });
   }
@@ -42,7 +47,7 @@
    el('defaults').textContent = tr('custom.defaults', { health: base.defaults.health, speed: base.defaults.speed });
    el('hints').textContent = (base.hints || []).map(function(key){return tr(key);}).join('\n');
    fillWeapons(base, data.weapons); renderList();
-   el('start').disabled = !selected || !base.available; el('delete').disabled = !selected; el('copy').disabled = !selected;
+   el('start').disabled = !selected || !base.available || unit?.available === false; el('delete').disabled = !selected; el('copy').disabled = !selected;
    dialog.querySelector('[type=submit]').disabled = !base.available;
   }
   async function refresh() {
@@ -68,6 +73,11 @@
   el('close').onclick = function () { dialog.close(); };
   el('new').onclick = function () { loadUnit(null); message(''); };
   el('base').onchange = function () { loadUnit(null); };
+  window.addEventListener('custom-weapons-changed', function () { run(async function () {
+   var draft={baseId:el('base').value,name:el('name').value,health:el('health').value,speed:el('speed').value,weapons:Array.from(el('weapons').querySelectorAll('select')).map(function(x){return x.value;})};
+   await refresh();el('name').value=draft.name;el('health').value=draft.health;el('speed').value=draft.speed;
+   var base=prototypes.find(function(x){return x.id===draft.baseId;});if(base){el('base').value=base.id;fillWeapons(base,draft.weapons);}
+  }); });
   el('form').onsubmit = function (event) {
    event.preventDefault(); run(async function () {
     var input = { baseId: el('base').value, name: el('name').value, health: Number(el('health').value), speed: Number(el('speed').value),
@@ -113,6 +123,7 @@
     el('defaults').textContent = tr('custom.defaults', { health: base.defaults.health, speed: base.defaults.speed });
     el('hints').textContent = (base.hints || []).map(function(key){return tr(key);}).join('\n');
     el('weapons').querySelectorAll('[data-custom-restriction]').forEach(function(note){note.textContent=tr(note.dataset.customRestriction);});
+    el('weapons').querySelectorAll('select').forEach(function(select){select.onchange();});
     el('reason').textContent = selected?.reason || (base.reason ? tr(base.reason) : '');
     Array.from(el('weapons').querySelectorAll('label span')).forEach(function (label, index) { label.textContent = tr('custom.slot', { number: index + 1 }); });
    }
@@ -129,7 +140,7 @@
     var response = await fetch('/api/custom-sandbox/control', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Custom-Unit-Token': sandboxToken }, body: JSON.stringify({ action: action }) });
     var data = await response.json(); if (!data.ok) throw new Error(data.error); return data;
    }
-   var heartbeat = setInterval(function () { control('heartbeat').catch(function (error) { document.getElementById('custom-sandbox-message').textContent = error.message; }); }, 15000);
+   var heartbeat = setInterval(function () { control('heartbeat').then(function(data){if(data.notice)document.getElementById('custom-sandbox-message').textContent=tr(data.notice.key);}).catch(function (error) { document.getElementById('custom-sandbox-message').textContent = error.message; }); }, 3000);
    window.addEventListener('pagehide', function () { clearInterval(heartbeat); fetch('/api/custom-sandbox/control', { method: 'POST', keepalive: true,
     headers: { 'Content-Type': 'application/json', 'X-Custom-Unit-Token': sandboxToken }, body: JSON.stringify({ action: 'stop' }) }).catch(function () {}); });
    document.getElementById('custom-sandbox-reset').onclick = function () { control('reset').catch(function (error) { document.getElementById('custom-sandbox-message').textContent = error.message; }); };

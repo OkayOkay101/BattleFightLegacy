@@ -2,15 +2,60 @@
 
 [ภาษาไทย](../th/custom-units.md) · [Documentation](index.md)
 
+Updated **2026-10-09** for current source. [Release notes](release-notes.md) identify behavior included in the existing portable build.
+
 Open **Custom Units** from the main game menu. Choose a prototype, enter a name, health and movement speed, choose equipment, then press **Save**. Select a saved unit to edit, duplicate or delete it. English is the default; the game language selector also translates the editor.
 
 ## Prototypes and equipment
 
 All **44 playable characters from the original selection menu** are supported, including Emo & Sky, Sixth Diva, Roboto and Zaprytos. Unfinished characters outside that menu, summons, selectors and the old character named Custom Unit are excluded. The custom catalog is independent of the production training roster.
 
-Every slot retains its original weapon. Audited slots also offer the independently usable **Stardust Storm** and **Debris Strike** weapons. Other slots are locked to native equipment because their state, resource, summon or form mechanics depend on it; the editor explains each restriction. Existing saved PewPew, Flaulist, Orlette and Casker variants retain their equipment choices. Images, skill scripts and resources are inherited. Image uploads, custom scripts, damage/cooldown editing and cross-character skill composition are not included.
+Every slot retains its original weapon. The extra **Stardust Storm** and **Debris Strike** choices have been removed from the equipment catalog; they remain available only as PewPew's original native equipment and are shown as saved-only when loading a prior unit that used them. Saved **Custom Weapons** can experimentally replace every root-form equipment slot of all 44 prototypes. The editor warns that replacing a required native skill can disable its transformations, summons or resource mechanics. Secondary forms keep native equipment; returning to the root form or respawning restores the saved custom loadout. Existing saved variants remain compatible. Image uploads, arbitrary scripts and cross-character skill composition are not included.
 
 Names contain 1–80 characters. Health is 1–100000, and base speed is 0–100 in the engine's movement units; zero means stationary before skill buffs. Original skills can temporarily modify these values. The editor shows the prototype's original values for comparison.
+
+## Custom Weapons
+
+Open the **Custom Weapons** tab, create or select a weapon, set its firing pattern and values, then **Save**. Duplicate creates an editable draft; save it to create a new ID. Deleting a weapon used by a saved unit is blocked: change or delete that unit first. Choose the weapon in a unit's equipment slots, save the unit, then start a new arena.
+
+| Setting | Default | Allowed |
+|---|---:|---:|
+| Damage per projectile | 10 | 0–100000 |
+| Projectile speed (engine units) | 20 | 1–200 |
+| Travel range from muzzle (pixels) | 800 | 50–5000 |
+| Cooldown (ms) | 500 | 100–10000 |
+| Spread count / total angle | 5 / 30° | 1–9 / 0–120° |
+| Burst shots / interval (ms) | 3 / 100 | 1–5 / 50–500 |
+
+Single fires one projectile; spread fires simultaneous projectiles symmetrically around the aim; burst fires timed shots using the current aim for each shot. Cooldown runs between activation starts and must exceed the time to the final burst shot by at least 100 ms. Releasing fire finishes the accepted burst. Switching equipment, changing form, death or restarting cancels remaining shots. Heuristic keeps the current weapon until its burst ends and uses the selected weapon's range.
+
+Custom weapons reuse local Stardust Storm visuals, with no audio, native projectile damage scripts or inherited attacker base-damage bonus. Damage is per projectile, reduced by the target's armor. Their non-piercing projectiles cannot damage their owner or teammates and disappear on an enemy, wall or range limit. Distinct spread pellets and burst shots can each deal damage; repeated callbacks for the same spent custom projectile cannot. The arena allows 256 live custom projectiles; reaching the limit stops new shots, cancels the remaining burst and displays a notice. There is no queued catch-up fire.
+
+Projectile/unit contact scripts now dispatch once per engine contact under the projectile's attribution context, fixing the duplicated Stardust damage path. Native piercing, damage-over-time and subsequent contacts retain their own mechanics. Damage, assists, kills and kill feed follow actual health changes.
+
+Already-fired custom projectiles survive the shooter's death or form change and retain the original source for kill credit; only un-fired burst shots are cancelled. Restart clears those projectiles too. Native character passives remain active and may create their own additional projectiles, independently of the custom firing pattern.
+
+Weapon records use schema version 1, an independent `cw-` ID and revision in `custom-units/weapons/`, including under Electron userData. CRUD uses `/api/custom-weapons` with the same local-origin restrictions and editor capability as units. Unit records remain schema version 1. Arena snapshots include referenced weapon records and revisions: later edits do not change an active arena. Missing/corrupt weapons make affected units unavailable; they are never silently replaced. Custom weapons stay outside production training.
+
+## Local API reference
+
+Read the token from the list response and send it as `X-Custom-Unit-Token` on writes, with a JSON body. Requests must use the local main-server origin; the sandbox editor is disabled. Successful responses include `ok: true`; failures include `ok: false` and an error. Updates/deletion require the current revision; stale revisions return 409.
+
+| Method / endpoint | Purpose / input |
+|---|---|
+| `GET /api/custom-units` | Units, catalog, legacy compatibility, errors and editor token |
+| `POST /api/custom-units` | Create `{baseId,name,health,speed,weapons}` |
+| `PUT /api/custom-units/:id` | Edit the same fields plus `revision`; an existing prototype cannot change |
+| `DELETE /api/custom-units/:id` | Delete with `{revision}` |
+| `GET /api/custom-weapons` | Weapons, defaults, local preview image, errors and token |
+| `POST /api/custom-weapons` | Create name/pattern/damage/speed/range/cooldown and pattern settings |
+| `PUT /api/custom-weapons/:id` | Edit weapon settings with current `revision` |
+| `DELETE /api/custom-weapons/:id` | Delete with `{revision}`; blocked while a saved unit references it |
+| `POST /api/custom-units/sandbox` | Start `{id,controller,opponent}`, with controller `human` or `heuristic` |
+| `GET /api/custom-units/sandbox/status` | Active session ports/URL or last startup/runtime error |
+| `POST /api/custom-units/sandbox/:id/stop` | Stop the owned arena |
+
+The arena's separate `/api/custom-sandbox/control` accepts `heartbeat`, `reset` or `stop` using its session token, distinct from the main editor token. Startup uses automatic loopback ports and reports errors rather than sharing the main match. Corrupt files return an explicit error/list warning; oversized records and missing dependencies are rejected.
 
 ## Separate arena
 
@@ -44,7 +89,7 @@ Selected generic projectile weapons use ranged spacing; selecting a native weapo
 
 All rows support player and heuristic control. Slot numbers start at 1. A dash means native weapons only; every original weapon is always available.
 
-| Character | Generic weapon slots | Additional requirements |
+| Character | Saved-only legacy weapon slots | Additional requirements |
 | --- | --- | --- |
 | Archmage | 1, 2, 3, 4 | — |
 | Alchemist | 1, 2, 3, 4 | — |

@@ -2,7 +2,7 @@
 
 [ภาษาไทย](../th/license-inventory.md) · [License guide](licenses.md)
 
-Snapshot: 2026-10-01, local evidence. Copied license texts are linked below; metadata alone is not complete permission evidence. This source dependency table is not itself the complete executable bill of materials.
+Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; metadata alone is not complete permission evidence. This source dependency table is not itself the complete executable bill of materials.
 
 ## npm
 

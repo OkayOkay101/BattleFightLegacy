@@ -1,7 +1,7 @@
 {
   "snapshot": {
-    "date": "2026-10-01",
-    "sourceCommit": "6d8fceb90bb8618ddcd9e149573d4f20c652c023",
+    "date": "2026-10-09",
+    "sourceCommit": "b9f87aae3010b3b37f6589a5353d495256e1dbbe",
     "counts": {
       "npm": 769,
       "python": 12,

@@ -46,7 +46,23 @@ For a running evaluation it waits for the current candidate evaluation result, t
 
 Missing visuals or unsupported asset origins can cause preparation failure; do not replace these errors with a silent network dependency. Browser vendor code and Font Awesome webfonts are copied locally. Source readme/licenses are not automatically shipped merely because they exist in the repository; see [notice gaps](licenses.md).
 
-## Existing validation commands
+## Custom editor development
+
+The normal source server also serves `/api/custom-units` and `/api/custom-weapons`; no Python process is needed for either editor. Source data is written to `custom-units/`, or `BATTLEFIGHT_CUSTOM_UNITS` when configured. Electron uses `custom-units/` inside its per-user data directory; it survives replacing the EXE. These user files, temporary arena snapshots and generated build/log artifacts are local data and are not source-release assets.
+
+Use the [API and storage reference](custom-units.md) for token/origin checks, revision handling and arena lifecycle. Only one custom arena may be active per main server. Restart the source server after changing server-side catalog/compiler code, and reload the browser after UI changes.
+
+## Documentation and focused verification
+
+```powershell
+node docs/generate-license-inventory.cjs
+node docs/verify-documentation.cjs
+node --test test/custom-units.test.js test/custom-all-units.test.js test/custom-weapons.test.js test/custom-weapon-ui.test.js
+```
+
+The inventory generator refreshes locally available evidence and dates it in Asia/Bangkok; `BATTLEFIGHT_DOCUMENTATION_DATE=YYYY-MM-DD` sets a reproducible date. Preserve original notice bytes. The verifier checks paired pages, local links, AI credits, notice hashes, lockfile coverage and schema/stat tables. Runtime/UI/portable testing is a separate step; see [validation notes](release-notes.md).
+
+## Runtime validation commands
 
 Use these only when verifying an implementation/release; writing documentation does not start them:
 

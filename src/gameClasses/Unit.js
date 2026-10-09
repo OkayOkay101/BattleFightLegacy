@@ -1348,7 +1348,7 @@ var Unit = IgeEntityPhysics.extend({
 
 				var armor = this._stats.attributes.armor && this._stats.attributes.armor.value || 0;
 				var damageReduction = (0.05 * armor) / (1.5 + 0.04 * armor);
-				var ownerUnitBaseDamage = (sourceUnit != undefined) ? sourceUnit.getBaseDamage() : 0;
+				var ownerUnitBaseDamage = (!damageData.ignoreBaseDamage && sourceUnit != undefined) ? sourceUnit.getBaseDamage() : 0;
 				if (damageData.unitAttributes) {
 					_.forEach(damageData.unitAttributes, function (damageValue, damageAttrKey) {
 						var attribute = self._stats.attributes[damageAttrKey];
@@ -2028,6 +2028,9 @@ var Unit = IgeEntityPhysics.extend({
 					for (var i = 0; i < list.length; i++) {
 						var p = list[i];
 						if (p && !p._isBeingRemoved && !p._cleaningUpProjectiles && p._alive !== false && p._stats) {
+							// Accepted custom shots retain their source snapshot after death
+							// or a form change. Arena reset destroys them explicitly.
+							if (p._stats.customWeapon && ige.training && ige.training.isCustomSandbox) continue;
 							if (p._stats.sourceUnitId === unitId || (ownerPlayerId && p._stats.sourcePlayerId === ownerPlayerId)) {
 								p._isBeingRemoved = true;
 								p.destroy();

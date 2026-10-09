@@ -40,14 +40,19 @@ test('SubLazer gets namespaced forms with custom caps, native form items and rev
  assert.ok(!change.some(x=>x.type==='setEntityAttribute'&&x.attribute==='health'&&x.value===100),'transition must not reset HP');
 });
 
-test('dependent skill slots explain restrictions; four existing prototypes keep prior equipment choices',()=>{
+test('generic weapon choices are removed; custom weapons remain available in every equipment slot',()=>{
  const entries=catalog(game);
  const sub=entries.find(x=>x.id==='TtQ4275KLf');
- assert.ok(sub.weaponRestrictions.some(Boolean));
- sub.weaponRestrictions.forEach((reason,n)=>{if(reason) assert.equal(sub.weapons[n].length,1);});
- for(const id of ['NNGRxjPsrz','8FyWfzucqo','Q2Vd00dRsL','JZaENvn4qJ']) {
-  for(const slot of entries.find(x=>x.id===id).weapons) assert.ok(slot.some(x=>x.id==='YCEF0g5Q66')&&slot.some(x=>x.id==='HxgjN3vbXs'));
+ const customWeapon={id:'cw-'+'a'.repeat(32),name:'Test custom weapon'};
+ assert.ok(sub.weaponRestrictions.every(reason=>reason===null));
+ for(const entry of entries) {
+  entry.weapons.forEach((slot,n)=>assert.deepEqual(slot.map(x=>x.id),[entry.defaults.weapons[n]]));
  }
+ for(const entry of catalog(game,[customWeapon])) {
+  entry.weapons.forEach((slot,n)=>assert.deepEqual(slot.map(x=>x.id),[entry.defaults.weapons[n],customWeapon.id]));
+ }
+ const legacy=record('8FyWfzucqo');legacy.weapons[0]='YCEF0g5Q66';
+ assert.equal(compileUnit(game,legacy).unit.defaultItems[0].key,'YCEF0g5Q66','saved prototype-native equipment remains compilable');
 });
 
 test('editor restriction and mechanic hints have matching English and Thai strings',()=>{
@@ -60,10 +65,10 @@ test('editor restriction and mechanic hints have matching English and Thai strin
 });
 
 test('English and Thai support tables match the live 44-character catalog and slot restrictions',()=>{
- const expected=catalog(game).map(entry=>[entry.name,entry.weapons.map((slot,i)=>slot.length>1?i+1:null).filter(Boolean).join(', ')||'—']);
+ const expected=catalog(game).map(entry=>[entry.name,entry.legacyWeapons.map((slot,i)=>slot.length?i+1:null).filter(Boolean).join(', ')||'—']);
  for(const language of ['en','th']) {
   const text=fs.readFileSync(path.join(__dirname,`../docs/${language}/custom-units.md`),'utf8');
-  const rows=text.split('\n').filter(line=>/^\| /.test(line)).slice(2).map(line=>line.split('|').slice(1,3).map(x=>x.trim()));
+  const rows=text.split('\n').filter(line=>/^\| /.test(line)).map(line=>line.split('|').slice(1,3).map(x=>x.trim())).filter(row=>expected.some(entry=>entry[0]===row[0]));
   assert.deepEqual(rows,expected);
  }
 });

@@ -6,6 +6,8 @@
 
 Heuristic ใช้กฎตามสถานะเกมแทนน้ำหนักที่เรียนรู้ Neural ให้คะแนนชุดคำสั่งที่ใช้ได้ ไม่ได้แก้ฟิสิกส์ HP หรือกฎสกิลโดยตรง Gemini Flash และ ChatGPT Sol เป็นผู้ช่วยพัฒนา ไม่ใช่บริการ inference ของบอทในเกม
 
+อัปเดต 2026-10-09 ยูนิต/อาวุธ custom ใช้ผู้เล่นหรือ heuristic ในสนามแยก ไม่เข้า Neural training production Heuristic สนามอ่านระยะอาวุธ custom ที่เลือกและยิง burst ที่เริ่มไว้ให้จบก่อนเปลี่ยนอุปกรณ์ คำแนะนำสกิลเฉพาะตัวใช้ในสนามนั้น ไม่เปลี่ยน schema policy, checkpoint หรือเกณฑ์ Champion production
+
 | Schema | Observation | Action features | Options สูงสุด | Actor | Critic |
 |---|---:|---:|---:|---|---|
 | V1 | 86 | 17 | 16 | 103 → 64 → 64 → 1 | 86 → 64 → 1 |

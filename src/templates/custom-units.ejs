@@ -1,7 +1,8 @@
 <dialog id="custom-unit-editor" aria-labelledby="custom-unit-title">
  <header><div><small>BATTLEFIGHT · UNIT LAB</small><h2 id="custom-unit-title" data-i18n="custom.title">Custom Units</h2></div><button type="button" id="custom-unit-close" data-i18n="custom.close">Close</button></header>
  <p data-i18n="custom.help">Clone a character, adjust its stats and equipment, then try it in a separate arena.</p>
- <div class="custom-editor-grid">
+ <nav class="custom-actions" role="tablist" aria-label="Unit lab"><button type="button" id="custom-unit-tab" role="tab" aria-selected="true" aria-controls="custom-unit-panel" data-i18n="custom.title">Custom Units</button><button type="button" id="custom-weapon-tab" role="tab" aria-selected="false" aria-controls="custom-weapon-panel" data-i18n="weapon.title">Custom Weapons</button></nav>
+ <div class="custom-editor-grid" id="custom-unit-panel" role="tabpanel" aria-labelledby="custom-unit-tab">
   <aside><h3 data-i18n="custom.saved">Saved units</h3><div id="custom-unit-list"></div><button type="button" id="custom-unit-new" data-i18n="custom.new">New from prototype</button></aside>
   <form id="custom-unit-form">
    <label><span data-i18n="custom.prototype">Prototype</span><select id="custom-unit-base" required></select></label>
@@ -23,6 +24,31 @@
   </section>
  </div>
  <p id="custom-unit-message" role="status" aria-live="polite"></p>
+ <div class="custom-editor-grid" id="custom-weapon-panel" role="tabpanel" aria-labelledby="custom-weapon-tab" hidden>
+  <aside><h3 data-i18n="weapon.saved">Saved weapons</h3><div id="custom-weapon-list"></div><button type="button" id="custom-weapon-new" data-i18n="weapon.new">New weapon</button></aside>
+  <form id="custom-weapon-form">
+   <label><span data-i18n="custom.name">Name</span><input id="custom-weapon-name" maxlength="80" required></label>
+   <label><span data-i18n="weapon.pattern">Firing pattern</span><select id="custom-weapon-pattern"><option value="single" data-i18n="weapon.single">Single</option><option value="spread" data-i18n="weapon.spread">Spread</option><option value="burst" data-i18n="weapon.burst">Burst</option></select></label>
+   <div class="custom-stats-fields">
+    <label><span data-i18n="weapon.damage">Damage per projectile</span><input id="custom-weapon-damage" type="number" min="0" max="100000" step="any" required></label>
+    <label><span data-i18n="weapon.speed">Projectile speed</span><input id="custom-weapon-speed" type="number" min="1" max="200" step="any" required></label>
+    <label><span data-i18n="weapon.range">Range (pixels)</span><input id="custom-weapon-range" type="number" min="50" max="5000" step="any" required></label>
+    <label><span data-i18n="weapon.cooldown">Cooldown (ms)</span><input id="custom-weapon-cooldown" type="number" min="100" max="10000" required></label>
+   </div>
+   <fieldset id="custom-weapon-spread-fields"><legend data-i18n="weapon.spread">Spread</legend><div class="custom-stats-fields">
+    <label><span data-i18n="weapon.pellets">Projectile count</span><input id="custom-weapon-pellets" type="number" min="1" max="9" required></label>
+    <label><span data-i18n="weapon.angle">Total angle (degrees)</span><input id="custom-weapon-spread" type="number" min="0" max="120" step="any" required></label>
+   </div></fieldset>
+   <fieldset id="custom-weapon-burst-fields"><legend data-i18n="weapon.burst">Burst</legend><div class="custom-stats-fields">
+    <label><span data-i18n="weapon.shots">Shots per burst</span><input id="custom-weapon-shots" type="number" min="1" max="5" required></label>
+    <label><span data-i18n="weapon.interval">Shot interval (ms)</span><input id="custom-weapon-interval" type="number" min="50" max="500" required></label>
+   </div></fieldset>
+   <p id="custom-weapon-minimum"></p>
+   <div class="custom-actions"><button type="submit" data-i18n="custom.save">Save</button><button type="button" id="custom-weapon-copy" data-i18n="custom.copy">Duplicate</button><button type="button" id="custom-weapon-delete" data-i18n="custom.delete">Delete</button></div>
+   <p id="custom-weapon-message" role="status" aria-live="polite"></p>
+  </form>
+  <section><h3 data-i18n="weapon.preview">Weapon preview</h3><img id="custom-weapon-image" alt="" width="120" height="120"><p id="custom-weapon-summary"></p><p data-i18n="weapon.help">Save a weapon, choose it in a unit's equipment slots, then start a new test arena.</p><p class="custom-warning" data-i18n="weapon.replaceWarning">Replacing a native skill can disable its transformations, summons or resource mechanics.</p><p data-i18n="weapon.burstHelp">Releasing the trigger finishes an accepted burst. Switching equipment, changing form, death or restarting cancels it.</p><p data-i18n="weapon.localOnly">Local visuals, no audio. Custom weapons are only available in the test arena.</p></section>
+ </div>
 </dialog>
 <div id="custom-sandbox-controls" hidden><strong data-i18n="custom.arena">Separate test arena</strong><button id="custom-sandbox-reset" data-i18n="custom.reset">Restart</button><button id="custom-sandbox-stop" data-i18n="custom.stop">End test</button><span id="custom-sandbox-message" role="status"></span></div>
 <style>
@@ -31,5 +57,7 @@
  .custom-editor-grid{display:grid;grid-template-columns:210px minmax(240px,1fr) 260px;gap:24px}#custom-unit-editor label{display:flex;flex-direction:column;gap:5px;margin:12px 0}#custom-unit-editor input,#custom-unit-editor select{width:100%;background:#0a1626;color:#e2e8f0;border:1px solid #47617e;border-radius:6px;padding:8px}#custom-unit-editor button,#custom-sandbox-controls button{background:#1a4260;color:white;border:1px solid #5783a5;border-radius:6px;padding:8px 12px;cursor:pointer}#custom-unit-editor button:disabled{opacity:.45;cursor:default}#custom-unit-editor button:focus-visible{outline:3px solid #38bdf8;outline-offset:2px}
  #custom-unit-list{max-height:390px;overflow:auto}#custom-unit-list button{display:block;width:100%;text-align:left;margin:6px 0;overflow-wrap:anywhere}#custom-unit-list button[aria-current=true]{border-color:#38bdf8;background:#1b5770}.custom-stats-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.custom-prototype{display:flex;gap:16px;align-items:center}.custom-prototype img{object-fit:contain;image-rendering:pixelated}.custom-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}#custom-unit-message,#custom-unit-reason{color:#fcd34d;white-space:pre-wrap}#custom-sandbox-controls{position:fixed;z-index:10000;bottom:12px;left:12px;padding:8px;background:#111f31ee;color:white;border-radius:8px;max-width:85vw}#custom-sandbox-controls[hidden]{display:none}
  @media(max-width:900px){.custom-editor-grid{grid-template-columns:1fr}#custom-unit-list{max-height:130px}}
+ #custom-unit-panel[hidden],#custom-weapon-panel[hidden],#custom-unit-message[hidden]{display:none}#custom-weapon-panel fieldset[hidden]{display:none}#custom-weapon-list{max-height:390px;overflow:auto}#custom-weapon-list button{display:block;width:100%;text-align:left;margin:6px 0;overflow-wrap:anywhere}#custom-unit-editor [role=tab][aria-selected=true],#custom-weapon-list button[aria-current=true]{border-color:#38bdf8;background:#1b5770}#custom-weapon-image{object-fit:contain;image-rendering:pixelated}.custom-warning,#custom-weapon-message{color:#fcd34d;white-space:pre-wrap}#custom-weapon-summary{font-size:1.15rem;color:#7dd3fc}
 </style>
 <script src="/src/custom-units/CustomUnitEditor.js"></script>
+<script src="/src/custom-units/CustomWeaponEditor.js"></script>

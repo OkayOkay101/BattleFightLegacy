@@ -39,6 +39,8 @@ var TriggerComponent = IgeEntity.extend({
 		var entityB = contact.m_fixtureB.m_body._entity;
 		if (!entityA || !entityB)
 			return;
+		var customShot = entityA._category === 'projectile' ? entityA : entityB._category === 'projectile' ? entityB : null;
+		if (customShot && customShot._stats.customWeapon && (customShot._alive === false || customShot._customImpactConsumed)) return;
 		if (ige.training && ige.training.stats && ige.training.stats.trace) {
 			var contactProjectile = entityA._category === 'projectile' ? entityA :
 				entityB._category === 'projectile' ? entityB : null;
@@ -105,6 +107,9 @@ var TriggerComponent = IgeEntity.extend({
 				[ [entityA, entityB], [entityB, entityA] ].forEach(function (pair) {
 					var subject = pair[0], other = pair[1];
 					if (subject._alive === false || other._alive === false) return;
+					// Projectile/unit scripts are dispatched below, inside their combat
+					// source context. Dispatching here as well applies scripted damage twice.
+					if (subject._category === 'projectile' && other._category === 'unit') return;
 					if (subject._category === 'item' && subject._stats.ownerUnitId === other.id()) return;
 					if (subject._category === 'projectile' && subject._stats.sourceUnitId === other.id()) return;
 					if (other._category === 'projectile' && other._stats.sourceUnitId === subject.id()) return;
@@ -187,7 +192,7 @@ var TriggerComponent = IgeEntity.extend({
 							if (entityB._stats.sourceUnitId == entityA.id()) {
 								triggeredBy.projectileId = entityB.id();
 								triggeredBy.collidingEntity = entityA.id();
-								ige.script.triggerEntity(entityB, 'entityTouchesUnit', triggeredBy);
+								ige.trigger._dispatchProjectileUnitContact(entityB, triggeredBy);
 								return;
 							}
 
@@ -195,8 +200,10 @@ var TriggerComponent = IgeEntity.extend({
 							var pSourcePlayer = pSourceUnit && pSourceUnit.getOwner && pSourceUnit.getOwner();
 							var pAttackedPlayer = entityA.getOwner && entityA.getOwner();
 							var pIsFriendly = pSourcePlayer && pAttackedPlayer && (pSourcePlayer === pAttackedPlayer || (pSourcePlayer.isFriendlyTo && pSourcePlayer.isFriendlyTo(pAttackedPlayer)));
-							if (pIsFriendly)
+								if (pIsFriendly) {
+									ige.trigger._dispatchProjectileUnitContact(entityB, { unitId: entityA.id(), projectileId: entityB.id(), collidingEntity: entityA.id() });
 								return;
+								}
 
 							triggeredBy.unitId = entityA.id();
 							triggeredBy.projectileId = entityB.id();
@@ -291,7 +298,32 @@ var TriggerComponent = IgeEntity.extend({
 	/*
 		fire trigger and run all of the corresponding script(s)
 	*/
+	_dispatchProjectileUnitContact: function (projectile, triggeredBy) {
+		if (!ige.isServer || !ige.script) return;
+		var previous = ige.game.currentProjectileId;
+		var previousTraining = ige.training && ige.training.currentProjectileId;
+		ige.game.currentProjectileId = projectile ? projectile.id() : triggeredBy.projectileId;
+		if (triggeredBy.unitId) ige.game.lastTouchedUnitId = triggeredBy.unitId;
+		if (ige.training) ige.training.currentProjectileId = ige.game.currentProjectileId;
+		try { ige.script.triggerEntity(projectile, 'entityTouchesUnit', triggeredBy); }
+		finally {
+			ige.game.currentProjectileId = previous;
+			if (ige.training) ige.training.currentProjectileId = previousTraining;
+		}
+	},
+
 	fire: function (triggerName, triggeredBy) {
+		if (ige.isServer && triggerName === 'unitTouchesProjectile' && triggeredBy) {
+			var customProjectile = ige.$(triggeredBy.projectileId);
+			if (customProjectile && customProjectile._stats.customWeapon) {
+				if (customProjectile._alive === false || customProjectile._customImpactConsumed) return;
+				var customVictim = ige.$(triggeredBy.collidingEntity || triggeredBy.unitId);
+				var customOwner = ige.$(customProjectile._stats.sourcePlayerId);
+				var victimOwner = customVictim && customVictim.getOwner();
+				if (!customOwner || !victimOwner || customOwner === victimOwner || customOwner.isFriendlyTo(victimOwner)) return;
+				customProjectile._customImpactConsumed = true;
+			}
+		}
 		// if (triggerName === 'projectileTouchesWall') console.log("trigger fire", triggerName, triggeredBy)
 		var isProjectileContact = ige.isServer && triggerName === 'unitTouchesProjectile';
 		var previousProjectileId = ige.game && ige.game.currentProjectileId;
@@ -315,7 +347,7 @@ var TriggerComponent = IgeEntity.extend({
 				if (triggerName === 'unitUsesItem') ige.script.triggerEntity(unit, 'thisUnitUsesItem', triggeredBy);
 				if (triggerName === 'unitStartsUsingAnItem') ige.script.triggerEntity(unit, triggerName, triggeredBy);
 				if (triggerName === 'unitTouchesProjectile') {
-					ige.script.triggerEntity(ige.$(triggeredBy.projectileId), 'entityTouchesUnit', triggeredBy);
+					this._dispatchProjectileUnitContact(ige.$(triggeredBy.projectileId), triggeredBy);
 				}
 				var attrMatch = /^(unit|item|projectile)AttributeBecomes(Zero|Full)$/.exec(triggerName);
 				if (attrMatch) ige.script.triggerEntity(ige.$(triggeredBy[attrMatch[1] + 'Id']), 'entityAttributeBecomes' + attrMatch[2], triggeredBy);

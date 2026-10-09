@@ -3,6 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const root = path.resolve(__dirname, '..');
+const snapshotDate = process.env.BATTLEFIGHT_DOCUMENTATION_DATE || new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+if(!/^\d{4}-\d{2}-\d{2}$/.test(snapshotDate))throw new Error('Documentation date must be YYYY-MM-DD');
 const out = path.join(__dirname, 'licenses');
 const posix = p => p.replaceAll('\\', '/');
 const relative = p => posix(path.relative(root, p));
@@ -81,7 +83,7 @@ const unresolved=[
   {component:'Imported sprite/tileset/UI assets',status:'License evidence not found',reason:'A cache.modd.io or S3 URL records location, not ownership or a license.'},
   {component:'Gemini Flash / ChatGPT Sol credit',status:'Development disclosure, not a software license',reason:'Names supplied by project owner; no provider endorsement or ownership claim.'}
 ];
-const snapshot={date:'2026-10-01',sourceCommit:require('node:child_process').execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),
+const snapshot={date:snapshotDate,sourceCommit:require('node:child_process').execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),
   counts:{npm:packages.length,python:python.length,assets:assets.length,embeddedHeaders:embedded.length,
     npmMetadataOnly:packages.filter(p=>p.evidenceStatus.startsWith('Metadata only')).length,npmMissing:packages.filter(p=>p.evidenceStatus==='License evidence not found').length},
   scope:'Local lockfile, installed package metadata/original notices, asset manifest, vendored headers and existing packaged resources. No legal clearance or inferred asset grant.'};
@@ -92,7 +94,7 @@ const clean=s=>String(s??'—').replaceAll('|','/').replace(/[\r\n]/g,' ');
 for(const lang of ['en','th']) {
   const thai=lang==='th',title=thai?'ทะเบียนส่วนประกอบและหลักฐาน License':'Component and License Evidence Inventory';
   let md=`# ${title}\n\n[${thai?'English':'ภาษาไทย'}](../${thai?'en':'th'}/license-inventory.md) · [${thai?'คู่มือ License':'License guide'}](licenses.md)\n\n`;
-  md+=thai?'ข้อมูลวันที่ 2026-10-01 จากไฟล์ในเครื่อง คอลัมน์ข้อความ license เป็นหลักฐานที่คัดลอกไว้ เมทาดาทาอย่างเดียวไม่ใช่หลักฐานสิทธิ์ครบถ้วน รายการในตารางนี้ไม่เท่ากับรายการที่ฝังใน EXE ทั้งหมด\n\n':'Snapshot: 2026-10-01, local evidence. Copied license texts are linked below; metadata alone is not complete permission evidence. This source dependency table is not itself the complete executable bill of materials.\n\n';
+  md+=thai?`ข้อมูลวันที่ ${snapshotDate} จากไฟล์ในเครื่อง คอลัมน์ข้อความ license เป็นหลักฐานที่คัดลอกไว้ เมทาดาทาอย่างเดียวไม่ใช่หลักฐานสิทธิ์ครบถ้วน รายการในตารางนี้ไม่เท่ากับรายการที่ฝังใน EXE ทั้งหมด\n\n`:`Snapshot: ${snapshotDate}, local evidence. Copied license texts are linked below; metadata alone is not complete permission evidence. This source dependency table is not itself the complete executable bill of materials.\n\n`;
   md+='## npm\n\n| Package | Locked / installed | Role | Declared license | Evidence | Standalone node module |\n|---|---|---|---|---|---|\n';
   for(const p of packages)md+=`| ${clean(p.name)} | ${p.lockedVersion} / ${p.installedVersion||'not installed'} | ${p.dependencyRole} | ${clean(p.declaredLicense)} | ${p.originalTexts.length?p.originalTexts.map(e=>`[${path.basename(e.copy)}](../licenses/${e.copy})`).join(', '):p.evidenceStatus} | ${p.packagedNodeModule?'yes':'not found'} |\n`;
   md+='\n## Python\n\nTraining/development only; not included in standalone. / ใช้ในการฝึกและพัฒนา ไม่รวมใน standalone\n\n| Package | Installed version | Declared license | Original text |\n|---|---|---|---|\n';
@@ -102,7 +104,7 @@ for(const lang of ['en','th']) {
   md+='\n## Complete evidence and asset records\n\n- [inventory.json](../licenses/inventory.json)\n- [asset-inventory.json](../licenses/asset-inventory.json)\n- [Original notices index](../licenses/README.md)\n';
   fs.mkdirSync(path.join(__dirname,lang),{recursive:true});fs.writeFileSync(path.join(__dirname,lang,'license-inventory.md'),md);
 }
-let index='# Original License and Notice Texts\n\nOriginal files are copied without translation or edits. / คัดลอกต้นฉบับโดยไม่แปลหรือแก้ไข\n\nSnapshot: 2026-10-01. Regenerate using `node docs/generate-license-inventory.cjs`; this reads local evidence and writes documentation only. The generator does not build, train, install packages, or grant rights.\n\n[English guide](../en/licenses.md) · [คู่มือภาษาไทย](../th/licenses.md)\n\n## Source and runtime\n\n';
+let index=`# Original License and Notice Texts\n\nOriginal files are copied without translation or edits. / คัดลอกต้นฉบับโดยไม่แปลหรือแก้ไข\n\nSnapshot: ${snapshotDate}. Regenerate using \`node docs/generate-license-inventory.cjs\`; this reads local evidence and writes documentation only. The generator does not build, train, install packages, or grant rights.\n\n[English guide](../en/licenses.md) · [คู่มือภาษาไทย](../th/licenses.md)\n\n## Source and runtime\n\n`;
 for(const e of [...engineTexts,...electronTexts])index+=`- [${e.source}](${e.copy})\n`;
 index+='\n## Package evidence\n\n';for(const p of [...packages,...python])for(const e of p.originalTexts)index+=`- ${p.name}: [${e.source}](${e.copy})\n`;
 write('README.md',index);console.log(JSON.stringify(snapshot.counts));

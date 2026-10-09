@@ -8,7 +8,9 @@ const th=fs.readdirSync(path.join(docs,'th')).filter(x=>x.endsWith('.md')).sort(
 if(JSON.stringify(en)!==JSON.stringify(th))failures.push('English/Thai page sets differ');
 const readme=fs.readFileSync(path.join(root,'README.md'),'utf8');
 const original=cp.execFileSync('git',['show','HEAD:README.md'],{cwd:root,encoding:'utf8'}).replaceAll('\r\n','\n');
-if(!readme.replaceAll('\r\n','\n').endsWith(original))failures.push('Upstream README body changed');
+const upstreamMarker='## Original upstream documentation / เอกสาร Taro ต้นฉบับ';
+const upstreamBody=text=>text.replaceAll('\r\n','\n').split(upstreamMarker)[1];
+if(!upstreamBody(original)||upstreamBody(readme)!==upstreamBody(original))failures.push('Upstream README body changed');
 const english='BattleFight was developed with assistance from Gemini Flash and ChatGPT Sol.';
 const thai='BattleFight พัฒนาโดยใช้ Gemini Flash และ ChatGPT Sol ช่วยในการพัฒนา';
 for(const [file,text] of [['README.md',english],['README.md',thai],['docs/en/credits.md',english],['docs/th/credits.md',thai]])if(!fs.readFileSync(path.join(root,file),'utf8').includes(text))failures.push('Missing AI credit in '+file);

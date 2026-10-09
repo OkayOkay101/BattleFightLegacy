@@ -2,6 +2,8 @@
 
 [ภาษาไทย](../th/credits.md) · [Documentation](index.md)
 
+Reviewed 2026-10-09 alongside the local component inventory. Custom editors reuse the existing local game visuals; a user-created name or stat/weapon preset does not change the underlying art's provenance or license.
+
 ## AI-Assisted Development
 
 BattleFight was developed with assistance from Gemini Flash and ChatGPT Sol.

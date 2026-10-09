@@ -4,8 +4,11 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 test('manual fixed steps can complete a short 3v3 match on simulated time', () => {
+	// With contact dispatch fixed, seed 1 has no hostile HP loss in its
+	// first 5 seconds. Ten seconds reaches combat without relying on the
+	// former duplicate/misaddressed script contacts; all assertions remain.
 	const result = spawnSync(process.execPath, [path.resolve(__dirname, '../server/training/MatchWorker.js'),
-		'--fixed-step-run-once', '--duration-ms', '5000'], {
+		'--fixed-step-run-once', '--duration-ms', '10000'], {
 		cwd: path.resolve(__dirname, '..'), encoding: 'utf8', timeout: 10000
 	});
 	assert.equal(result.status, 0, result.stderr || result.stdout);
@@ -13,8 +16,8 @@ test('manual fixed steps can complete a short 3v3 match on simulated time', () =
 	assert.ok(line, result.stdout);
 	const report = JSON.parse(line.slice('TRAINING_FIXED_MATCH '.length));
 	assert.equal(report.result.status, 'complete');
-	assert.equal(report.result.durationMs, 5000);
-	assert.equal(report.steps, 300);
+	assert.equal(report.result.durationMs, 10000);
+	assert.equal(report.steps, 600);
 	assert.equal(Object.keys(report.stats.players).length, 6);
 	assert.equal(report.trace.winner, report.result.winner);
 	assert.ok(report.trace.positions.length > 0 && report.trace.positions.length <= report.steps);

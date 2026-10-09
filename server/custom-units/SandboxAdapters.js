@@ -36,6 +36,7 @@ function installAdapters(ige,runtime,snapshot) {
  const normalSelect=ige.game._selectBattleBotWeapon;
  if(normalSelect) ige.game._selectBattleBotWeapon=function(unit,profile,...args) {
   if(unit?._stats?.customUnit?.id===snapshot.unit.id) {
+   if(runtime.customBurstActive?.(unit.getCurrentItem())) return {slot:unit._stats.currentItemIndex,item:unit.getCurrentItem(),ricochet:null};
    profile={...profile,slots:(profile.slots||[]).filter(slot=>{
     const item=unit.inventory.getItemBySlotNumber(slot+1);
     return item&&scriptPrerequisites(ige,item,unit,unit.getOwner());
@@ -49,7 +50,8 @@ function installAdapters(ige,runtime,snapshot) {
    const profile=this.battleBotRoster?.find(x=>x.id===unit._stats.type);
    if(profile) {
     const generic=['YCEF0g5Q66','HxgjN3vbXs'].includes(unit.getCurrentItem()?._stats.itemTypeId);
-    profile.range=generic?400:originalProfile.range;profile.role=generic?'ranged':originalProfile.role;
+    const customWeapon=unit.getCurrentItem()?._stats.customWeapon;
+    profile.range=customWeapon?customWeapon.range:generic?400:originalProfile.range;profile.role=customWeapon||generic?'ranged':originalProfile.role;
    }
   }
   const prior=player?._battleBot?.thinkingAt;
@@ -61,7 +63,7 @@ function installAdapters(ige,runtime,snapshot) {
   // Native gun selection handles aim, range and dodge. Script-only abilities
   // also need a chance to run: readiness includes their explicit resource/state
   // conditions, not just the generic gun's cost object.
-  if(unit.inventory && now >= (state.customSkillAt||0) && target.distance <= compiled.profile.range) {
+  if(unit.inventory && !runtime.customBurstActive?.(unit.getCurrentItem()) && now >= (state.customSkillAt||0) && target.distance <= compiled.profile.range) {
    const map=ige.map.data, visible=unit.ai.battleBotHasLineOfSight(map,1,1,ige.scaleMapDetails.tileWidth,unit._translate,target.unit._translate);
    const count=unit._stats.itemIds.length;
    if(visible) for(let offset=0;offset<count;offset++) {

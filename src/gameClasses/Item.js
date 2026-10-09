@@ -248,6 +248,10 @@ var Item = IgeEntityPhysics.extend({
 	use: function () {
 		var self = this;
 		var now = ige.now;
+		if (self._stats.itemTypeId && self._stats.itemTypeId.indexOf('cw-') === 0) {
+			if (ige.isServer && ige.training && ige.training.isCustomSandbox && ige.training.useCustomWeapon) return ige.training.useCustomWeapon(self);
+			return false; // Custom projectiles are streamed; clients never fire them locally.
+		}
 		var owner = self.getOwnerUnit();
 		var player = owner && owner.getOwner();
 		var isUsed = false;

@@ -51,6 +51,7 @@ test('invalid fields, incompatible weapons and unavailable prototypes are reject
   for (const entry of list.filter(x => x.available)) {
    entry.weapons.forEach((slot, n) => assert.ok(slot.some(x => x.id === entry.defaults.weapons[n])));
   }
+  assert.ok(list.every(entry => entry.weapons.every((slot,n) => slot.every(item => item.id === entry.defaults.weapons[n]))));
  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
 

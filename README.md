@@ -1,6 +1,19 @@
 # BattleFight
 
-BattleFight is a local web game and offline Windows portable game built on the Taro engine, with team AI model selection, spectator cameras, a live kill feed, and English/Thai UI.
+BattleFight is a local web game and offline Windows portable game built on the Taro engine, with team AI model selection, spectator cameras, a live kill feed, English/Thai UI, and a Custom Unit/Weapon test arena.
+
+Current source documentation: **2026-10-09**. The local portable artifact is a separate build snapshot; see [release and validation notes](docs/en/release-notes.md).
+
+## Play from source
+
+```powershell
+npm ci
+npm run demo
+```
+
+Open [http://127.0.0.1/](http://127.0.0.1/). Use **Custom Units** to create a variant of any of the 44 playable characters, or **Custom Weapons** to build single, spread or burst weapons. Test them in a separate arena with player or heuristic control. Custom content is saved locally and stays outside Neural training.
+
+For offline Windows play, open `BattleFight-Portable-1.0.0.exe`. It includes local visuals and AI inference, has no audio, and does not require Node or Python. Packaging instructions and prerequisites are in the development guide.
 
 ## Documentation — English first
 
@@ -9,6 +22,8 @@ BattleFight is a local web game and offline Windows portable game built on the T
 - [Architecture and combat](docs/en/architecture.md)
 - [AI and training](docs/en/ai-training.md)
 - [Development and standalone packaging](docs/en/development.md)
+- [Custom Units and Custom Weapons](docs/en/custom-units.md)
+- [Release and validation notes](docs/en/release-notes.md)
 - [Licenses and redistribution evidence](docs/en/licenses.md)
 - [Component inventory](docs/en/license-inventory.md)
 - [Credits](docs/en/credits.md)
@@ -21,13 +36,21 @@ This development credit is separate from the heuristic and Neural bots that run 
 
 ## เอกสารภาษาไทย
 
-BattleFight เป็นเกมเว็บในเครื่องและเกม Windows แบบ portable ออฟไลน์ที่พัฒนาบน Taro มีระบบเลือกโมเดล AI แยกทีม กล้องผู้ชม kill feed สด และ UI อังกฤษ–ไทย
+BattleFight เป็นเกมเว็บในเครื่องและเกม Windows แบบ portable ออฟไลน์ที่พัฒนาบน Taro มีระบบเลือกโมเดล AI แยกทีม กล้องผู้ชม kill feed สด UI อังกฤษ–ไทย และสนามทดลองยูนิต/อาวุธสร้างเอง
+
+เอกสาร source ปัจจุบันอัปเดต **2026-10-09** ส่วน portable เป็นข้อมูลตามรอบ build ของไฟล์นั้น ดู [บันทึกรุ่นและการตรวจรับ](docs/th/release-notes.md)
+
+รัน `npm ci` และ `npm run demo` จากโฟลเดอร์นี้ แล้วเปิด [http://127.0.0.1/](http://127.0.0.1/) เมนู **ยูนิตสร้างเอง** สร้างตัวแปรจาก 44 ตัวละคร และ **อาวุธสร้างเอง** สร้างการยิงเดี่ยว กระจาย หรือเป็นชุด ทดลองในสนามแยกโดยเลือกผู้เล่นหรือ heuristic ข้อมูล custom บันทึกในเครื่องและไม่เข้าการฝึก Neural
+
+เล่นออฟไลน์บน Windows ด้วย `BattleFight-Portable-1.0.0.exe` ซึ่งมีภาพและ AI inference ในเครื่อง ไม่มีเสียง และไม่ต้องติดตั้ง Node/Python ดูวิธี build และ prerequisites ในคู่มือพัฒนา
 
 - [สารบัญเอกสาร](docs/th/index.md)
 - [คู่มือผู้เล่น](docs/th/player-guide.md)
 - [โครงสร้างและการต่อสู้](docs/th/architecture.md)
 - [AI และการฝึก](docs/th/ai-training.md)
 - [การพัฒนาและแพ็กเกจ standalone](docs/th/development.md)
+- [ยูนิตและอาวุธสร้างเอง](docs/th/custom-units.md)
+- [บันทึกรุ่นและการตรวจรับ](docs/th/release-notes.md)
 - [License และหลักฐานสิทธิ์เผยแพร่](docs/th/licenses.md)
 - [ทะเบียนส่วนประกอบ](docs/th/license-inventory.md)
 - [เครดิต](docs/th/credits.md)

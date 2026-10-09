@@ -2,7 +2,7 @@
 
 [ภาษาไทย](../th/licenses.md) · [Documentation](index.md) · [Component inventory](license-inventory.md)
 
-Snapshot: **2026-10-01**. This is a source/evidence register, not a declaration that every game asset is cleared for redistribution. Existing licenses are preserved; this documentation neither changes them nor assigns rights to custom content.
+Snapshot: **2026-10-09**. This is a source/evidence register, not a declaration that every game asset is cleared for redistribution. Existing licenses are preserved; this documentation neither changes them nor assigns rights to custom content.
 
 ## Separate the rights by component
 
@@ -21,6 +21,8 @@ Snapshot: **2026-10-01**. This is a source/evidence register, not a declaration 
 | Audio | Some historical manifest entries exist; standalone preparation removes audio and its references. Removing an asset does not establish a license for any copy elsewhere | Excluded from the current offline standalone |
 
 Phaser is declared in package dependencies. A declaration alone does not prove that browser gameplay executes it; inspect runtime imports/vendor mappings separately. The current browser renderer uses Pixi. No dependency upgrade/removal is performed by this documentation task.
+
+Custom Unit/Weapon records are names and numeric presets referencing existing visuals and mechanics; the editor does not upload new images or execute user scripts. They are local user data, not portable seed assets. Creating a preset does not establish a new license for the reused art or grant additional redistribution rights.
 
 ## Original notices and provenance
 
@@ -41,7 +43,7 @@ Do not remove original credits, claim provider endorsement, or infer ownership f
 
 ## Current standalone notice gaps
 
-The inspected 2026-10-01 unpacked release retains `LICENSE.electron.txt` and `LICENSES.chromium.html` at the application root. The repository Taro `LICENSE` is **not copied into desktop-data** by the current preparer; root app.asar contains desktop code/package/dependencies rather than the repository documentation tree. No standalone vendor `LICENSE` files were found beneath the copied `assets/desktop-vendor` tree during this inspection. Individual JS/CSS headers and module notices may remain, but they are not a complete aggregated notice audit.
+The inspected 2026-10-09 unpacked release retains `LICENSE.electron.txt` and `LICENSES.chromium.html` at the application root. The repository Taro `LICENSE` is **not copied into desktop-data** by the current preparer; root app.asar contains desktop code/package/dependencies rather than the repository documentation tree. No standalone vendor `LICENSE` files were found beneath the copied `assets/desktop-vendor` tree during this inspection. Individual JS/CSS headers and module notices may remain, but they are not a complete aggregated notice audit.
 
 The new `docs/licenses` collection is **not automatically included in the existing EXE**. A later packaging change should carry the applicable upstream/game/dependency/font notices and resolve unknown asset rights before claiming a fully cleared redistributable package. This task records that gap; it does not rebuild or change the package.
 

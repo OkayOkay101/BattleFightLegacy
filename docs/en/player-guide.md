@@ -8,9 +8,19 @@ For Windows standalone, run the portable `.exe`. It starts its own local server 
 
 Choose **Spectate** to watch Blue and Red bots, or **Play Game** to select a character and join Blue against Red. Use **Enter Game** after selecting options. The desktop edition offers play and AI selection, not training.
 
-## Controls and cameras
+## Custom content
 
-The web game and the current portable build also provide [Custom Units](custom-units.md), an editor with a separate player/heuristic test arena. Older portable executables do not include this feature.
+The web game and the 2026-10-09 portable build provide [Custom Units and Weapons](custom-units.md), editors with a separate player/heuristic test arena. The equipment catalog change described below is newer source behavior; consult [build notes](release-notes.md) before comparing an older EXE.
+
+### Workflow
+
+1. Open **Custom Weapons**, create single/spread/burst equipment, set damage, speed, range and cooldown, then save.
+2. Open **Custom Units**, select one of 44 prototypes, set name/health/speed, choose native or saved custom equipment, then save.
+3. Choose player or heuristic control and an original opponent; **Test** opens an independent local 1v1 arena. Use **Restart** for a fresh match or **End test** to close its server.
+
+Source equipment no longer offers Stardust Storm/Debris Strike as extra cross-character choices. PewPew keeps its native versions; previously saved selections remain compatible. Replacing a native skill with a custom weapon can disable skill-dependent forms/resources/summons. Edits apply to the next arena, not one already running. Custom characters are not included in normal matches or Neural training.
+
+## Controls and cameras
 
 - Default movement uses WASD or arrow keys; aim with the mouse and use the active item with the primary mouse button. Character-specific controls/skills are configured in the game data; do not assume every character shares the same skill keys or conditions.
 - **Follow player** tracks the selected player. **Auto** chooses an available target; **Next player** changes the target. Team and target selectors help choose Blue/Red participants.

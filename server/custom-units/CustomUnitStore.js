@@ -3,11 +3,12 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { playableIds, adapter, visit, GENERIC_WEAPONS } = require('./CustomUnitAdapters');
+const { CustomWeaponStore, compileWeapons } = require('./CustomWeaponStore');
 const ID = /^cu-[a-f0-9]{32}$/;
 const clone = value => JSON.parse(JSON.stringify(value));
 function fail(message, status = 400) { const error = new Error(message); error.status = status; throw error; }
 
-function catalog(game) {
+function catalog(game, customWeapons = []) {
  return playableIds(game).map(id => {
   const unit = game.unitTypes[id], support=adapter(game,id), profile=support.profile;
   const available = unit.attributes?.health && unit.attributes?.speed && unit.cellSheet?.url;
@@ -15,27 +16,31 @@ function catalog(game) {
    weapons: unit.defaultItems.map(item => item.key) };
   return { id: profile.id, name: unit.name, available: !!available,
    reason: available ? null : 'custom.adapterRequired', image: unit.cellSheet?.url || '', defaults,
-   weapons: defaults.weapons.map((original,index) => [...new Set([original, ...(support.genericSlots.includes(index)?GENERIC_WEAPONS:[])])]
-    .filter(id => game.itemTypes[id]).map(id => ({ id, name: game.itemTypes[id].name }))),
-   weaponRestrictions:defaults.weapons.map((_,index)=>support.genericSlots.includes(index)?null:'custom.nativeSlot'),
+   weapons: defaults.weapons.map(original => [original]
+    .filter(id => game.itemTypes[id]).map(id => ({ id, name: game.itemTypes[id].name })).concat(customWeapons.map(weapon=>({id:weapon.id,name:weapon.name,custom:true})))),
+   legacyWeapons: defaults.weapons.map((_,index) => (support.genericSlots.includes(index)?GENERIC_WEAPONS:[])
+    .filter(id => game.itemTypes[id]).map(id => ({id,name:game.itemTypes[id].name}))),
+   weaponRestrictions:defaults.weapons.map(()=>null),
    hints:support.hints, profile };
  });
 }
 
-function validate(game, value) {
+function validate(game, value, customWeapons = []) {
  if (!value || typeof value !== 'object' || Array.isArray(value)) fail('Invalid unit data');
- const base = catalog(game).find(entry => entry.id === value.baseId);
+ const base = catalog(game, customWeapons).find(entry => entry.id === value.baseId);
  if (!base?.available) fail('Prototype requires a compatibility adapter');
  if (typeof value.name !== 'string' || !value.name.trim() || value.name.trim().length > 80) fail('Name must contain 1–80 characters');
  if (!Number.isFinite(value.health) || value.health < 1 || value.health > 100000) fail('Health must be between 1 and 100000');
  if (!Number.isFinite(value.speed) || value.speed < 0 || value.speed > 100) fail('Speed must be between 0 and 100');
  if (!Array.isArray(value.weapons) || value.weapons.length !== base.weapons.length ||
-  value.weapons.some((id, index) => !base.weapons[index].some(weapon => weapon.id === id))) fail('Incompatible weapon selection');
+  value.weapons.some((id, index) => !base.weapons[index].some(weapon => weapon.id === id) &&
+   !base.legacyWeapons[index].some(weapon => weapon.id === id))) fail('Incompatible weapon selection');
  return { baseId: value.baseId, name: value.name.trim(), health: value.health, speed: value.speed, weapons: value.weapons.slice() };
 }
 
-function compileUnit(game, saved) {
- const data = validate(game, saved);
+function compileUnit(game, saved, customWeapons = []) {
+ const weapons = compileWeapons(game, customWeapons);
+ const data = validate(game, saved, customWeapons);
  if (!ID.test(saved.id)) fail('Invalid custom unit ID');
  const support=adapter(game,data.baseId), formIds=Object.fromEntries(support.forms.map(id=>[id,id===data.baseId?saved.id:`${saved.id}-form-${id}`]));
  const unitTypes={};
@@ -48,7 +53,7 @@ function compileUnit(game, saved) {
   unit.attributes.health.min=baseId==='TtQ4275KLf'?1:0;
   unit.attributes.speed.value=unit.attributes.speed.max=data.speed;
   unit.attributes.speed.min=0;
-  if(baseId===data.baseId) unit.defaultItems=data.weapons.map(id=>({key:id,name:game.itemTypes[id].name,value:game.itemTypes[id].name}));
+  if(baseId===data.baseId) unit.defaultItems=data.weapons.map(id=>({key:id,name:(weapons.itemTypes[id]||game.itemTypes[id]).name,value:(weapons.itemTypes[id]||game.itemTypes[id]).name}));
   if(baseId==='TtQ4275KLf' && unit.scripts?.['7ghxSVXMRn']) {
    const transition=unit.scripts['7ghxSVXMRn'].actions[0].then;
    unit.scripts['7ghxSVXMRn'].actions[0].then=transition.filter(x=>!(x.type==='setEntityAttribute'&&x.attribute==='health'&&x.value===100));
@@ -63,7 +68,8 @@ function compileUnit(game, saved) {
   unitTypes[formIds[baseId]]=unit;
  }
  const profile={...support.profile,id:saved.id,name:data.name};
- const itemTypes={};
+ if(data.weapons.some(id=>weapons.itemTypes[id])) profile.slots=data.weapons.map((_,index)=>index);
+ const itemTypes={...weapons.itemTypes};
  // Carry/use restrictions use actual IDs, unlike script comparisons. Extend
  // arena copies of the item definitions for the corresponding compiled form.
  for(const [itemId,item] of Object.entries(game.itemTypes)) for(const field of ['carriedBy','canBeUsedBy']) {
@@ -71,11 +77,12 @@ function compileUnit(game, saved) {
   const additions=Object.entries(formIds).filter(([native])=>item[field].includes(native)).map(([,id])=>id);
   if(additions.length) { itemTypes[itemId] ||= clone(item);itemTypes[itemId][field]=[...new Set([...item[field],...additions])]; }
  }
- return {id:saved.id,unit:unitTypes[saved.id],unitTypes,itemTypes,formIds,adapter:support,profile};
+ return {id:saved.id,unit:unitTypes[saved.id],unitTypes,itemTypes,projectileTypes:weapons.projectileTypes,formIds,adapter:support,profile};
 }
 
 class CustomUnitStore {
- constructor(directory, game) { this.directory = path.resolve(directory); this.game = game; }
+ constructor(directory, game) { this.directory = path.resolve(directory); this.game = game; this.weaponStore = new CustomWeaponStore(this.directory); }
+ compile(saved) { return compileUnit(this.game, saved, this.weaponStore.recordsFor(saved.weapons)); }
  file(id) { if (!ID.test(id)) fail('Invalid custom unit ID'); return path.join(this.directory, `${id}.json`); }
  get(id) {
   const file = this.file(id);
@@ -96,14 +103,14 @@ class CustomUnitStore {
    try {
     const value = this.get(name.slice(0, -5));
     let reason = null;
-    try { validate(this.game, value); } catch (error) { reason = error.message; }
+    try { validate(this.game, value, this.weaponStore.recordsFor(value.weapons)); } catch (error) { reason = error.message; }
     units.push({ ...value, available: !reason, reason });
    } catch (error) { errors.push({ file: name, error: error.message }); }
   }
   return { units, errors };
  }
  save(value) {
-  const data = validate(this.game, value);
+  const data = validate(this.game, value, Array.isArray(value?.weapons) ? this.weaponStore.recordsFor(value.weapons) : []);
   const old = value.id ? this.get(value.id) : null;
   if (old && old.baseId !== data.baseId) fail('Prototype cannot change on an existing unit; create a new variant');
   if (old && value.revision !== old.revision) fail('Revision conflict: reload this unit before saving', 409);

@@ -26,13 +26,14 @@ class SandboxManager {
  async start({ id, controller, opponent }) {
   if (!['human', 'heuristic'].includes(controller)) throw new Error('Choose human or heuristic');
   const saved = this.store.get(id);
-  compileUnit(this.game, saved);
+  const weapons = this.store.weaponStore.recordsFor(saved.weapons);
+  compileUnit(this.game, saved, weapons);
   if (!catalog(this.game).some(entry => entry.id === opponent)) throw new Error('Unknown opponent');
   if (this.starting || this.active) throw new Error('Close the current sandbox before starting another');
   this.starting = true;
   this.lastError = null;
   const sessionId = crypto.randomBytes(16).toString('hex');
-  const snapshot = { schemaVersion: 1, unit: saved, controller, opponent, token: crypto.randomBytes(32).toString('hex') };
+  const snapshot = { schemaVersion: 1, unit: saved, weapons, controller, opponent, token: crypto.randomBytes(32).toString('hex') };
   const file = path.join(this.directory, `sandbox-${sessionId}.json`);
   let active;
   try {

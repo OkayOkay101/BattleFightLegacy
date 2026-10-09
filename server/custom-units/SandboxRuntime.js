@@ -5,9 +5,10 @@ const { installDemo } = require('../training/DemoRuntime');
 
 function loadSnapshot(game, file) {
  const snapshot = JSON.parse(fs.readFileSync(file, 'utf8'));
- const compiled = compileUnit(game, snapshot.unit);
+ const compiled = compileUnit(game, snapshot.unit, snapshot.weapons || []);
  Object.assign(game.unitTypes,compiled.unitTypes);
  Object.assign(game.itemTypes,compiled.itemTypes);
+ Object.assign(game.projectileTypes,compiled.projectileTypes);
  snapshot.compiled = compiled;
  // The test arena has a continuous match, without the lobby's scheduled
  // mode changes or its character-selection/respawn scripts.
@@ -42,6 +43,8 @@ function installSandbox(ige, snapshot) {
   const timer = setTimeout(() => { scheduled.delete(timer); callback(); }, delay);
   scheduled.add(timer); return timer;
  };
+ runtime.cancelSandboxAction = timer => { clearTimeout(timer); scheduled.delete(timer); };
+ require('./CustomWeaponRuntime').installCustomWeapons(ige, runtime);
  const roster = catalog(ige.game.data).map(entry=>entry.profile);
  const opponent = roster.find(entry => entry.id === snapshot.opponent);
  if (!opponent) throw new Error('Sandbox opponent unavailable');
@@ -117,6 +120,7 @@ function installSandbox(ige, snapshot) {
   try { return originalDeath.call(this, unit, context); } finally { deathSource = null; }
  };
  runtime.resetSandbox = () => {
+  runtime.cancelCustomBursts();
   for (const timer of scheduled) clearTimeout(timer);
   scheduled.clear();
   for (const player of participants) {

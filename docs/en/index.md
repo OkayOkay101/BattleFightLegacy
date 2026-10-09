@@ -4,9 +4,12 @@
 
 English is the default documentation language. Every guide has a corresponding Thai page. These guides describe the current local implementation; historical evaluation reports are dated snapshots, not live training status.
 
+Updated **2026-10-09**. Start with the player guide for normal play, Custom Units for the local experiment editor, or Development for server/training/build commands.
+
 | Guide | Contents |
 |---|---|
-| [Custom Units](custom-units.md) | Local editor, supported prototypes, equipment and separate test arena |
+| [Custom Units and Weapons](custom-units.md) | All 44 prototypes, single/spread/burst weapons, storage, APIs and separate test arena |
+| [Release and validation notes](release-notes.md) | Source versus portable build, exact artifact hash and validation limits |
 | [Player guide](player-guide.md) | Starting a game, controls, teams, cameras, language, kill feed and statistics |
 | [Architecture](architecture.md) | Client/server, game definitions, physics, skills, projectiles and attribution |
 | [AI and training](ai-training.md) | Heuristic/Neural models, observations, PPO, checkpoints and promotion |

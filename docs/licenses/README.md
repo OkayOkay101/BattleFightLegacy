@@ -2,7 +2,7 @@
 
 Original files are copied without translation or edits. / คัดลอกต้นฉบับโดยไม่แปลหรือแก้ไข
 
-Snapshot: 2026-10-01. Regenerate using `node docs/generate-license-inventory.cjs`; this reads local evidence and writes documentation only. The generator does not build, train, install packages, or grant rights.
+Snapshot: 2026-10-09. Regenerate using `node docs/generate-license-inventory.cjs`; this reads local evidence and writes documentation only. The generator does not build, train, install packages, or grant rights.
 
 [English guide](../en/licenses.md) · [คู่มือภาษาไทย](../th/licenses.md)
 

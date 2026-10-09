@@ -27,6 +27,8 @@ When a tracked combat unit dies, life bookkeeping avoids duplicate death credit.
 
 ## Attribution and statistics
 
+Projectile-to-unit entity scripts are dispatched through one canonical contact path with the projectile owner and touched victim in context. This removes the former double invocation that made Stardust damage count twice. Unit-side contacts, owner-touch skills, native piercing and later contacts keep their own rules. Non-piercing custom projectiles mark themselves consumed before damage so repeated fixtures cannot spend the same pellet twice.
+
 `CombatAttribution` and combat event propagation preserve damage-source ownership/character information, including delayed projectiles. `TrainingStats` groups records by player and by player/character life history. It records actual HP loss; source damage credit applies to an enemy source, while target damage taken can include other causes.
 
 - Duplicate health/death events are rejected by identifiers/life bookkeeping.
@@ -35,7 +37,13 @@ When a tracked combat unit dies, life bookkeeping avoids duplicate death credit.
 - Source character IDs preserve credit when a projectile hits after its source changes character or dies, where the event carries that information.
 - Weapon use and damage-hit events are separate; multiple hits can result from one use, so hits/use is not bullet accuracy.
 
-## Desktop boundary
+## Custom editor and sandbox boundary
+
+Custom records use separate `cu-`/`cw-` IDs and versioned JSON; the editor never rewrites the original game definition. A shared compiler creates root/secondary definitions for client and server. A loopback-only child process receives an immutable unit/weapon snapshot and starts its own HTTP/WebSocket ports, world and statistics. The main match and production training roster remain separate.
+
+Custom weapons clone local visual/body data, omit native firing/damage scripts, and create authoritative server projectiles. Single/spread/burst scheduling, travelled distance and the 256-projectile limit are owned by the arena runtime. Un-fired burst shots cancel on weapon/form change, death or reset; accepted projectiles retain attribution after the shooter dies. Reset clears projectiles, summons and pending actions. Window closure or heartbeat expiry stops the arena process.
+
+## Desktop process and resources
 
 Electron starts its own server in a utility process, obtains local HTTP/WebSocket addresses, and configures the game window. Its request allowlist limits renderer network access to the owned local endpoints. Packaged resources contain gameplay and inference code, visual assets and policy seeds; training mutation tools and audio are excluded. Missing user policy seeds are copied without overwriting existing policies. Selection and logs live in per-user data.
 
