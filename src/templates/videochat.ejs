@@ -70,12 +70,15 @@
             }
 
             .video-controls .btn.btn-primary,
-            .video-controls .btn.btn-primary:focus,
             .video-controls .btn.btn-primary:visited,
             .video-controls .btn.btn-primary:active {
                 background: none;
                 border: none;
-                outline: none !important;
+                outline: none;
+            }
+            .video-controls .btn.btn-primary:focus-visible {
+                outline: 2px solid #0cbeef !important;
+                outline-offset: 2px;
             }
 
             .name-label {
@@ -114,14 +117,16 @@
         <div>
             <div class="video-controls" id="video-controls-my">
                 <button class="btn btn-sm mute-btn btn-primary" data-action="mute"
+                    aria-label="Toggle microphone"
                     data-nextclass="fa fa-microphone-slash" data-istrueclass="fa fa-microphone-slash"
                     data-isfalseclass="fa fa-microphone">
-                    <i class="fa fa-microphone"></i>
+                    <i class="fa fa-microphone" aria-hidden="true"></i>
                 </button>
                 <button class="btn btn-sm hide-btn btn-primary" data-action="hide" data-hidden="0"
+                    aria-label="Toggle camera"
                     data-nextclass="fa fa-video-slash" data-istrueclass="fa fa-video-slash"
                     data-isfalseclass="fa fa-video">
-                    <i class="fa fa-video"></i>
+                    <i class="fa fa-video" aria-hidden="true"></i>
                 </button>
                 <div class="mt-3 name-label">
                     user
