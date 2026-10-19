@@ -115,12 +115,12 @@
             <div class="video-controls" id="video-controls-my">
                 <button class="btn btn-sm mute-btn btn-primary" data-action="mute"
                     data-nextclass="fa fa-microphone-slash" data-istrueclass="fa fa-microphone-slash"
-                    data-isfalseclass="fa fa-microphone">
+                    data-isfalseclass="fa fa-microphone" aria-label="Toggle microphone">
                     <i class="fa fa-microphone"></i>
                 </button>
                 <button class="btn btn-sm hide-btn btn-primary" data-action="hide" data-hidden="0"
                     data-nextclass="fa fa-video-slash" data-istrueclass="fa fa-video-slash"
-                    data-isfalseclass="fa fa-video">
+                    data-isfalseclass="fa fa-video" aria-label="Toggle video">
                     <i class="fa fa-video"></i>
                 </button>
                 <div class="mt-3 name-label">
@@ -189,7 +189,7 @@
                                         <div class="input-group-prepend">
                                             <div class="input-group-text"><i class="fa fa-video"></i></div>
                                         </div>
-                                        <select class="form-control" id="video-inputs">
+                                        <select class="form-control" id="video-inputs" aria-label="Select video input">
                                             <option class="remove-me">Waiting for permissions...</option>
                                         </select>
                                     </div>
@@ -197,7 +197,7 @@
                                         <div class="input-group-prepend">
                                             <div class="input-group-text"><i class="fa fa-microphone"></i></div>
                                         </div>
-                                        <select class="form-control" id="audio-inputs">
+                                        <select class="form-control" id="audio-inputs" aria-label="Select audio input">
                                             <option class="remove-me">Waiting for permissions...</option>
                                         </select>
                                     </div>
@@ -205,7 +205,7 @@
                                         <div class="input-group-prepend">
                                             <div class="input-group-text"><i class="fa fa-volume-down"></i></div>
                                         </div>
-                                        <select class="form-control" id="audio-outputs">
+                                        <select class="form-control" id="audio-outputs" aria-label="Select audio output">
                                             <option class="remove-me">Waiting for permissions...</option>
                                         </select>
                                     </div>
