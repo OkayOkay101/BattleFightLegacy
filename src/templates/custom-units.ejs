@@ -50,8 +50,17 @@
   <section><h3 data-i18n="weapon.preview">Weapon preview</h3><img id="custom-weapon-image" alt="" width="120" height="120"><p id="custom-weapon-summary"></p><p data-i18n="weapon.help">Save a weapon, choose it in a unit's equipment slots, then start a new test arena.</p><p class="custom-warning" data-i18n="weapon.replaceWarning">Replacing a native skill can disable its transformations, summons or resource mechanics.</p><p data-i18n="weapon.burstHelp">Releasing the trigger finishes an accepted burst. Switching equipment, changing form, death or restarting cancels it.</p><p data-i18n="weapon.localOnly">Local visuals, no audio. Custom weapons are only available in the test arena.</p></section>
  </div>
 </dialog>
-<div id="custom-sandbox-controls" hidden><strong data-i18n="custom.arena">Separate test arena</strong><button id="custom-sandbox-reset" data-i18n="custom.reset">Restart</button><button id="custom-sandbox-stop" data-i18n="custom.stop">End test</button><span id="custom-sandbox-message" role="status"></span></div>
+<dialog id="solo-editor" aria-labelledby="solo-title">
+ <h2 id="solo-title" data-i18n="solo.title">Solo Test</h2>
+ <p data-i18n="solo.help">An isolated arena with no bots. Choose a character, add stationary targets, test death and respawn, or reset everything.</p>
+ <label for="solo-character" data-i18n="solo.character">Character</label><select id="solo-character"></select>
+ <p data-i18n="custom.controls">WASD to move, mouse to aim, left click to fire, 1–4 to select equipment.</p>
+ <div class="custom-actions"><button id="solo-start" data-i18n="custom.start">Start test</button><button id="solo-stop" disabled data-i18n="custom.stop">End test</button><button id="solo-close" data-i18n="custom.close">Close</button></div>
+ <p id="solo-message" role="status" aria-live="polite"></p>
+</dialog>
+<div id="custom-sandbox-controls" hidden><strong id="custom-sandbox-title" data-i18n="custom.arena">Separate test arena</strong><button id="solo-dummy" hidden data-i18n="solo.dummy">Add target dummy</button><button id="solo-kill" hidden data-i18n="solo.kill">Die / respawn</button><button id="custom-sandbox-reset" data-i18n="custom.reset">Restart</button><button id="custom-sandbox-stop" data-i18n="custom.stop">End test</button><span id="custom-sandbox-message" role="status"></span></div>
 <style>
+ #solo-editor{color:#dbeafe;background:#111f31;border:1px solid #47617e;border-radius:16px;padding:24px;width:min(600px,94vw);max-height:90vh;overflow:auto}#solo-editor::backdrop{background:#050e1cd9}#solo-editor select{display:block;width:100%;padding:10px;margin:12px 0;background:#0a1626;color:#e2e8f0}#solo-editor button{padding:8px 12px;border-radius:6px;background:#1a4260;color:white;border:1px solid #5783a5}#solo-message{color:#fcd34d}#custom-sandbox-controls button[hidden]{display:none}
  #custom-unit-editor{color:#dbeafe;background:#111f31;border:1px solid #47617e;border-radius:16px;padding:24px;width:min(1100px,94vw);max-height:90vh;overflow:auto;box-shadow:0 24px 80px #0009}
  #custom-unit-editor::backdrop{background:#050e1cd9}#custom-unit-editor header{display:flex;justify-content:space-between;align-items:center}#custom-unit-editor small{color:#7dd3fc;letter-spacing:.12em}#custom-unit-editor h2{margin:5px 0 14px}#custom-unit-editor h3{font-size:1.1rem;color:#a5d7ff}
  .custom-editor-grid{display:grid;grid-template-columns:210px minmax(240px,1fr) 260px;gap:24px}#custom-unit-editor label{display:flex;flex-direction:column;gap:5px;margin:12px 0}#custom-unit-editor input,#custom-unit-editor select{width:100%;background:#0a1626;color:#e2e8f0;border:1px solid #47617e;border-radius:6px;padding:8px}#custom-unit-editor button,#custom-sandbox-controls button{background:#1a4260;color:white;border:1px solid #5783a5;border-radius:6px;padding:8px 12px;cursor:pointer}#custom-unit-editor button:disabled{opacity:.45;cursor:default}#custom-unit-editor button:focus-visible{outline:3px solid #38bdf8;outline-offset:2px}
@@ -61,3 +70,4 @@
 </style>
 <script src="/src/custom-units/CustomUnitEditor.js"></script>
 <script src="/src/custom-units/CustomWeaponEditor.js"></script>
+<script src="/src/custom-units/SoloTest.js"></script>

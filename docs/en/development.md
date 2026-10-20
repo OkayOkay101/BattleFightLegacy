@@ -28,6 +28,15 @@ For the current source server, open `http://127.0.0.1/` (HTTP port 80). The game
 
 `launch-ai-gui.bat` is the Windows launcher for the training/server workflow. The portable executable does not require it. Do not change gameplay/schema/reward source while a frozen production training environment is running; keep diagnostics and fixtures out of the production optimizer and registry.
 
+## Solo regression checks
+
+```powershell
+node --test test/solo-mode.test.js test/solo-ui.test.js test/morrow-skills.test.js
+node --test test/solo-api.test.js test/solo-runtime.test.js test/custom-sandbox.test.js
+```
+
+The first command covers the native catalog, definitions, English/Thai UI wiring, marker timers and Atlas raycasts. The second starts real isolated loopback processes, checks API capabilities, movement, exact projectile damage with repeated/reversed callbacks and actual Box2D-generated impacts, banked redirection, warning persistence, reset, respawn and shutdown. It needs permission to listen on local ports. Test IPC/preloads are enabled only by the explicit test configuration. These checks do not prove every character's skill or visually validate an Electron build.
+
 ## Checkpoints and stopping
 
 `train:status` should be checked with live PID, `supervisor.lock.json`, timestamps and schema-specific checkpoint. Do not start a second supervisor against a locked production directory. Status, models, optimizer state and match logs under `training-data` are local runtime data, not documentation or distributable trainer assets.

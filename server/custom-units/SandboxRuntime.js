@@ -1,11 +1,15 @@
 'use strict';
 const fs = require('fs');
 const { compileUnit, catalog } = require('./CustomUnitStore');
+const { soloCatalog } = require('./SoloCatalog');
 const { installDemo } = require('../training/DemoRuntime');
 
 function loadSnapshot(game, file) {
  const snapshot = JSON.parse(fs.readFileSync(file, 'utf8'));
- const compiled = compileUnit(game, snapshot.unit, snapshot.weapons || []);
+ const native = snapshot.mode === 'solo' && soloCatalog(game).find(entry => entry.id === snapshot.unit.id && entry.available);
+ if (snapshot.mode === 'solo' && !native) throw new Error('Unknown playable character');
+ const compiled = native ? { id: native.id, profile: native.profile, formIds: {}, unitTypes: {}, itemTypes: {}, projectileTypes: {} }
+  : compileUnit(game, snapshot.unit, snapshot.weapons || []);
  Object.assign(game.unitTypes,compiled.unitTypes);
  Object.assign(game.itemTypes,compiled.itemTypes);
  Object.assign(game.projectileTypes,compiled.projectileTypes);
@@ -37,7 +41,9 @@ function installSandbox(ige, snapshot) {
  const runtime = installDemo(ige, { kind: 'heuristic', version: 'baseline' }, { selections: { blue: 'baseline', red: 'baseline' } });
  runtime.isCustomSandbox = true;
  runtime.snapshot = snapshot;
- require('./SandboxAdapters').installAdapters(ige,runtime,snapshot);
+ const solo = snapshot.mode === 'solo';
+ if (solo) runtime.attachCustomUnit = () => {};
+ else require('./SandboxAdapters').installAdapters(ige,runtime,snapshot);
  const scheduled = new Set();
  runtime.scheduleSandboxAction = (callback, delay) => {
   const timer = setTimeout(() => { scheduled.delete(timer); callback(); }, delay);
@@ -67,12 +73,13 @@ function installSandbox(ige, snapshot) {
   player._battleBot.previousCharacter = id;
   const unit = player.createUnit(data);
   runtime.attachCustomUnit(unit);
+  if (player._soloDummy) unit._stats.attributes.health.regenerateSpeed = 0;
   player.selectUnit(unit.id());
   runtime.stats.startLife({ playerId: player.id(), lifeId: unit.id(), characterId: id });
-  if (player._stats.controlledBy !== 'human') unit.addBehaviour('battleBotBrain', () => this._thinkBattleBot(player, unit));
+  if (player._stats.controlledBy !== 'human' && !player._soloDummy) unit.addBehaviour('battleBotBrain', () => this._thinkBattleBot(player, unit));
   return unit;
  };
- const spawn = (player, team) => {
+ const spawn = (player, team, requestedPosition) => {
   const leftSide = team === 'blue';
   player._battleBot = { leftSide, fixedCharacter: leftSide ? snapshot.compiled.id : opponent.id,
    previousCharacter: null, respawnTimer: null, thinkingAt: 0, lastPosition: null, stuckAt: 0 };
@@ -81,7 +88,7 @@ function installSandbox(ige, snapshot) {
   const type = ige.game.getAsset('playerTypes', leftSide ? 'NZRmXbrEjA' : 'A6C0imglP3');
   if (type?.attributes) player.updatePlayerType({ attributes: JSON.parse(JSON.stringify(type.attributes)), variables: type.variables || {} });
   runtime.stats.registerPlayer({ playerId: player.id(), teamId: team, characterId: player._battleBot.fixedCharacter });
-  const position = ige.game._pickBattleBotSpawn(leftSide, null, 20);
+  const position = requestedPosition || ige.game._pickBattleBotSpawn(leftSide, null, 20);
   if (!position) throw new Error('No clear sandbox spawn');
   ige.game._spawnBattleBotUnit(player, position, leftSide ? 0 : Math.PI);
   participants.add(player);
@@ -90,6 +97,7 @@ function installSandbox(ige, snapshot) {
   game.battleBotRoster = [snapshot.compiled.profile, ...Object.entries(snapshot.compiled.formIds)
    .filter(([,id])=>id!==snapshot.unit.id).map(([baseId,id])=>({...snapshot.compiled.profile,id})), opponent];
   for (const team of ['blue', 'red']) {
+   if (solo) continue;
    if (team === 'blue' && snapshot.controller === 'human') continue;
    const player = game.createPlayer({ name: team === 'blue' ? snapshot.unit.name : opponent.name,
     controlledBy: 'computer', playerTypeId: team === 'blue' ? 'NZRmXbrEjA' : 'A6C0imglP3',
@@ -103,9 +111,42 @@ function installSandbox(ige, snapshot) {
   player._stats.isSpectator = snapshot.controller !== 'human' || occupied;
   if (!player._stats.isSpectator && !player._battleBot) spawn(player, 'blue');
  };
+ runtime.addSoloDummy = () => {
+  if (!solo) throw new Error('Solo Test required');
+  const human = [...participants].find(p => p._stats.controlledBy === 'human' && ige.$(p.id()));
+  const source = human?.getSelectedUnit();
+  if (!source || source._stats.attributes.health.value <= 0) throw new Error('Enter the arena first');
+  if ([...participants].filter(p => p._soloDummy).length >= 16) throw new Error('Maximum 16 target dummies');
+  let position;
+  for (const distance of [180, 250, 320]) for (const angle of [0, Math.PI / 2, Math.PI, -Math.PI / 2]) {
+   const candidate = { x: source._translate.x + Math.cos(angle) * distance, y: source._translate.y + Math.sin(angle) * distance };
+   const unoccupied = ige.$$('unit').every(unit => {
+    if (unit._alive === false || unit._stats.attributes.health.value <= 0) return true;
+    const body = unit._stats.currentBody || {};
+    const radius = Math.max(25, Math.hypot(Number(body.width) || 0, Number(body.height) || 0) / 2);
+    return Math.hypot(unit._translate.x - candidate.x, unit._translate.y - candidate.y) > radius + 39;
+   });
+   if (!position && unoccupied && ige.game._battleBotClearPosition(candidate, 35) && source.ai.battleBotHasLineOfSight(ige.map.data, 1, 1, ige.scaleMapDetails.tileWidth, source._translate, candidate)) position = candidate;
+  }
+  if (!position) throw new Error('No clear position near the player');
+  const player = ige.game.createPlayer({ name: 'Target dummy', controlledBy: 'computer', playerTypeId: 'A6C0imglP3', isBattleBot: true, unitIds: [] });
+  player._soloDummy = true;
+  spawn(player, 'red', position);
+  return runtime.status();
+ };
+ runtime.killSoloPlayer = () => {
+  if (!solo) throw new Error('Solo Test required');
+  const player = [...participants].find(p => p._stats.controlledBy === 'human' && ige.$(p.id()));
+  const unit = player?.getSelectedUnit();
+  if (!unit || unit._stats.attributes.health.value <= 0) throw new Error('No living player');
+  // Test the death/respawn lifecycle even for forms whose native health floor is 1.
+  unit._stats.attributes.health.min = 0;
+  unit.attribute.update('health', 0);
+  return runtime.status();
+ };
  const status = runtime.status.bind(runtime);
  runtime.status = () => ({ ...status(), sandbox: { customId: snapshot.unit.id, revision: snapshot.unit.revision,
-  controller: snapshot.controller, opponent: snapshot.opponent } });
+  controller: snapshot.controller, opponent: snapshot.opponent, mode: solo ? 'solo' : 'custom' } });
  // Count human kills exactly like heuristic kills in this isolated runtime.
  const originalDeath = ige.game.handleBattleBotDeath;
  const recordDeath = runtime.recordBotDeath.bind(runtime);
@@ -134,6 +175,7 @@ function installSandbox(ige, snapshot) {
   runtime.resetExhibition();
   for (const player of [...participants]) {
    if (!ige.$(player.id())) { participants.delete(player); continue; }
+   if (solo && player._soloDummy) { participants.delete(player); player.destroy(); continue; }
    spawn(player, player._stats.trainingTeamId);
   }
   if (ige.game.killFeed) ige.game.killFeed = new (require('../KillFeed').KillFeed)();

@@ -134393,6 +134393,220 @@
         "instancedMesh": false,
         "is3DObject": false,
         "threeD": {}
+      },
+      "ol_eJa6Cej": {
+        "inventoryImage": "/assets/morrow/marker.png",
+        "name": "Morrow Compass Bolt",
+        "attributes": {},
+        "variables": {},
+        "states": {
+          "zTzPFYOZkc": {
+            "name": "default",
+            "sound": {},
+            "particles": {},
+            "animation": "default",
+            "body": "default"
+          }
+        },
+        "animations": {
+          "default": {
+            "name": "default",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          }
+        },
+        "bodies": {
+          "default": {
+            "bullet": true,
+            "name": "default",
+            "type": "dynamic",
+            "width": 44,
+            "height": 44,
+            "z-index": {
+              "layer": 3,
+              "depth": 1
+            },
+            "fixedRotation": false,
+            "constantSpeed +DestroyedOnCollisionWithWall/unit": true,
+            "allowSleep": false,
+            "collidesWith": {
+              "debris": false,
+              "walls": true,
+              "projectiles": false,
+              "items": true,
+              "units": true
+            },
+            "angularDamping": 1,
+            "linearDamping": 0,
+            "rotationSpeed": 1,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 1,
+                "friction": 0,
+                "restitution": 0,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": true
+              }
+            ],
+            "jointType": "weldJoint",
+            "unitAnchor": {
+              "x": 0,
+              "y": 33,
+              "rotation": 0
+            },
+            "itemAnchor": {
+              "x": 0,
+              "y": 0,
+              "lowerAngle": 0,
+              "upperAngle": 0
+            },
+            "affectedByGravity": false
+          }
+        },
+        "destroyTimer": 1500,
+        "cellSheet": {
+          "url": "/assets/morrow/marker.png",
+          "rowCount": 1,
+          "columnCount": 1
+        },
+        "lifeSpan": 2400,
+        "effects": {
+          "create": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "destroy": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          }
+        },
+        "destroyOnContactWith": {
+          "debris": true,
+          "walls": true,
+          "projectiles": false,
+          "items": true,
+          "units": true
+        },
+        "confinedWithinMapBoundaries": true,
+        "scripts": {},
+        "streamMode": 1
+      },
+      "Z1m9TfXgfi": {
+        "inventoryImage": "/assets/morrow/marker.png",
+        "name": "Morrow Banked Route",
+        "attributes": {},
+        "variables": {},
+        "states": {
+          "zTzPFYOZkc": {
+            "name": "default",
+            "sound": {},
+            "particles": {},
+            "animation": "default",
+            "body": "default"
+          }
+        },
+        "animations": {
+          "default": {
+            "name": "default",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          }
+        },
+        "bodies": {
+          "default": {
+            "bullet": true,
+            "name": "default",
+            "type": "dynamic",
+            "width": 44,
+            "height": 44,
+            "z-index": {
+              "layer": 3,
+              "depth": 1
+            },
+            "fixedRotation": false,
+            "constantSpeed +DestroyedOnCollisionWithWall/unit": true,
+            "allowSleep": false,
+            "collidesWith": {
+              "debris": false,
+              "walls": true,
+              "projectiles": false,
+              "items": true,
+              "units": true
+            },
+            "angularDamping": 1,
+            "linearDamping": 0,
+            "rotationSpeed": 1,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 1,
+                "friction": 0,
+                "restitution": 0,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": true
+              }
+            ],
+            "jointType": "weldJoint",
+            "unitAnchor": {
+              "x": 0,
+              "y": 33,
+              "rotation": 0
+            },
+            "itemAnchor": {
+              "x": 0,
+              "y": 0,
+              "lowerAngle": 0,
+              "upperAngle": 0
+            },
+            "affectedByGravity": false
+          }
+        },
+        "destroyTimer": 1500,
+        "cellSheet": {
+          "url": "/assets/morrow/marker.png",
+          "rowCount": 1,
+          "columnCount": 1
+        },
+        "lifeSpan": 2400,
+        "effects": {
+          "create": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "destroy": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          }
+        },
+        "destroyOnContactWith": {
+          "debris": true,
+          "walls": true,
+          "projectiles": false,
+          "items": true,
+          "units": true
+        },
+        "confinedWithinMapBoundaries": true,
+        "scripts": {},
+        "streamMode": 1
       }
     },
     "itemTypes": {
@@ -276583,6 +276797,1789 @@
         "streamMode": 1,
         "showCDOverlay": true,
         "id": "DiVZAFoB4m"
+      },
+      "3IP3slslrx": {
+        "delayBeforeUse": 0,
+        "bulletStartPosition": {
+          "rotation": 0,
+          "y": 15,
+          "x": 0
+        },
+        "name": "Compass Bolt",
+        "handle": "Compass Bolt",
+        "attributes": {},
+        "variables": {},
+        "cellSheet": {
+          "url": "/assets/morrow/morrow.png",
+          "rowCount": 1,
+          "columnCount": 1
+        },
+        "inventoryImage": "/assets/morrow/morrow.png",
+        "isStackable": false,
+        "isPurchasable": false,
+        "canBePurchasedBy": [],
+        "isGun": true,
+        "bulletDestroyedOnCollisionWithWall/unitType": "projectile",
+        "type": "weapon",
+        "hits": [],
+        "states": {
+          "selected": {
+            "name": "selected",
+            "animation": "default",
+            "body": "selected",
+            "particles": {},
+            "sound": {}
+          },
+          "unselected": {
+            "name": "unselected",
+            "animation": "default",
+            "body": "none",
+            "particles": {},
+            "sound": {}
+          },
+          "dropped": {
+            "name": "dropped",
+            "animation": "dropped",
+            "body": "dropped",
+            "particles": {},
+            "sound": {}
+          }
+        },
+        "animations": {
+          "default": {
+            "name": "default",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          },
+          "dropped": {
+            "name": "dropped",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          }
+        },
+        "bodies": {
+          "selected": {
+            "name": "selected",
+            "type": "spriteOnly",
+            "width": 28,
+            "height": 72,
+            "z-index": {
+              "layer": 3,
+              "depth": 4
+            },
+            "fixedRotation": false,
+            "constantSpeed +DestroyedOnCollisionWithWall/unit": false,
+            "allowSleep": true,
+            "collidesWith": {
+              "units": true,
+              "items": true,
+              "projectiles": true,
+              "walls": true,
+              "debris": false
+            },
+            "angularDamping": 1,
+            "linearDamping": 5,
+            "rotationSpeed": 3,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 1,
+                "friction": 0.01,
+                "restitution": 0.01,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": false
+              }
+            ],
+            "jointType": "weldJoint",
+            "unitAnchor": {
+              "x": 0,
+              "y": 60
+            },
+            "itemAnchor": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          "dropped": {
+            "bullet": false,
+            "name": "dropped",
+            "type": "dynamic",
+            "width": 12,
+            "height": 71,
+            "z-index": {
+              "layer": 1,
+              "depth": 2
+            },
+            "fixedRotation": false,
+            "constantSpeed +DestroyedOnCollisionWithWall/unit": false,
+            "allowSleep": true,
+            "collidesWith": {
+              "units": false,
+              "items": false,
+              "projectiles": false,
+              "walls": true,
+              "debris": false
+            },
+            "angularDamping": 1,
+            "linearDamping": 1,
+            "rotationSpeed": 1,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 1,
+                "friction": 0,
+                "restitution": 0,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": false
+              }
+            ],
+            "jointType": "weldJoint",
+            "unitAnchor": {
+              "x": 0,
+              "y": 76
+            },
+            "itemAnchor": {
+              "x": 0,
+              "y": 58
+            },
+            "affectedByGravity": false
+          }
+        },
+        "hideIfUnaffordable": false,
+        "quantity": null,
+        "maxQuantity": null,
+        "description": "Scorches an area in front of him with flames, dealing high damage in a short range.<br>\nDamage = 10<br>\nProjectile Speed = 12<br>\nUse Time = 50<br>",
+        "reloadRate": 700,
+        "recoilForce": 0,
+        "fireRate": 700,
+        "bulletDestroyedOnCollisionWithWall/unitForce": 20,
+        "knockbackForce": 0,
+        "effects": {
+          "use": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "tween": "none",
+            "runScript": ""
+          },
+          "create": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "destroy": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "reload": {
+            "sound": {},
+            "animation": ""
+          },
+          "empty": {
+            "sound": {},
+            "animation": ""
+          }
+        },
+        "bulletDestroyedOnCollisionWithWall/unitStartPosition": {
+          "x": -5,
+          "y": -12,
+          "rotation": 0
+        },
+        "bulletDestroyedOnCollisionWithWall/unitDistance": 1300,
+        "penetration": false,
+        "destroyTimer": 100000,
+        "particles": {},
+        "damage": {
+          "unitAttributes": {},
+          "targetsAffected": []
+        },
+        "sound": {},
+        "canBeUsedBy": [],
+        "isUsedOnPickup": false,
+        "removeWhenEmpty": false,
+        "bonus": {
+          "consume": {
+            "playerAttribute": {},
+            "unitAttribute": {}
+          },
+          "passive": {
+            "playerAttribute": {},
+            "unitAttribute": {},
+            "isDisabledInBackpack": false
+          }
+        },
+        "cost": {
+          "quantity": 1
+        },
+        "buffTypes": [],
+        "carriedBy": [],
+        "frames": {},
+        "bulletType": "projectile",
+        "bulletForce": 12,
+        "bulletDistance": 1300,
+        "controls": {
+          "undroppable": true,
+          "permittedInventorySlots": [],
+          "mouseBehaviour": {
+            "rotateToFaceMouseCursor": true,
+            "flipSpriteHorizontallyWRTMouse": true
+          },
+          "canMerge": false,
+          "backpackAllowed": false
+        },
+        "deployMethod": "setVelocity",
+        "scripts": {
+          "ZZdMrz4dQY": {
+            "key": "ZZdMrz4dQY",
+            "name": "Compass Bolt Use",
+            "parent": "3IP3slslrx",
+            "triggers": [
+              {
+                "type": "itemIsUsed"
+              }
+            ],
+            "conditions": [
+              {
+                "operator": "==",
+                "operandType": "boolean"
+              },
+              true,
+              true
+            ],
+            "actions": [
+              {
+                "type": "createProjectileAtPosition",
+                "projectileType": "ol_eJa6Cej",
+                "unit": {
+                  "function": "getTriggeringUnit"
+                },
+                "position": {
+                  "function": "getPositionInFrontOfPosition",
+                  "position": {
+                    "function": "getEntityPosition",
+                    "entity": {
+                      "function": "getTriggeringUnit"
+                    }
+                  },
+                  "distance": 34,
+                  "angle": {
+                    "function": "angleBetweenPositions",
+                    "positionA": {
+                      "function": "getEntityPosition",
+                      "entity": {
+                        "function": "getTriggeringUnit"
+                      }
+                    },
+                    "positionB": {
+                      "function": "getMouseCursorPosition",
+                      "player": {
+                        "function": "getOwner",
+                        "entity": {
+                          "function": "getTriggeringUnit"
+                        }
+                      }
+                    }
+                  }
+                },
+                "force": 25,
+                "angle": {
+                  "function": "angleBetweenPositions",
+                  "positionA": {
+                    "function": "getEntityPosition",
+                    "entity": {
+                      "function": "getTriggeringUnit"
+                    }
+                  },
+                  "positionB": {
+                    "function": "getMouseCursorPosition",
+                    "player": {
+                      "function": "getOwner",
+                      "entity": {
+                        "function": "getTriggeringUnit"
+                      }
+                    }
+                  }
+                },
+                "damage": 12
+              }
+            ]
+          }
+        },
+        "projectileStreamMode": 1,
+        "lifeSpan": 0,
+        "ignoreServerStream": false,
+        "confinedWithinMapBoundaries": true,
+        "streamMode": 1,
+        "showCDOverlay": false,
+        "projectileType": ""
+      },
+      "wfils6EYBv": {
+        "delayBeforeUse": 0,
+        "bulletStartPosition": {
+          "rotation": 0,
+          "y": 15,
+          "x": 0
+        },
+        "name": "Pin the Map",
+        "handle": "Pin the Map",
+        "attributes": {},
+        "variables": {},
+        "cellSheet": {
+          "url": "/assets/morrow/morrow.png",
+          "rowCount": 1,
+          "columnCount": 1
+        },
+        "inventoryImage": "/assets/morrow/morrow.png",
+        "isStackable": false,
+        "isPurchasable": false,
+        "canBePurchasedBy": [],
+        "isGun": true,
+        "bulletDestroyedOnCollisionWithWall/unitType": "projectile",
+        "type": "weapon",
+        "hits": [],
+        "states": {
+          "selected": {
+            "name": "selected",
+            "animation": "default",
+            "body": "selected",
+            "particles": {},
+            "sound": {}
+          },
+          "unselected": {
+            "name": "unselected",
+            "animation": "default",
+            "body": "none",
+            "particles": {},
+            "sound": {}
+          },
+          "dropped": {
+            "name": "dropped",
+            "animation": "dropped",
+            "body": "dropped",
+            "particles": {},
+            "sound": {}
+          }
+        },
+        "animations": {
+          "default": {
+            "name": "default",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          },
+          "dropped": {
+            "name": "dropped",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          }
+        },
+        "bodies": {
+          "selected": {
+            "name": "selected",
+            "type": "spriteOnly",
+            "width": 28,
+            "height": 72,
+            "z-index": {
+              "layer": 3,
+              "depth": 4
+            },
+            "fixedRotation": false,
+            "constantSpeed +DestroyedOnCollisionWithWall/unit": false,
+            "allowSleep": true,
+            "collidesWith": {
+              "units": true,
+              "items": true,
+              "projectiles": true,
+              "walls": true,
+              "debris": false
+            },
+            "angularDamping": 1,
+            "linearDamping": 5,
+            "rotationSpeed": 3,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 1,
+                "friction": 0.01,
+                "restitution": 0.01,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": false
+              }
+            ],
+            "jointType": "weldJoint",
+            "unitAnchor": {
+              "x": 0,
+              "y": 60
+            },
+            "itemAnchor": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          "dropped": {
+            "bullet": false,
+            "name": "dropped",
+            "type": "dynamic",
+            "width": 12,
+            "height": 71,
+            "z-index": {
+              "layer": 1,
+              "depth": 2
+            },
+            "fixedRotation": false,
+            "constantSpeed +DestroyedOnCollisionWithWall/unit": false,
+            "allowSleep": true,
+            "collidesWith": {
+              "units": false,
+              "items": false,
+              "projectiles": false,
+              "walls": true,
+              "debris": false
+            },
+            "angularDamping": 1,
+            "linearDamping": 1,
+            "rotationSpeed": 1,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 1,
+                "friction": 0,
+                "restitution": 0,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": false
+              }
+            ],
+            "jointType": "weldJoint",
+            "unitAnchor": {
+              "x": 0,
+              "y": 76
+            },
+            "itemAnchor": {
+              "x": 0,
+              "y": 58
+            },
+            "affectedByGravity": false
+          }
+        },
+        "hideIfUnaffordable": false,
+        "quantity": null,
+        "maxQuantity": null,
+        "description": "Scorches an area in front of him with flames, dealing high damage in a short range.<br>\nDamage = 10<br>\nProjectile Speed = 12<br>\nUse Time = 50<br>",
+        "reloadRate": 9000,
+        "recoilForce": 0,
+        "fireRate": 9000,
+        "bulletDestroyedOnCollisionWithWall/unitForce": 20,
+        "knockbackForce": 0,
+        "effects": {
+          "use": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "tween": "none",
+            "runScript": ""
+          },
+          "create": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "destroy": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "reload": {
+            "sound": {},
+            "animation": ""
+          },
+          "empty": {
+            "sound": {},
+            "animation": ""
+          }
+        },
+        "bulletDestroyedOnCollisionWithWall/unitStartPosition": {
+          "x": -5,
+          "y": -12,
+          "rotation": 0
+        },
+        "bulletDestroyedOnCollisionWithWall/unitDistance": 1300,
+        "penetration": false,
+        "destroyTimer": 100000,
+        "particles": {},
+        "damage": {
+          "unitAttributes": {},
+          "targetsAffected": []
+        },
+        "sound": {},
+        "canBeUsedBy": [],
+        "isUsedOnPickup": false,
+        "removeWhenEmpty": false,
+        "bonus": {
+          "consume": {
+            "playerAttribute": {},
+            "unitAttribute": {}
+          },
+          "passive": {
+            "playerAttribute": {},
+            "unitAttribute": {},
+            "isDisabledInBackpack": false
+          }
+        },
+        "cost": {
+          "quantity": 1
+        },
+        "buffTypes": [],
+        "carriedBy": [],
+        "frames": {},
+        "bulletType": "projectile",
+        "bulletForce": 12,
+        "bulletDistance": 1300,
+        "controls": {
+          "undroppable": true,
+          "permittedInventorySlots": [],
+          "mouseBehaviour": {
+            "rotateToFaceMouseCursor": true,
+            "flipSpriteHorizontallyWRTMouse": true
+          },
+          "canMerge": false,
+          "backpackAllowed": false
+        },
+        "deployMethod": "setVelocity",
+        "scripts": {
+          "ltEkTu_-x9": {
+            "key": "ltEkTu_-x9",
+            "name": "Pin the Map Use",
+            "parent": "wfils6EYBv",
+            "triggers": [
+              {
+                "type": "itemIsUsed"
+              }
+            ],
+            "conditions": [
+              {
+                "operator": "==",
+                "operandType": "boolean"
+              },
+              true,
+              true
+            ],
+            "actions": [
+              {
+                "type": "placeMorrowMarker",
+                "itemType": "pTci7A1HLy",
+                "unit": {
+                  "function": "getTriggeringUnit"
+                },
+                "position": {
+                  "function": "getMouseCursorPosition",
+                  "player": {
+                    "function": "getOwner",
+                    "entity": {
+                      "function": "getTriggeringUnit"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "projectileStreamMode": 1,
+        "lifeSpan": 0,
+        "ignoreServerStream": false,
+        "confinedWithinMapBoundaries": true,
+        "streamMode": 1,
+        "showCDOverlay": false,
+        "projectileType": ""
+      },
+      "_TPa_xNT-C": {
+        "delayBeforeUse": 0,
+        "bulletStartPosition": {
+          "rotation": 0,
+          "y": 15,
+          "x": 0
+        },
+        "name": "Banked Delivery",
+        "handle": "Banked Delivery",
+        "attributes": {},
+        "variables": {},
+        "cellSheet": {
+          "url": "/assets/morrow/morrow.png",
+          "rowCount": 1,
+          "columnCount": 1
+        },
+        "inventoryImage": "/assets/morrow/morrow.png",
+        "isStackable": false,
+        "isPurchasable": false,
+        "canBePurchasedBy": [],
+        "isGun": true,
+        "bulletDestroyedOnCollisionWithWall/unitType": "projectile",
+        "type": "weapon",
+        "hits": [],
+        "states": {
+          "selected": {
+            "name": "selected",
+            "animation": "default",
+            "body": "selected",
+            "particles": {},
+            "sound": {}
+          },
+          "unselected": {
+            "name": "unselected",
+            "animation": "default",
+            "body": "none",
+            "particles": {},
+            "sound": {}
+          },
+          "dropped": {
+            "name": "dropped",
+            "animation": "dropped",
+            "body": "dropped",
+            "particles": {},
+            "sound": {}
+          }
+        },
+        "animations": {
+          "default": {
+            "name": "default",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          },
+          "dropped": {
+            "name": "dropped",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          }
+        },
+        "bodies": {
+          "selected": {
+            "name": "selected",
+            "type": "spriteOnly",
+            "width": 28,
+            "height": 72,
+            "z-index": {
+              "layer": 3,
+              "depth": 4
+            },
+            "fixedRotation": false,
+            "constantSpeed +DestroyedOnCollisionWithWall/unit": false,
+            "allowSleep": true,
+            "collidesWith": {
+              "units": true,
+              "items": true,
+              "projectiles": true,
+              "walls": true,
+              "debris": false
+            },
+            "angularDamping": 1,
+            "linearDamping": 5,
+            "rotationSpeed": 3,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 1,
+                "friction": 0.01,
+                "restitution": 0.01,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": false
+              }
+            ],
+            "jointType": "weldJoint",
+            "unitAnchor": {
+              "x": 0,
+              "y": 60
+            },
+            "itemAnchor": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          "dropped": {
+            "bullet": false,
+            "name": "dropped",
+            "type": "dynamic",
+            "width": 12,
+            "height": 71,
+            "z-index": {
+              "layer": 1,
+              "depth": 2
+            },
+            "fixedRotation": false,
+            "constantSpeed +DestroyedOnCollisionWithWall/unit": false,
+            "allowSleep": true,
+            "collidesWith": {
+              "units": false,
+              "items": false,
+              "projectiles": false,
+              "walls": true,
+              "debris": false
+            },
+            "angularDamping": 1,
+            "linearDamping": 1,
+            "rotationSpeed": 1,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 1,
+                "friction": 0,
+                "restitution": 0,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": false
+              }
+            ],
+            "jointType": "weldJoint",
+            "unitAnchor": {
+              "x": 0,
+              "y": 76
+            },
+            "itemAnchor": {
+              "x": 0,
+              "y": 58
+            },
+            "affectedByGravity": false
+          }
+        },
+        "hideIfUnaffordable": false,
+        "quantity": null,
+        "maxQuantity": null,
+        "description": "Scorches an area in front of him with flames, dealing high damage in a short range.<br>\nDamage = 10<br>\nProjectile Speed = 12<br>\nUse Time = 50<br>",
+        "reloadRate": 7500,
+        "recoilForce": 0,
+        "fireRate": 7500,
+        "bulletDestroyedOnCollisionWithWall/unitForce": 20,
+        "knockbackForce": 0,
+        "effects": {
+          "use": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "tween": "none",
+            "runScript": ""
+          },
+          "create": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "destroy": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "reload": {
+            "sound": {},
+            "animation": ""
+          },
+          "empty": {
+            "sound": {},
+            "animation": ""
+          }
+        },
+        "bulletDestroyedOnCollisionWithWall/unitStartPosition": {
+          "x": -5,
+          "y": -12,
+          "rotation": 0
+        },
+        "bulletDestroyedOnCollisionWithWall/unitDistance": 1300,
+        "penetration": false,
+        "destroyTimer": 100000,
+        "particles": {},
+        "damage": {
+          "unitAttributes": {},
+          "targetsAffected": []
+        },
+        "sound": {},
+        "canBeUsedBy": [],
+        "isUsedOnPickup": false,
+        "removeWhenEmpty": false,
+        "bonus": {
+          "consume": {
+            "playerAttribute": {},
+            "unitAttribute": {}
+          },
+          "passive": {
+            "playerAttribute": {},
+            "unitAttribute": {},
+            "isDisabledInBackpack": false
+          }
+        },
+        "cost": {
+          "quantity": 1
+        },
+        "buffTypes": [],
+        "carriedBy": [],
+        "frames": {},
+        "bulletType": "projectile",
+        "bulletForce": 12,
+        "bulletDistance": 1300,
+        "controls": {
+          "undroppable": true,
+          "permittedInventorySlots": [],
+          "mouseBehaviour": {
+            "rotateToFaceMouseCursor": true,
+            "flipSpriteHorizontallyWRTMouse": true
+          },
+          "canMerge": false,
+          "backpackAllowed": false
+        },
+        "deployMethod": "setVelocity",
+        "scripts": {
+          "6BwS8edtg5": {
+            "key": "6BwS8edtg5",
+            "name": "Banked Delivery Use",
+            "parent": "_TPa_xNT-C",
+            "triggers": [
+              {
+                "type": "itemIsUsed"
+              }
+            ],
+            "conditions": [
+              {
+                "operator": "==",
+                "operandType": "boolean"
+              },
+              true,
+              true
+            ],
+            "actions": [
+              {
+                "type": "createProjectileAtPosition",
+                "projectileType": "Z1m9TfXgfi",
+                "unit": {
+                  "function": "getTriggeringUnit"
+                },
+                "position": {
+                  "function": "getPositionInFrontOfPosition",
+                  "position": {
+                    "function": "getEntityPosition",
+                    "entity": {
+                      "function": "getTriggeringUnit"
+                    }
+                  },
+                  "distance": 34,
+                  "angle": {
+                    "function": "angleBetweenPositions",
+                    "positionA": {
+                      "function": "getEntityPosition",
+                      "entity": {
+                        "function": "getTriggeringUnit"
+                      }
+                    },
+                    "positionB": {
+                      "function": "getMouseCursorPosition",
+                      "player": {
+                        "function": "getOwner",
+                        "entity": {
+                          "function": "getTriggeringUnit"
+                        }
+                      }
+                    }
+                  }
+                },
+                "force": 23,
+                "angle": {
+                  "function": "angleBetweenPositions",
+                  "positionA": {
+                    "function": "getEntityPosition",
+                    "entity": {
+                      "function": "getTriggeringUnit"
+                    }
+                  },
+                  "positionB": {
+                    "function": "getMouseCursorPosition",
+                    "player": {
+                      "function": "getOwner",
+                      "entity": {
+                        "function": "getTriggeringUnit"
+                      }
+                    }
+                  }
+                },
+                "damage": 22,
+                "morrowBanked": true
+              }
+            ]
+          }
+        },
+        "projectileStreamMode": 1,
+        "lifeSpan": 0,
+        "ignoreServerStream": false,
+        "confinedWithinMapBoundaries": true,
+        "streamMode": 1,
+        "showCDOverlay": false,
+        "projectileType": ""
+      },
+      "JQccvRVdSP": {
+        "delayBeforeUse": 0,
+        "bulletStartPosition": {
+          "rotation": 0,
+          "y": 15,
+          "x": 0
+        },
+        "name": "Atlas Unfolded",
+        "handle": "Atlas Unfolded",
+        "attributes": {},
+        "variables": {},
+        "cellSheet": {
+          "url": "/assets/morrow/morrow.png",
+          "rowCount": 1,
+          "columnCount": 1
+        },
+        "inventoryImage": "/assets/morrow/morrow.png",
+        "isStackable": false,
+        "isPurchasable": false,
+        "canBePurchasedBy": [],
+        "isGun": true,
+        "bulletDestroyedOnCollisionWithWall/unitType": "projectile",
+        "type": "weapon",
+        "hits": [],
+        "states": {
+          "selected": {
+            "name": "selected",
+            "animation": "default",
+            "body": "selected",
+            "particles": {},
+            "sound": {}
+          },
+          "unselected": {
+            "name": "unselected",
+            "animation": "default",
+            "body": "none",
+            "particles": {},
+            "sound": {}
+          },
+          "dropped": {
+            "name": "dropped",
+            "animation": "dropped",
+            "body": "dropped",
+            "particles": {},
+            "sound": {}
+          }
+        },
+        "animations": {
+          "default": {
+            "name": "default",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          },
+          "dropped": {
+            "name": "dropped",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          }
+        },
+        "bodies": {
+          "selected": {
+            "name": "selected",
+            "type": "spriteOnly",
+            "width": 28,
+            "height": 72,
+            "z-index": {
+              "layer": 3,
+              "depth": 4
+            },
+            "fixedRotation": false,
+            "constantSpeed +DestroyedOnCollisionWithWall/unit": false,
+            "allowSleep": true,
+            "collidesWith": {
+              "units": true,
+              "items": true,
+              "projectiles": true,
+              "walls": true,
+              "debris": false
+            },
+            "angularDamping": 1,
+            "linearDamping": 5,
+            "rotationSpeed": 3,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 1,
+                "friction": 0.01,
+                "restitution": 0.01,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": false
+              }
+            ],
+            "jointType": "weldJoint",
+            "unitAnchor": {
+              "x": 0,
+              "y": 60
+            },
+            "itemAnchor": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          "dropped": {
+            "bullet": false,
+            "name": "dropped",
+            "type": "dynamic",
+            "width": 12,
+            "height": 71,
+            "z-index": {
+              "layer": 1,
+              "depth": 2
+            },
+            "fixedRotation": false,
+            "constantSpeed +DestroyedOnCollisionWithWall/unit": false,
+            "allowSleep": true,
+            "collidesWith": {
+              "units": false,
+              "items": false,
+              "projectiles": false,
+              "walls": true,
+              "debris": false
+            },
+            "angularDamping": 1,
+            "linearDamping": 1,
+            "rotationSpeed": 1,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 1,
+                "friction": 0,
+                "restitution": 0,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": false
+              }
+            ],
+            "jointType": "weldJoint",
+            "unitAnchor": {
+              "x": 0,
+              "y": 76
+            },
+            "itemAnchor": {
+              "x": 0,
+              "y": 58
+            },
+            "affectedByGravity": false
+          }
+        },
+        "hideIfUnaffordable": false,
+        "quantity": null,
+        "maxQuantity": null,
+        "description": "Scorches an area in front of him with flames, dealing high damage in a short range.<br>\nDamage = 10<br>\nProjectile Speed = 12<br>\nUse Time = 50<br>",
+        "reloadRate": 14000,
+        "recoilForce": 0,
+        "fireRate": 14000,
+        "bulletDestroyedOnCollisionWithWall/unitForce": 20,
+        "knockbackForce": 0,
+        "effects": {
+          "use": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "tween": "none",
+            "runScript": ""
+          },
+          "create": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "destroy": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "reload": {
+            "sound": {},
+            "animation": ""
+          },
+          "empty": {
+            "sound": {},
+            "animation": ""
+          }
+        },
+        "bulletDestroyedOnCollisionWithWall/unitStartPosition": {
+          "x": -5,
+          "y": -12,
+          "rotation": 0
+        },
+        "bulletDestroyedOnCollisionWithWall/unitDistance": 1300,
+        "penetration": false,
+        "destroyTimer": 100000,
+        "particles": {},
+        "damage": {
+          "unitAttributes": {},
+          "targetsAffected": []
+        },
+        "sound": {},
+        "canBeUsedBy": [],
+        "isUsedOnPickup": false,
+        "removeWhenEmpty": false,
+        "bonus": {
+          "consume": {
+            "playerAttribute": {},
+            "unitAttribute": {}
+          },
+          "passive": {
+            "playerAttribute": {},
+            "unitAttribute": {},
+            "isDisabledInBackpack": false
+          }
+        },
+        "cost": {
+          "quantity": 1
+        },
+        "buffTypes": [],
+        "carriedBy": [],
+        "frames": {},
+        "bulletType": "projectile",
+        "bulletForce": 12,
+        "bulletDistance": 1300,
+        "controls": {
+          "undroppable": true,
+          "permittedInventorySlots": [],
+          "mouseBehaviour": {
+            "rotateToFaceMouseCursor": true,
+            "flipSpriteHorizontallyWRTMouse": true
+          },
+          "canMerge": false,
+          "backpackAllowed": false
+        },
+        "deployMethod": "setVelocity",
+        "scripts": {
+          "4pTaFywruJ": {
+            "key": "4pTaFywruJ",
+            "name": "Atlas Unfolded Use",
+            "parent": "JQccvRVdSP",
+            "triggers": [
+              {
+                "type": "itemIsUsed"
+              }
+            ],
+            "conditions": [
+              {
+                "operator": "==",
+                "operandType": "boolean"
+              },
+              true,
+              true
+            ],
+            "actions": [
+              {
+                "type": "createMorrowAtlasUnfolded",
+                "unit": {
+                  "function": "getTriggeringUnit"
+                }
+              }
+            ]
+          }
+        },
+        "projectileStreamMode": 1,
+        "lifeSpan": 0,
+        "ignoreServerStream": false,
+        "confinedWithinMapBoundaries": true,
+        "streamMode": 1,
+        "showCDOverlay": false,
+        "projectileType": ""
+      },
+      "pTci7A1HLy": {
+        "delayBeforeUse": 0,
+        "bulletStartPosition": {
+          "rotation": 0,
+          "y": 15,
+          "x": 0
+        },
+        "name": "Morrow Route Marker",
+        "handle": "",
+        "attributes": {},
+        "variables": {},
+        "cellSheet": {
+          "url": "/assets/morrow/marker.png",
+          "rowCount": 1,
+          "columnCount": 1
+        },
+        "inventoryImage": "/assets/morrow/marker.png",
+        "isStackable": false,
+        "isPurchasable": false,
+        "canBePurchasedBy": [],
+        "isGun": false,
+        "bulletDestroyedOnCollisionWithWall/unitType": "projectile",
+        "type": "item",
+        "hits": [],
+        "states": {
+          "selected": {
+            "name": "selected",
+            "animation": "default",
+            "body": "none",
+            "particles": {},
+            "sound": {}
+          },
+          "unselected": {
+            "name": "unselected",
+            "animation": "default",
+            "body": "none",
+            "particles": {},
+            "sound": {}
+          },
+          "dropped": {
+            "name": "dropped",
+            "animation": "dropped",
+            "body": "dropped",
+            "particles": {},
+            "sound": {}
+          }
+        },
+        "animations": {
+          "default": {
+            "name": "default",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          },
+          "dropped": {
+            "name": "dropped",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          }
+        },
+        "bodies": {
+          "dropped": {
+            "name": "dropped",
+            "type": "static",
+            "width": 64,
+            "height": 64,
+            "z-index": {
+              "layer": 3,
+              "depth": 2
+            },
+            "fixedRotation": true,
+            "allowSleep": false,
+            "collidesWith": {
+              "units": false,
+              "items": false,
+              "projectiles": true,
+              "walls": false,
+              "debris": false
+            },
+            "angularDamping": 1,
+            "linearDamping": 0,
+            "rotationSpeed": 0,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 0,
+                "friction": 0,
+                "restitution": 0,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": true
+              }
+            ],
+            "affectedByGravity": false
+          }
+        },
+        "hideIfUnaffordable": false,
+        "quantity": null,
+        "maxQuantity": null,
+        "description": "Scorches an area in front of him with flames, dealing high damage in a short range.<br>\nDamage = 10<br>\nProjectile Speed = 12<br>\nUse Time = 50<br>",
+        "reloadRate": 0,
+        "recoilForce": 0,
+        "fireRate": 50,
+        "bulletDestroyedOnCollisionWithWall/unitForce": 20,
+        "knockbackForce": 0,
+        "effects": {
+          "create": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "destroy": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          }
+        },
+        "bulletDestroyedOnCollisionWithWall/unitStartPosition": {
+          "x": -5,
+          "y": -12,
+          "rotation": 0
+        },
+        "bulletDestroyedOnCollisionWithWall/unitDistance": 1300,
+        "penetration": false,
+        "destroyTimer": 100000,
+        "particles": {},
+        "damage": {
+          "unitAttributes": {},
+          "targetsAffected": []
+        },
+        "sound": {},
+        "canBeUsedBy": [],
+        "isUsedOnPickup": false,
+        "removeWhenEmpty": false,
+        "bonus": {
+          "consume": {
+            "playerAttribute": {},
+            "unitAttribute": {}
+          },
+          "passive": {
+            "playerAttribute": {},
+            "unitAttribute": {},
+            "isDisabledInBackpack": false
+          }
+        },
+        "cost": {
+          "quantity": 1
+        },
+        "buffTypes": [],
+        "carriedBy": [],
+        "frames": {},
+        "bulletType": "projectile",
+        "bulletForce": 12,
+        "bulletDistance": 1300,
+        "controls": {
+          "undroppable": true,
+          "permittedInventorySlots": [],
+          "mouseBehaviour": {
+            "rotateToFaceMouseCursor": true,
+            "flipSpriteHorizontallyWRTMouse": true
+          },
+          "canMerge": false,
+          "backpackAllowed": false
+        },
+        "deployMethod": "setVelocity",
+        "defaultProjectile": {
+          "inventoryImage": "/assets/cache.modd.io/asset/spriteImage/1594326998539_1.png",
+          "name": "Constant Speed",
+          "attributes": {},
+          "variables": {},
+          "states": {
+            "zTzPFYOZkc": {
+              "name": "default",
+              "sound": {},
+              "particles": {},
+              "animation": "default",
+              "body": "default"
+            }
+          },
+          "animations": {
+            "default": {
+              "name": "default",
+              "frames": [
+                1
+              ],
+              "loopCount": 0,
+              "framesPerSecond": 0
+            }
+          },
+          "bodies": {
+            "default": {
+              "bullet": true,
+              "name": "default",
+              "type": "dynamic",
+              "width": 10,
+              "height": 24,
+              "z-index": {
+                "layer": 3,
+                "depth": 1
+              },
+              "fixedRotation": false,
+              "constantSpeed +DestroyedOnCollisionWithWall/unit": true,
+              "allowSleep": false,
+              "collidesWith": {
+                "units": true,
+                "items": true,
+                "projectiles": false,
+                "walls": true,
+                "debris": false
+              },
+              "angularDamping": 1,
+              "linearDamping": 0,
+              "rotationSpeed": 1,
+              "spriteScale": 1,
+              "fixtures": [
+                {
+                  "density": 1,
+                  "friction": 0.01,
+                  "restitution": 0.01,
+                  "shape": {
+                    "type": "rectangle"
+                  },
+                  "isSensor": true
+                }
+              ],
+              "jointType": "weldJoint",
+              "unitAnchor": {
+                "x": 0,
+                "y": 33,
+                "rotation": 0
+              },
+              "itemAnchor": {
+                "x": 0,
+                "y": 0,
+                "lowerAngle": 0,
+                "upperAngle": 0
+              }
+            }
+          },
+          "destroyTimer": 1500,
+          "cellSheet": {
+            "columnCount": 1,
+            "rowCount": 1,
+            "url": "/assets/cache.modd.io/asset/spriteImage/1594326948666_1.png"
+          },
+          "lifeSpan": 1500,
+          "effects": {
+            "create": {
+              "projectileType": "",
+              "sound": {},
+              "animation": "",
+              "runScript": ""
+            },
+            "destroy": {
+              "projectileType": "",
+              "sound": {},
+              "animation": "",
+              "runScript": ""
+            }
+          },
+          "destroyOnContactWith": {
+            "units": true,
+            "items": true,
+            "projectiles": true,
+            "walls": true,
+            "debris": true
+          }
+        },
+        "scripts": {},
+        "projectileStreamMode": 1,
+        "ignoreServerStream": false,
+        "confinedWithinMapBoundaries": true,
+        "streamMode": 1,
+        "showCDOverlay": false,
+        "projectileType": ""
+      },
+      "morrowAtlasTelegraph": {
+        "delayBeforeUse": 0,
+        "bulletStartPosition": {
+          "rotation": 0,
+          "y": 15,
+          "x": 0
+        },
+        "name": "Morrow Atlas Warning",
+        "handle": "",
+        "attributes": {},
+        "variables": {},
+        "cellSheet": {
+          "url": "/assets/morrow/atlas-line.png",
+          "rowCount": 1,
+          "columnCount": 1
+        },
+        "inventoryImage": "/assets/morrow/atlas-line.png",
+        "isStackable": false,
+        "isPurchasable": false,
+        "canBePurchasedBy": [],
+        "isGun": false,
+        "bulletDestroyedOnCollisionWithWall/unitType": "projectile",
+        "type": "item",
+        "hits": [],
+        "states": {
+          "selected": {
+            "name": "selected",
+            "animation": "default",
+            "body": "none",
+            "particles": {},
+            "sound": {}
+          },
+          "unselected": {
+            "name": "unselected",
+            "animation": "default",
+            "body": "none",
+            "particles": {},
+            "sound": {}
+          },
+          "dropped": {
+            "name": "dropped",
+            "animation": "dropped",
+            "body": "dropped",
+            "particles": {},
+            "sound": {}
+          }
+        },
+        "animations": {
+          "default": {
+            "name": "default",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          },
+          "dropped": {
+            "name": "dropped",
+            "frames": [
+              1
+            ],
+            "framesPerSecond": 0,
+            "loopCount": 0
+          }
+        },
+        "bodies": {
+          "dropped": {
+            "name": "dropped",
+            "type": "spriteOnly",
+            "width": 100,
+            "height": 34,
+            "z-index": {
+              "layer": 3,
+              "depth": 2
+            },
+            "fixedRotation": true,
+            "allowSleep": false,
+            "collidesWith": {
+              "units": false,
+              "items": false,
+              "projectiles": false,
+              "walls": false,
+              "debris": false
+            },
+            "angularDamping": 1,
+            "linearDamping": 0,
+            "rotationSpeed": 0,
+            "spriteScale": 1,
+            "fixtures": [],
+            "affectedByGravity": false
+          }
+        },
+        "hideIfUnaffordable": false,
+        "quantity": null,
+        "maxQuantity": null,
+        "description": "Scorches an area in front of him with flames, dealing high damage in a short range.<br>\nDamage = 10<br>\nProjectile Speed = 12<br>\nUse Time = 50<br>",
+        "reloadRate": 0,
+        "recoilForce": 0,
+        "fireRate": 50,
+        "bulletDestroyedOnCollisionWithWall/unitForce": 20,
+        "knockbackForce": 0,
+        "effects": {
+          "create": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "destroy": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          }
+        },
+        "bulletDestroyedOnCollisionWithWall/unitStartPosition": {
+          "x": -5,
+          "y": -12,
+          "rotation": 0
+        },
+        "bulletDestroyedOnCollisionWithWall/unitDistance": 1300,
+        "penetration": false,
+        "destroyTimer": 100000,
+        "particles": {},
+        "damage": {
+          "unitAttributes": {},
+          "targetsAffected": []
+        },
+        "sound": {},
+        "canBeUsedBy": [],
+        "isUsedOnPickup": false,
+        "removeWhenEmpty": false,
+        "bonus": {
+          "consume": {
+            "playerAttribute": {},
+            "unitAttribute": {}
+          },
+          "passive": {
+            "playerAttribute": {},
+            "unitAttribute": {},
+            "isDisabledInBackpack": false
+          }
+        },
+        "cost": {
+          "quantity": 1
+        },
+        "buffTypes": [],
+        "carriedBy": [],
+        "frames": {},
+        "bulletType": "projectile",
+        "bulletForce": 12,
+        "bulletDistance": 1300,
+        "controls": {
+          "undroppable": true,
+          "permittedInventorySlots": [],
+          "mouseBehaviour": {
+            "rotateToFaceMouseCursor": true,
+            "flipSpriteHorizontallyWRTMouse": true
+          },
+          "canMerge": false,
+          "backpackAllowed": false
+        },
+        "deployMethod": "setVelocity",
+        "defaultProjectile": {
+          "inventoryImage": "/assets/cache.modd.io/asset/spriteImage/1594326998539_1.png",
+          "name": "Constant Speed",
+          "attributes": {},
+          "variables": {},
+          "states": {
+            "zTzPFYOZkc": {
+              "name": "default",
+              "sound": {},
+              "particles": {},
+              "animation": "default",
+              "body": "default"
+            }
+          },
+          "animations": {
+            "default": {
+              "name": "default",
+              "frames": [
+                1
+              ],
+              "loopCount": 0,
+              "framesPerSecond": 0
+            }
+          },
+          "bodies": {
+            "default": {
+              "bullet": true,
+              "name": "default",
+              "type": "dynamic",
+              "width": 10,
+              "height": 24,
+              "z-index": {
+                "layer": 3,
+                "depth": 1
+              },
+              "fixedRotation": false,
+              "constantSpeed +DestroyedOnCollisionWithWall/unit": true,
+              "allowSleep": false,
+              "collidesWith": {
+                "units": true,
+                "items": true,
+                "projectiles": false,
+                "walls": true,
+                "debris": false
+              },
+              "angularDamping": 1,
+              "linearDamping": 0,
+              "rotationSpeed": 1,
+              "spriteScale": 1,
+              "fixtures": [
+                {
+                  "density": 1,
+                  "friction": 0.01,
+                  "restitution": 0.01,
+                  "shape": {
+                    "type": "rectangle"
+                  },
+                  "isSensor": true
+                }
+              ],
+              "jointType": "weldJoint",
+              "unitAnchor": {
+                "x": 0,
+                "y": 33,
+                "rotation": 0
+              },
+              "itemAnchor": {
+                "x": 0,
+                "y": 0,
+                "lowerAngle": 0,
+                "upperAngle": 0
+              }
+            }
+          },
+          "destroyTimer": 1500,
+          "cellSheet": {
+            "columnCount": 1,
+            "rowCount": 1,
+            "url": "/assets/cache.modd.io/asset/spriteImage/1594326948666_1.png"
+          },
+          "lifeSpan": 1500,
+          "effects": {
+            "create": {
+              "projectileType": "",
+              "sound": {},
+              "animation": "",
+              "runScript": ""
+            },
+            "destroy": {
+              "projectileType": "",
+              "sound": {},
+              "animation": "",
+              "runScript": ""
+            }
+          },
+          "destroyOnContactWith": {
+            "units": true,
+            "items": true,
+            "projectiles": true,
+            "walls": true,
+            "debris": true
+          }
+        },
+        "scripts": {},
+        "projectileStreamMode": 1,
+        "ignoreServerStream": false,
+        "confinedWithinMapBoundaries": true,
+        "streamMode": 1,
+        "showCDOverlay": false,
+        "projectileType": ""
       }
     },
     "music": {
@@ -307938,6 +309935,164 @@
         "parent": "kDaCsBOQ0B",
         "key": "JmXYfQ7TCE",
         "order": 1
+      },
+      "B3dRse_Vpq": {
+        "triggers": [],
+        "conditions": [
+          {
+            "operator": "==",
+            "operandType": "boolean"
+          },
+          true,
+          true
+        ],
+        "actions": [
+          {
+            "type": "forAllUnits",
+            "unitGroup": {
+              "function": "allUnitsOwnedByPlayer",
+              "player": {
+                "function": "getLastPlayerSelectingDialogueOption"
+              }
+            },
+            "actions": [
+              {
+                "type": "condition",
+                "conditions": [
+                  {
+                    "operandType": "unitType",
+                    "operator": "=="
+                  },
+                  {
+                    "function": "getUnitTypeOfUnit",
+                    "entity": {
+                      "function": "selectedUnit"
+                    }
+                  },
+                  "hLrbyj6dKv"
+                ],
+                "then": [
+                  {
+                    "type": "destroyEntity",
+                    "entity": {
+                      "function": "selectedUnit"
+                    }
+                  }
+                ],
+                "else": []
+              }
+            ]
+          },
+          {
+            "type": "createUnitAtPosition",
+            "unitType": "morrowRouteCartographer",
+            "position": {
+              "region": {
+                "function": "getEntireMapRegion"
+              },
+              "function": "getRandomPositionInRegion"
+            },
+            "entity": {
+              "function": "getLastPlayerSelectingDialogueOption"
+            },
+            "angle": 0,
+            "disabled": false
+          },
+          {
+            "unit": {
+              "function": "getLastCreatedUnit"
+            },
+            "fighter": {
+              "function": "getTriggeringPlayer"
+            },
+            "type": "playerCameraTrackUnit",
+            "player": {
+              "function": "getLastPlayerSelectingDialogueOption"
+            },
+            "disabled": false
+          },
+          {
+            "type": "assignPlayerType",
+            "entity": {
+              "function": "getLastPlayerSelectingDialogueOption"
+            },
+            "playerType": "humanPlayer",
+            "disabled": true
+          },
+          {
+            "type": "runScript",
+            "scriptName": "4CUmpCVa6u",
+            "isEntityScript": false
+          },
+          {
+            "type": "setPlayerVariable",
+            "player": {
+              "function": "getLastPlayerSelectingDialogueOption"
+            },
+            "variable": {
+              "function": "getPlayerVariable",
+              "variable": {
+                "text": "(Player Type) Current Dialogue Page",
+                "dataType": "number",
+                "entity": "humanPlayer",
+                "key": "(Player Type) Current Dialogue Page"
+              }
+            },
+            "value": 6,
+            "comment": ""
+          }
+        ],
+        "name": "Create Morrow",
+        "parent": "nd4Fd6NfCQ",
+        "key": "B3dRse_Vpq",
+        "order": 0
+      },
+      "DyU0gJZHiB": {
+        "key": "DyU0gJZHiB",
+        "name": "Remove Morrow Route Marker on Death",
+        "parent": "morrowRouteCartographer",
+        "triggers": [
+          {
+            "type": "entityAttributeBecomesZero"
+          }
+        ],
+        "conditions": [
+          {
+            "operator": "==",
+            "operandType": "boolean"
+          },
+          true,
+          true
+        ],
+        "actions": [
+          {
+            "type": "condition",
+            "conditions": [
+              {
+                "operandType": "attributeType",
+                "operator": "=="
+              },
+              {
+                "function": "getAttributeTypeOfAttribute",
+                "entity": {
+                  "function": "getTriggeringAttribute",
+                  "vars": []
+                },
+                "vars": []
+              },
+              "health"
+            ],
+            "then": [
+              {
+                "type": "clearMorrowMarker",
+                "unit": {
+                  "function": "thisEntity"
+                }
+              }
+            ],
+            "else": []
+          }
+        ]
       }
     },
     "unitTypes": {
@@ -383166,6 +385321,423 @@
         "is3DObject": false,
         "threeD": {},
         "id": "sarLaTkdF2"
+      },
+      "morrowRouteCartographer": {
+        "scripts": {
+          "DyU0gJZHiB": {
+            "key": "DyU0gJZHiB",
+            "name": "Remove Morrow Route Marker on Death",
+            "parent": "morrowRouteCartographer",
+            "triggers": [
+              {
+                "type": "entityAttributeBecomesZero"
+              }
+            ],
+            "conditions": [
+              {
+                "operator": "==",
+                "operandType": "boolean"
+              },
+              true,
+              true
+            ],
+            "actions": [
+              {
+                "type": "condition",
+                "conditions": [
+                  {
+                    "operandType": "attributeType",
+                    "operator": "=="
+                  },
+                  {
+                    "function": "getAttributeTypeOfAttribute",
+                    "entity": {
+                      "function": "getTriggeringAttribute",
+                      "vars": []
+                    },
+                    "vars": []
+                  },
+                  "health"
+                ],
+                "then": [
+                  {
+                    "type": "clearMorrowMarker",
+                    "unit": {
+                      "function": "thisEntity"
+                    }
+                  }
+                ],
+                "else": []
+              }
+            ]
+          }
+        },
+        "abilitiesJ8Gtv5HQ8JREnjD": {
+          "movementWheel": {
+            "mobilePosition": {
+              "y": 204,
+              "x": 35
+            }
+          },
+          "lookWheel": {
+            "mobilePosition": {
+              "y": 204,
+              "x": 407
+            }
+          },
+          "w": {
+            "keyUp": "stopMovingUp",
+            "keyDown": "moveUp"
+          },
+          "a": {
+            "keyUp": "stopMovingLeft",
+            "keyDown": "moveLeft"
+          },
+          "s": {
+            "keyUp": "stopMovingDown",
+            "keyDown": "moveDown"
+          },
+          "d": {
+            "keyUp": "stopMovingRight",
+            "keyDown": "moveRight"
+          },
+          "button1": {
+            "keyUp": "stopUsingItem",
+            "keyDown": "startUsingItem",
+            "mobilePosition": {
+              "x": 326,
+              "y": 132
+            }
+          },
+          "up": {
+            "keyUp": "stopMovingUp",
+            "keyDown": "moveUp"
+          },
+          "down": {
+            "keyUp": "stopMovingDown",
+            "keyDown": "moveDown"
+          },
+          "left": {
+            "keyUp": "stopMovingLeft",
+            "keyDown": "moveLeft"
+          },
+          "right": {
+            "keyUp": "stopMovingRight",
+            "keyDown": "moveRight"
+          },
+          "e": {
+            "keyUp": "",
+            "keyDown": "pickUp",
+            "mobilePosition": {
+              "x": 366,
+              "y": 85
+            }
+          },
+          "f": {
+            "keyUp": "",
+            "keyDown": "pickUp"
+          },
+          "g": {
+            "keyUp": "",
+            "keyDown": "drop",
+            "mobilePosition": {
+              "x": 365,
+              "y": 33
+            }
+          },
+          "b": {
+            "keyUp": "",
+            "keyDown": "shop",
+            "mobilePosition": {
+              "x": 419,
+              "y": 32
+            }
+          }
+        },
+        "ai": {
+          "pathFindingMethod": "simple",
+          "idleBehaviour": "wander",
+          "sensorResponse": "fight",
+          "attackResponse": "fight",
+          "maxTravelDistance": 300,
+          "sensorRadius": 200,
+          "maxAttackRange": 400,
+          "letGoDistance": "",
+          "enabled": false
+        },
+        "animations": {
+          "default": {
+            "name": "default",
+            "frames": [
+              1
+            ],
+            "loopCount": 0,
+            "framesPerSecond": 0
+          }
+        },
+        "attributes": {
+          "speed": {
+            "decimalPlaces": 0,
+            "dataType": "",
+            "name": "speed",
+            "min": 0,
+            "max": 12,
+            "value": 11,
+            "regenerateSpeed": "0.4",
+            "isVisible": [
+              "unitBarNeutral",
+              "unitBarHostile",
+              "unitBarFriendly"
+            ],
+            "showAsHUD": true,
+            "color": "#00fff0",
+            "displayValue": true
+          },
+          "health": {
+            "decimalPlaces": 0,
+            "color": "#ffff0f",
+            "showAsHUD": true,
+            "displayValue": true,
+            "isVisible": [
+              "unitBarFriendly",
+              "unitBarNeutral",
+              "unitBarHostile"
+            ],
+            "regenerateSpeed": 0,
+            "value": 90,
+            "dataType": "",
+            "max": 90,
+            "min": 0,
+            "name": "health "
+          }
+        },
+        "backpackSize": 0,
+        "baseSpeed": 53,
+        "bodies": {
+          "default": {
+            "bullet": false,
+            "name": "default",
+            "type": "dynamic",
+            "width": 50,
+            "height": 50,
+            "z-index": {
+              "layer": 3,
+              "depth": 3
+            },
+            "fixedRotation": false,
+            "constantSpeed +DestroyedOnCollisionWithWall/unit": false,
+            "allowSleep": true,
+            "collidesWith": {
+              "units": true,
+              "items": true,
+              "projectiles": true,
+              "walls": true,
+              "debris": true
+            },
+            "angularDamping": 1,
+            "linearDamping": 8,
+            "rotationSpeed": 1,
+            "spriteScale": 1,
+            "fixtures": [
+              {
+                "density": 1,
+                "friction": 0,
+                "restitution": 0,
+                "shape": {
+                  "type": "rectangle"
+                },
+                "isSensor": false
+              }
+            ],
+            "jointType": "weldJoint",
+            "unitAnchor": {
+              "x": 0,
+              "y": 33,
+              "rotation": 0
+            },
+            "itemAnchor": {
+              "x": 0,
+              "y": 0,
+              "lowerAngle": 0,
+              "upperAngle": 0
+            },
+            "affectedByGravity": false
+          }
+        },
+        "body": {
+          "spriteScale": 1,
+          "fixtures": [
+            {
+              "shape": {
+                "type": "rectangle"
+              },
+              "restitution": 0.01,
+              "friction": 0.01,
+              "density": 3
+            }
+          ],
+          "isFlying": false,
+          "fixedRotation": false,
+          "constantSpeed +DestroyedOnCollisionWithWall/unit": false,
+          "allowSleep": true,
+          "angularDamping": 1,
+          "linearDamping": 5,
+          "rotationSpeed": 2,
+          "type": "dynamic",
+          "height": 40,
+          "width": 40,
+          "collidesWith": {
+            "units": true,
+            "items": true,
+            "projectiles": true,
+            "walls": true,
+            "unit": true,
+            "item": true,
+            "debris": true
+          },
+          "z-index": {
+            "layer": 3,
+            "depth": 3
+          },
+          "name": "Human-body"
+        },
+        "canBePurchasedBy": [],
+        "canBuyItem": true,
+        "cellSheet": {
+          "url": "/assets/morrow/morrow.png",
+          "rowCount": 1,
+          "columnCount": 1
+        },
+        "confinedWithinMapBoundaries": true,
+        "controls": {
+          "permittedInventorySlots": [],
+          "movementMethod": "velocity",
+          "movementControlScheme": "wasd",
+          "abilities": {
+            "movementWheel": {
+              "mobilePosition": {
+                "x": 67,
+                "y": 196
+              }
+            },
+            "lookWheel": {
+              "mobilePosition": {
+                "x": 376,
+                "y": 199
+              }
+            },
+            "button1": {
+              "keyUp": {
+                "scriptName": "iMvNViahpu",
+                "cost": {}
+              },
+              "keyDown": {
+                "scriptName": "pmFcU2muPm",
+                "cost": {}
+              },
+              "mobilePosition": {
+                "x": 142,
+                "y": 111
+              }
+            },
+            "lookAndFireWheel": {
+              "mobilePosition": {
+                "x": 283,
+                "y": 102
+              }
+            }
+          },
+          "mouseBehaviour": {
+            "flipSpriteHorizontallyWRTMouse": false,
+            "rotateToFaceMouseCursor": true
+          },
+          "movementType": "wasd",
+          "absoluteRotation": true,
+          "unitAbilities": {}
+        },
+        "defaultItem": [],
+        "defaultItems": [
+          {
+            "key": "3IP3slslrx",
+            "value": "Compass Bolt",
+            "name": "Compass Bolt"
+          },
+          {
+            "key": "wfils6EYBv",
+            "value": "Pin the Map",
+            "name": "Pin the Map"
+          },
+          {
+            "key": "_TPa_xNT-C",
+            "value": "Banked Delivery",
+            "name": "Banked Delivery"
+          },
+          {
+            "key": "JQccvRVdSP",
+            "value": "Atlas Unfolded",
+            "name": "Atlas Unfolded"
+          }
+        ],
+        "effects": {
+          "idle": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "tween": "",
+            "runScript": ""
+          },
+          "attacked": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "tween": "",
+            "runScript": ""
+          },
+          "move": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "tween": "",
+            "runScript": ""
+          },
+          "create": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          },
+          "destroy": {
+            "projectileType": "",
+            "sound": {},
+            "animation": "",
+            "runScript": ""
+          }
+        },
+        "handle": "morrow",
+        "inventoryImage": "/assets/morrow/morrow.png",
+        "inventorySize": 4,
+        "isPurchasable": false,
+        "isUnTargetable": false,
+        "name": "Morrow",
+        "particles": {},
+        "price": {},
+        "skin": "",
+        "sound": {},
+        "spawnPosition": {
+          "y": 2200,
+          "x": 1500
+        },
+        "states": {
+          "default": {
+            "name": "default",
+            "sound": {},
+            "particles": {},
+            "animation": "default",
+            "body": "default"
+          }
+        },
+        "variables": {},
+        "streamMode": 1
       }
     },
     "abilities": {},
@@ -385940,6 +388512,11 @@
           {
             "name": "Emo ☆ Sky,<br>Danmaku Maestro",
             "scriptName": "6vLdTYHXlA",
+            "followUpDialogue": ""
+          },
+          {
+            "name": "Morrow, the Route Cartographer<br>🧭",
+            "scriptName": "B3dRse_Vpq",
             "followUpDialogue": ""
           },
           {

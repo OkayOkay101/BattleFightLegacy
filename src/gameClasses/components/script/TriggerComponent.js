@@ -323,6 +323,20 @@ var TriggerComponent = IgeEntity.extend({
 				if (!customOwner || !victimOwner || customOwner === victimOwner || customOwner.isFriendlyTo(victimOwner)) return;
 				customProjectile._customImpactConsumed = true;
 			}
+			if (customProjectile && customProjectile._morrowSingleHit) {
+				var morrowTarget = ige.$(triggeredBy.collidingEntity || triggeredBy.unitId);
+				var morrowSource = customProjectile._stats.sourceUnitId && ige.$(customProjectile._stats.sourceUnitId);
+				var morrowSourcePlayer = morrowSource && morrowSource.getOwner && morrowSource.getOwner();
+				var morrowTargetPlayer = morrowTarget && morrowTarget.getOwner && morrowTarget.getOwner();
+				var morrowFriendly = morrowSourcePlayer && morrowTargetPlayer &&
+					(morrowSourcePlayer === morrowTargetPlayer || (morrowSourcePlayer.isFriendlyTo && morrowSourcePlayer.isFriendlyTo(morrowTargetPlayer)));
+				if (morrowFriendly) return;
+				if (morrowTarget) {
+					customProjectile._morrowHitUnitIds = customProjectile._morrowHitUnitIds || new Set();
+					if (customProjectile._morrowHitUnitIds.has(morrowTarget.id())) return;
+					customProjectile._morrowHitUnitIds.add(morrowTarget.id());
+				}
+			}
 		}
 		// if (triggerName === 'projectileTouchesWall') console.log("trigger fire", triggerName, triggeredBy)
 		var isProjectileContact = ige.isServer && triggerName === 'unitTouchesProjectile';
@@ -393,6 +407,20 @@ var TriggerComponent = IgeEntity.extend({
 						}
 						break;
 					case 'projectileTouchesItem':
+						var contactedItem = ige.$(triggeredBy.itemId || triggeredBy.collidingEntity);
+						var route = projectile._morrowRedirect;
+						if (route && contactedItem && contactedItem.id() === route.markerId && !route.redirected) {
+							route.redirected = true;
+							projectile._morrowRedirectedMarkerId = contactedItem.id();
+							// Sensor contact begins at the marker edge. Start the second leg
+							// at its centre so marker/projectile sizes do not shift the route.
+							projectile.translateTo(contactedItem._translate.x, contactedItem._translate.y, 0);
+							var redirectAngle = route.angle - Math.PI / 2;
+							projectile.setLinearVelocity(Math.cos(redirectAngle) * route.speed, Math.sin(redirectAngle) * route.speed);
+							projectile.rotateTo(0, 0, route.angle);
+							break;
+						}
+						if (route && contactedItem && route.redirected && contactedItem.id() === projectile._morrowRedirectedMarkerId) break;
 						if (projectile._stats.destroyOnContactWith && projectile._stats.destroyOnContactWith.items) {
 							projectile.destroy();
 						}

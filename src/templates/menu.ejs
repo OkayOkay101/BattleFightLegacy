@@ -18,6 +18,7 @@
         <h2 data-i18n="menu.trainingTitle">สนามทดลอง &amp; ควบคุม AI</h2>
         <p data-i18n="menu.trainingDescription">เลือกโหมดการเล่น ติดตามสถิติการฝึก และควบคุมการเทรน AI จากหน้านี้ได้ทันที</p>
         <button type="button" id="custom-unit-open" class="btn btn-outline-info mb-3" data-i18n="custom.title">Custom Units</button>
+        <button type="button" id="solo-open" class="btn btn-outline-info mb-3" data-i18n="solo.title">Solo Test</button>
         
         <!-- Live AI Training Stats Dashboard -->
         <div class="train-dashboard mb-3">
@@ -80,8 +81,8 @@
         </div>
 
         <div class="demo-options" role="radiogroup" aria-label="โหมดทดลอง" data-i18n-aria-label="training.mode">
-            <label><input type="radio" name="training-demo-mode" value="spectate" checked><span><strong data-i18n="training.spectate">👁️ ดูบอทสู้ (Spectate)</strong><small data-i18n="training.spectateHelp">ชมการต่อสู้ 3v3 และสลับมุมกล้องตามบอท</small></span></label>
-            <label><input type="radio" name="training-demo-mode" value="fight"><span><strong data-i18n="training.play">⚔️ ลงสู้เอง (Play Game)</strong><small data-i18n="training.playHelp">เลือกตัวละครแล้วร่วมทีมฟ้าต่อสู้กับทีมแดง</small></span></label>
+            <label><input type="radio" name="training-demo-mode" value="spectate"><span><strong data-i18n="training.spectate">👁️ ดูบอทสู้ (Spectate)</strong><small data-i18n="training.spectateHelp">ชมการต่อสู้ 3v3 และสลับมุมกล้องตามบอท</small></span></label>
+            <label><input type="radio" name="training-demo-mode" value="fight" checked><span><strong data-i18n="training.play">⚔️ ลงสู้เอง (Play Game)</strong><small data-i18n="training.playHelp">เลือกตัวละครแล้วร่วมทีมฟ้าต่อสู้กับทีมแดง</small></span></label>
         </div>
     </div>
     
@@ -210,7 +211,7 @@
 <%- include('custom-units.ejs') %>
 <script src="/src/localization/TrainingTelemetry.js"></script>
 <script>
-window.trainingDemoMode = 'spectate';
+window.trainingDemoMode = 'fight';
 
 document.addEventListener('DOMContentLoaded', function () {
     var desktopMode = <%- JSON.stringify(!!desktopMode) %>;

@@ -288,13 +288,19 @@ var Server = IgeClass.extend({
 				return res.json(document);
 			}
 			const acceptEncoding = req.headers['accept-encoding'] || '';
+			const jsonPath = path.resolve('./src/game.json');
 			const gzPath = path.resolve('./src/game.json.gz');
-			if (acceptEncoding.includes('gzip') && fs.existsSync(gzPath)) {
+			res.vary('Accept-Encoding');
+			res.setHeader('Cache-Control', 'no-cache');
+			// Source edits must not leave browsers loading an older game definition.
+			const gzipIsCurrent = fs.existsSync(gzPath) &&
+				fs.statSync(gzPath).mtimeMs >= fs.statSync(jsonPath).mtimeMs;
+			if (acceptEncoding.includes('gzip') && gzipIsCurrent) {
 				res.setHeader('Content-Type', 'application/json');
 				res.setHeader('Content-Encoding', 'gzip');
 				return res.sendFile(gzPath);
 			}
-			return res.sendFile(path.resolve('./src/game.json'));
+			return res.sendFile(jsonPath);
 		});
 
 		const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
@@ -311,6 +317,7 @@ var Server = IgeClass.extend({
 			}
 		}));
 
+		app.use('/assets/morrow', express.static(path.resolve('./src/assets/morrow/')));
 		app.use('/assets', express.static(path.resolve('./assets/'), { cacheControl: 7 * 24 * 60 * 60 * 1000 }));
 
 		if (!desktopMode) {

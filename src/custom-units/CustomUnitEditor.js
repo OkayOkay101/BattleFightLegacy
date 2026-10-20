@@ -146,6 +146,18 @@
    document.getElementById('custom-sandbox-reset').onclick = function () { control('reset').catch(function (error) { document.getElementById('custom-sandbox-message').textContent = error.message; }); };
    document.getElementById('custom-sandbox-stop').onclick = async function () { try { await control('stop'); document.getElementById('custom-sandbox-message').textContent = tr('custom.stopped'); window.close(); } catch (error) { document.getElementById('custom-sandbox-message').textContent = error.message; } };
    fetch('/api/demo/status').then(function (response) { return response.json(); }).then(function (data) {
+    if (data.demo.sandbox.mode === 'solo') {
+     var title = document.getElementById('custom-sandbox-title'); title.dataset.i18n = 'solo.title'; title.textContent = tr('solo.title');
+     ['dummy','kill'].forEach(function(action) {
+      var button = document.getElementById('solo-' + action); button.hidden = false;
+      button.onclick = async function() {
+       button.disabled = true;
+       try { await control(action); document.getElementById('custom-sandbox-message').textContent = tr(action === 'kill' ? 'solo.respawning' : 'solo.dummyAdded'); }
+       catch(error) { document.getElementById('custom-sandbox-message').textContent = error.message; }
+       finally { button.disabled = false; }
+      };
+     });
+    }
     var mode = data.demo.sandbox.controller === 'human' ? 'fight' : 'spectate';
     window.trainingDemoMode = mode; var radio = document.querySelector('input[name=training-demo-mode][value="' + mode + '"]');
     if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }

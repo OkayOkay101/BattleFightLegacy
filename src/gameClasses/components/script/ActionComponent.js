@@ -6,6 +6,106 @@ var ActionComponent = IgeEntity.extend({
 		this.entityCategories = ['unit', 'item', 'projectile', 'debris', 'region', 'wall'];
 	},
 
+	_clearMorrowMarker: function (unit) {
+		if (!unit || unit._stats?.type !== 'morrowRouteCartographer') return;
+		var marker = unit._morrowMarkerId && ige.$(unit._morrowMarkerId);
+		if (marker) {
+			if (marker._morrowMarkerTimer) {
+				if (ige.training?.cancelSandboxAction) ige.training.cancelSandboxAction(marker._morrowMarkerTimer);
+				else clearTimeout(marker._morrowMarkerTimer);
+			}
+			marker._morrowMarkerOwnerId = undefined;
+			marker.remove();
+		}
+		unit._morrowMarkerId = undefined;
+	},
+
+	_morrowLine: function (start, end) {
+		if (!ige.physics || !ige.physics.world || !ige.physics.world()) return { end: end, units: [] };
+		var scale = Number(ige.physics.scaleRatio ? ige.physics.scaleRatio() : 1) || 1;
+		var dx = end.x - start.x;
+		var dy = end.y - start.y;
+		var length = Math.sqrt(dx * dx + dy * dy);
+		if (!length) return { end: end, units: [] };
+		var nx = -dy / length;
+		var ny = dx / length;
+		var wallFraction = 1;
+		var hits = new Map();
+		var world = ige.physics.world();
+		[-12, 0, 12].forEach(function (offset) {
+			var from = { x: (start.x + nx * offset) / scale, y: (start.y + ny * offset) / scale };
+			var to = { x: (end.x + nx * offset) / scale, y: (end.y + ny * offset) / scale };
+			world.rayCast(function (fixture, point, normal, fraction) {
+				var body = fixture && fixture.m_body;
+				var entity = body && body._entity;
+				if (!entity) return 1;
+				if (entity._category === 'wall' || entity._category === undefined) {
+					wallFraction = Math.min(wallFraction, fraction);
+				} else if (entity._category === 'unit' && entity._alive !== false && entity._stats?.attributes?.health?.value > 0) {
+					if (!hits.has(entity.id()) || fraction < hits.get(entity.id()).fraction) hits.set(entity.id(), { entity: entity, fraction: fraction });
+				}
+				return 1;
+			}, from, to);
+		});
+		var clippedEnd = { x: start.x + dx * wallFraction, y: start.y + dy * wallFraction };
+		var units = Array.from(hits.values()).filter(function (hit) { return hit.fraction <= wallFraction; });
+		units.sort(function (a, b) { return a.fraction - b.fraction; });
+		return { end: clippedEnd, units: units.map(function (hit) { return hit.entity; }) };
+	},
+
+	_createMorrowTelegraph: function (unit, abilityItem, start, end, markerId) {
+		var dx = end.x - start.x;
+		var dy = end.y - start.y;
+		var length = Math.sqrt(dx * dx + dy * dy);
+		if (!length || !ige.isServer) return;
+		var clipped = this._morrowLine(start, end).end;
+		dx = clipped.x - start.x;
+		dy = clipped.y - start.y;
+		length = Math.sqrt(dx * dx + dy * dy);
+		if (!length) return;
+		var beamTypeId = 'morrowAtlasTelegraph';
+		var beamType = ige.game.getAsset('itemTypes', beamTypeId);
+		if (!beamType) return;
+		var beamData = _.cloneDeep(beamType);
+		beamData.itemTypeId = beamTypeId;
+		beamData.isHidden = false;
+		beamData.stateId = 'dropped';
+		beamData.ownerUnitId = unit.id();
+		beamData.defaultData = {
+			translate: { x: start.x + dx / 2, y: start.y + dy / 2 },
+			rotate: Math.atan2(dy, dx)
+		};
+		beamData.bodies.dropped.width = length;
+		// The texture's visible band occupies roughly 1/8 of its transparent canvas.
+		// Keep its rendered attack strip ~24px wide at every marker distance.
+		beamData.bodies.dropped.height = 192;
+		beamData.width = length;
+		beamData.height = 192;
+		beamData.scaleDimensions = true;
+		var beam = new Item(beamData);
+		beam._morrowTelegraphOwnerId = unit.id();
+		var self = this;
+		var schedule = ige.training?.scheduleSandboxAction || setTimeout;
+		schedule(function () {
+			if (beam && beam._alive !== false) beam.remove();
+			if (!unit || unit._alive === false || unit._isBeingRemoved || unit._morrowMarkerId !== markerId) return;
+			var marker = markerId && ige.$(markerId);
+			if (!marker || marker._alive === false) return;
+			var line = self._morrowLine(start, { x: marker._translate.x, y: marker._translate.y });
+			var owner = unit.getOwner && unit.getOwner();
+			var itemId = abilityItem && abilityItem.id();
+			var hit = new Set();
+			line.units.forEach(function (target) {
+				if (!target || target.id() === unit.id() || hit.has(target.id())) return;
+				hit.add(target.id());
+				target.inflictDamage({
+					sourceUnitId: unit.id(), sourcePlayerId: owner && owner.id(), sourceItemId: itemId,
+					targetsAffected: ['hostile'], unitAttributes: { health: 30 }, ignoreBaseDamage: true
+				});
+			});
+		}, 800);
+	},
+
 	// entity can be either trigger entity, or entity in loop
 	run: function (actionList, vars) {
 		var self = this;
@@ -1559,11 +1659,14 @@ var ActionComponent = IgeEntity.extend({
 						var force = ige.variable.getValue(action.force, vars);
 						var unit = ige.variable.getValue(action.unit, vars);
 						var angle = ige.variable.getValue(action.angle, vars);
+						var morrowDamage = action.damage === undefined ? undefined : ige.variable.getValue(action.damage, vars);
+						var morrowMarker = action.morrowBanked && unit && unit._morrowMarkerId ? ige.$(unit._morrowMarkerId) : undefined;
 						var error = '';
 						var delta = Math.radians(90); // unitsFacingAngle delta
 						var facingAngleDelta = 0;
 						// Every expression returns the same up-zero heading, including calculated angles.
 
+						if (action.morrowBanked && (!ige.isServer || !unit || unit._stats?.type !== 'morrowRouteCartographer' || !morrowMarker || morrowMarker._alive === false)) break;
 						if (projectileTypeId) {
 							var projectileData = ige.game.getAsset('projectileTypes', projectileTypeId);
 
@@ -1591,6 +1694,12 @@ var ActionComponent = IgeEntity.extend({
 							}
 
 							if (projectileData != undefined && position != undefined && position.x != undefined && position.y != undefined && angle != undefined) {
+								var bankedAimAngle = angle;
+								if (action.morrowBanked && morrowMarker) {
+									var toMarker = Math.atan2(morrowMarker._translate.y - unit._translate.y, morrowMarker._translate.x - unit._translate.x);
+									position = { x: unit._translate.x + Math.cos(toMarker) * 34, y: unit._translate.y + Math.sin(toMarker) * 34 };
+									angle = toMarker + delta;
+								}
 								var facingAngleInRadians = angle + facingAngleDelta;
 								angle = angle - delta;
 								var streamMode = 1;
@@ -1623,8 +1732,22 @@ var ActionComponent = IgeEntity.extend({
 										streamMode: streamMode
 									}
 								);
+								if (Number.isFinite(Number(morrowDamage))) {
+									data.damageData.unitAttributes = { health: Number(morrowDamage) };
+					data.damageData.targetsAffected = ['hostile'];
+									data.damageData.ignoreBaseDamage = true;
+								}
 
 								var projectile = new Projectile(data);
+								if (Number.isFinite(Number(morrowDamage))) projectile._morrowSingleHit = true;
+								if (action.morrowBanked && ige.isServer) {
+									projectile._morrowRedirect = {
+										markerId: morrowMarker.id(),
+										angle: bankedAimAngle,
+										speed: force,
+										redirected: false
+									};
+								}
 								ige.game.lastCreatedProjectileId = projectile._id;
 							} else {
 								if (!projectileData) {
@@ -1638,6 +1761,46 @@ var ActionComponent = IgeEntity.extend({
 								}
 							}
 						}
+						break;
+
+					case 'placeMorrowMarker':
+						if (!ige.isServer) break;
+						var markerOwner = ige.variable.getValue(action.unit, vars) || vars.thisEntity;
+						var markerPosition = ige.variable.getValue(action.position, vars);
+						var markerTypeId = ige.variable.getValue(action.itemType, vars);
+						if (!markerOwner || markerOwner._stats?.type !== 'morrowRouteCartographer' || !markerPosition || !markerTypeId) break;
+						this._clearMorrowMarker(markerOwner);
+						var markerTemplate = ige.game.getAsset('itemTypes', markerTypeId);
+						if (!markerTemplate) break;
+						var markerData = _.cloneDeep(markerTemplate);
+						markerData.itemTypeId = markerTypeId;
+						markerData.isHidden = false;
+						markerData.stateId = 'dropped';
+						markerData.ownerUnitId = markerOwner.id();
+						markerData.defaultData = { translate: { x: markerPosition.x, y: markerPosition.y }, rotate: 0 };
+						var routeMarker = new Item(markerData);
+						routeMarker._morrowMarkerOwnerId = markerOwner.id();
+						markerOwner._morrowMarkerId = routeMarker.id();
+						var scheduleMarker = ige.training?.scheduleSandboxAction || setTimeout;
+						routeMarker._morrowMarkerTimer = scheduleMarker(function () {
+							if (routeMarker && routeMarker._alive !== false) routeMarker.remove();
+							if (markerOwner && markerOwner._morrowMarkerId === routeMarker.id()) markerOwner._morrowMarkerId = undefined;
+						}, 7000);
+						break;
+
+					case 'clearMorrowMarker':
+						if (ige.isServer) this._clearMorrowMarker(ige.variable.getValue(action.unit, vars) || vars.thisEntity);
+						break;
+
+					case 'createMorrowAtlasUnfolded':
+						if (!ige.isServer) break;
+						var atlasOwner = ige.variable.getValue(action.unit, vars) || vars.thisEntity;
+						var atlasMarker = atlasOwner && atlasOwner._morrowMarkerId && ige.$(atlasOwner._morrowMarkerId);
+						if (!atlasOwner || atlasOwner._stats?.type !== 'morrowRouteCartographer' || atlasOwner._alive === false || !atlasMarker || atlasMarker._alive === false) break;
+						var abilityItem = vars.triggeredBy && vars.triggeredBy.itemId && ige.$(vars.triggeredBy.itemId);
+						this._createMorrowTelegraph(atlasOwner, abilityItem,
+							{ x: atlasOwner._translate.x, y: atlasOwner._translate.y },
+							{ x: atlasMarker._translate.x, y: atlasMarker._translate.y }, atlasMarker.id());
 						break;
 
 					case 'setOwnerUnitOfProjectile':

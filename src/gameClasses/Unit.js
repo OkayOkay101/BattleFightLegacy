@@ -1396,6 +1396,17 @@ var Unit = IgeEntityPhysics.extend({
 
 	remove: function () {
 		var self = this;
+		if (self._stats && self._stats.type === 'morrowRouteCartographer' && self._morrowMarkerId) {
+			var morrowMarker = ige.$(self._morrowMarkerId);
+			if (morrowMarker) {
+				if (morrowMarker._morrowMarkerTimer) {
+					if (ige.training?.cancelSandboxAction) ige.training.cancelSandboxAction(morrowMarker._morrowMarkerTimer);
+					else clearTimeout(morrowMarker._morrowMarkerTimer);
+				}
+				morrowMarker.remove();
+			}
+			self._morrowMarkerId = undefined;
+		}
 
 		clearInterval(self.contactLoop);
 

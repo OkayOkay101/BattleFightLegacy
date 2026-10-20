@@ -5,6 +5,10 @@
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   return {
     en: {
+      'solo.title': 'Solo Test', 'solo.character': 'Character',
+      'solo.help': 'An isolated arena with no bots. Choose a character, add stationary targets, test death and respawn, or reset everything. Reset removes all targets and resets statistics.',
+      'solo.dummy': 'Add target dummy', 'solo.kill': 'Die / respawn',
+      'solo.respawning': 'Respawning in about 3 seconds...', 'solo.dummyAdded': 'Stationary target added (maximum 16).',
       'weapon.title':'Custom Weapons', 'weapon.saved':'Saved weapons', 'weapon.new':'New weapon', 'weapon.empty':'No saved weapons yet.',
       'weapon.pattern':'Firing pattern', 'weapon.single':'Single', 'weapon.spread':'Spread', 'weapon.burst':'Burst',
       'weapon.damage':'Damage per projectile', 'weapon.speed':'Projectile speed (engine units)', 'weapon.range':'Range (pixels)', 'weapon.cooldown':'Cooldown (ms)',
@@ -267,6 +271,10 @@
       'item.stunTargetChance': 'Stun target chance'
     },
     th: {
+      'solo.title': 'ทดสอบคนเดียว', 'solo.character': 'ตัวละคร',
+      'solo.help': 'สนามแยกที่ไม่มีบอท เลือกตัวละคร เพิ่มเป้านิ่ง ทดลองตายและเกิดใหม่ หรือเริ่มใหม่ได้ การเริ่มใหม่จะลบเป้าทั้งหมดและล้างสถิติ',
+      'solo.dummy': 'เพิ่มเป้านิ่ง', 'solo.kill': 'ตาย / เกิดใหม่',
+      'solo.respawning': 'กำลังเกิดใหม่ในประมาณ 3 วินาที...', 'solo.dummyAdded': 'เพิ่มเป้านิ่งแล้ว (สูงสุด 16 ตัว)',
       'weapon.title':'อาวุธสร้างเอง', 'weapon.saved':'อาวุธที่บันทึก', 'weapon.new':'สร้างอาวุธใหม่', 'weapon.empty':'ยังไม่มีอาวุธที่บันทึก',
       'weapon.pattern':'รูปแบบการยิง', 'weapon.single':'ยิงเดี่ยว', 'weapon.spread':'ยิงกระจาย', 'weapon.burst':'ยิงเป็นชุด',
       'weapon.damage':'ดาเมจต่อกระสุนหนึ่งเม็ด', 'weapon.speed':'ความเร็วกระสุน (หน่วยเอนจิน)', 'weapon.range':'ระยะยิง (พิกเซล)', 'weapon.cooldown':'คูลดาวน์ (ms)',

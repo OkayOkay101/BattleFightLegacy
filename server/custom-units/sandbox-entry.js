@@ -23,7 +23,9 @@ process.on('message', message => {
    ige.training.joinHuman(player);
   }
   const units = global.ige?.$$('unit').filter(unit => unit._stats?.type !== 'hLrbyj6dKv') || [];
-  const custom = units.find(unit => unit._stats.customUnit?.id === ige.training.snapshot.unit.id);
+  const custom = units.find(unit => ige.training.snapshot.mode === 'solo'
+   ? unit.getOwner()?._stats.controlledBy === 'human' && unit.getOwner().getSelectedUnit() === unit
+   : unit._stats.customUnit?.id === ige.training.snapshot.unit.id);
   if(message.relocate) ige.$(message.relocate.id)?.translateTo(message.relocate.position.x,message.relocate.position.y,0);
   if(custom&&message.buff) ige.action.run([
    {type:'setEntityAttributeMax',attribute:'speed',entity:{function:'thisEntity'},value:message.buff.speedMax},
@@ -90,7 +92,10 @@ process.on('message', message => {
    position: { x: unit._translate.x, y: unit._translate.y } })),
    effects:effectBefore||message.effectResult?{before:effectBefore||previousEffect,after:effects()}:null,
    errors:global.ige?.script.errorLogs,
-   projectiles: global.ige?.$$('projectile').length || 0, stats: global.ige?.training?.status(),
+   projectiles: global.ige?.$$('projectile').length || 0,
+   projectileDetails: ige.$$('projectile').map(p=>({id:p.id(),type:p._stats.type,position:{x:p._translate.x,y:p._translate.y},redirect:p._morrowRedirect})),
+   markers: ige.$$('item').filter(item=>item._morrowMarkerOwnerId || item._morrowTelegraphOwnerId).map(item=>({id:item.id(),type:item._stats.itemTypeId,position:{x:item._translate.x,y:item._translate.y},width:item._stats.width,height:item._stats.height,scaleDimensions:item._stats.scaleDimensions})),
+   stats: global.ige?.training?.status(),
    timerTick:global.ige?.timer.lastTick,
    characterStats:global.ige?.training.stats.finish().characters,
    weaponStats:global.ige?.training.stats.finish().weapons,

@@ -4,6 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { fork } = require('child_process');
 const { catalog, compileUnit } = require('./CustomUnitStore');
+const { soloCatalog } = require('./SoloCatalog');
 
 function localRequest(req) {
  const address = req.socket?.remoteAddress;
@@ -29,11 +30,20 @@ class SandboxManager {
   const weapons = this.store.weaponStore.recordsFor(saved.weapons);
   compileUnit(this.game, saved, weapons);
   if (!catalog(this.game).some(entry => entry.id === opponent)) throw new Error('Unknown opponent');
+  return this._startSnapshot({ schemaVersion: 1, unit: saved, weapons, controller, opponent });
+ }
+ async startSolo({ characterId }) {
+  const character = soloCatalog(this.game).find(entry => entry.id === characterId && entry.available);
+  if (!character) throw new Error('Unknown playable character');
+  return this._startSnapshot({ schemaVersion: 1, mode: 'solo', unit: { id: character.id, name: character.name },
+   weapons: [], controller: 'human', opponent: 'NNGRxjPsrz' });
+ }
+ async _startSnapshot(data) {
   if (this.starting || this.active) throw new Error('Close the current sandbox before starting another');
   this.starting = true;
   this.lastError = null;
   const sessionId = crypto.randomBytes(16).toString('hex');
-  const snapshot = { schemaVersion: 1, unit: saved, weapons, controller, opponent, token: crypto.randomBytes(32).toString('hex') };
+  const snapshot = { ...data, token: crypto.randomBytes(32).toString('hex') };
   const file = path.join(this.directory, `sandbox-${sessionId}.json`);
   let active;
   try {

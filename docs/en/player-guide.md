@@ -20,6 +20,19 @@ The web game and the 2026-10-09 portable build provide [Custom Units and Weapons
 
 Source equipment no longer offers Stardust Storm/Debris Strike as extra cross-character choices. PewPew keeps its native versions; previously saved selections remain compatible. Replacing a native skill with a custom weapon can disable skill-dependent forms/resources/summons. Edits apply to the next arena, not one already running. Custom characters are not included in normal matches or Neural training.
 
+## Solo Test (current source)
+
+Open **Solo Test** on the main page. Choose any of the 45 playable characters (Morrow is selected initially), then **Start test**. A separate local arena opens in a browser tab or an Electron window. Enter the arena using **Enter Game**; the selected character spawns directly, without a character picker or automatic opponents.
+
+- **Add target dummy** creates a stationary enemy PewPew nearby, up to 16 targets. Damage, kills and deaths use the existing statistics. This is a test session, not a training win-rate evaluation.
+- **Die / respawn** exercises the selected character's death lifecycle and respawns it after about 3 seconds. Native transformations, health floors and skills remain available; this button explicitly allows testing death even with a native health floor of 1.
+- **Restart** clears targets, projectiles, summons, pending sandbox skill timers and session statistics, then respawns the chosen character.
+- **End test** stops the isolated server. Closing its tab/window also requests shutdown; the local heartbeat watchdog is a fallback if the close request is lost. Only one Custom/Solo arena can run per main game server.
+
+Use the existing movement, equipment, camera and statistics controls. Morrow's Compass/Banked projectiles are now 44×44 world pixels and its marker is 64×64; their collision dimensions were enlarged accordingly. Atlas shows a constant-width attack band along the wall-clipped route, warns for 0.8 seconds and damages a target once. Banked Delivery travels to the marker's center before following the aim direction captured on cast. Marker lifetime is 7 seconds; replacement, death and reset clean it up.
+
+Solo uses native characters rather than custom clones. Custom Unit adapters remain limited to the original 44 supported prototypes. Solo does not add Morrow or custom units to Neural training. These changes require the current source; an older portable EXE does not include them until rebuilt.
+
 ## Controls and cameras
 
 - Default movement uses WASD or arrow keys; aim with the mouse and use the active item with the primary mouse button. Character-specific controls/skills are configured in the game data; do not assume every character shares the same skill keys or conditions.

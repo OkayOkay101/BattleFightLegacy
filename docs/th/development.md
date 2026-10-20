@@ -28,6 +28,15 @@ npm run desktop:build
 
 `launch-ai-gui.bat` เป็น launcher Windows สำหรับ GUI/เซิร์ฟเวอร์ฝึก Portable ไม่ต้องใช้ไฟล์นี้ ห้ามเปลี่ยนโค้ด gameplay/schema/reward ขณะที่ production training ใช้ environment ที่ตรึงอยู่ และแยก diagnostics/fixtures ออกจาก optimizer/registry จริง
 
+## ตรวจ regression ของ Solo
+
+```powershell
+node --test test/solo-mode.test.js test/solo-ui.test.js test/morrow-skills.test.js
+node --test test/solo-api.test.js test/solo-runtime.test.js test/custom-sandbox.test.js
+```
+
+คำสั่งแรกตรวจรายชื่อตัวละคร definition การเชื่อม UI อังกฤษ/ไทย timer หมุด และ raycast ของ Atlas คำสั่งที่สองเปิดโปรเซส loopback จริง ตรวจสิทธิ์ API การเดิน ดาเมจกระสุนเมื่อ callback ซ้ำหรือสลับ fixture และเมื่อ Box2D สร้างการชนเอง การหักวิถี เส้นเตือนที่คงอยู่ การเริ่มใหม่ ตาย/เกิดใหม่ และหยุดโปรเซส ต้องอนุญาตให้เปิดพอร์ตในเครื่อง IPC และ preload สำหรับทดสอบเปิดเฉพาะเมื่อระบุการตั้งค่า test เท่านั้น การตรวจนี้ไม่ได้ยืนยันว่าสกิลทุกตัวละครผ่าน หรือยืนยันภาพใน Electron build
+
 ## Checkpoint และการหยุด
 
 ตรวจ `train:status` ร่วมกับ PID จริง `supervisor.lock.json` timestamps และ checkpoint ตาม schema อย่าเปิด supervisor ซ้ำกับ data directory ที่มี lock สถานะ โมเดล optimizer และ match logs ใน `training-data` เป็น runtime data ในเครื่อง ไม่ใช่เอกสารหรือชุดฝึกที่จะฝังใน EXE

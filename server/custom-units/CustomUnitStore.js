@@ -9,7 +9,8 @@ const clone = value => JSON.parse(JSON.stringify(value));
 function fail(message, status = 400) { const error = new Error(message); error.status = status; throw error; }
 
 function catalog(game, customWeapons = []) {
- return playableIds(game).map(id => {
+ // Morrow is menu/Solo only until its namespaced skill adapter is implemented.
+ return playableIds(game).filter(id => id !== 'morrowRouteCartographer').map(id => {
   const unit = game.unitTypes[id], support=adapter(game,id), profile=support.profile;
   const available = unit.attributes?.health && unit.attributes?.speed && unit.cellSheet?.url;
   const defaults = { health: unit.attributes.health.max, speed: unit.attributes.speed?.value || 0,

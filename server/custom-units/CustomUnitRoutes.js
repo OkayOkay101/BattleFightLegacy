@@ -5,6 +5,7 @@ const path = require('path');
 const { CustomUnitStore, catalog } = require('./CustomUnitStore');
 const { SandboxManager, localRequest } = require('./SandboxManager');
 const { DEFAULTS } = require('./CustomWeaponStore');
+const { soloCatalog } = require('./SoloCatalog');
 
 function registerCustomRoutes(app, server) {
  const token = crypto.randomBytes(32).toString('hex');
@@ -23,6 +24,8 @@ function registerCustomRoutes(app, server) {
   try { await handler(req, res); } catch (error) { res.status(error.status || 400).json({ ok: false, error: error.message }); }
  };
  app.get('/api/custom-units', route((req, res) => res.json({ ok: true, token, catalog: catalog(game, store.weaponStore.list().weapons), ...store.list() })));
+ app.get('/api/solo', route((req, res) => res.json({ ok: true, token, catalog: soloCatalog(game).map(({id,name,image}) => ({id,name,image})) })));
+ app.post('/api/solo', route(async (req, res) => res.json({ ok: true, session: await manager.startSolo(req.body) })));
  app.get('/api/custom-weapons', route((req, res) => res.json({ ok: true, token, defaults: DEFAULTS, image: game.itemTypes.YCEF0g5Q66.cellSheet.url, ...store.weaponStore.list() })));
  app.post('/api/custom-weapons', route((req, res) => res.json({ ok: true, weapon: store.weaponStore.save(req.body) })));
  app.put('/api/custom-weapons/:id', route((req, res) => res.json({ ok: true, weapon: store.weaponStore.save({ ...req.body, id: req.params.id }) })));
@@ -40,6 +43,10 @@ function registerCustomRoutes(app, server) {
   const action = req.body.action;
   if (action === 'heartbeat') { process.send?.({ type: 'sandbox-alive' }); return res.json({ ok: true, notice: global.ige.training.customWeaponNotice || null }); }
   if (action === 'reset') { try { return res.json({ ok: true, demo: global.ige.training.resetSandbox() }); } catch (error) { return res.status(500).json({ ok: false, error: error.message }); } }
+  if (['dummy', 'kill'].includes(action) && global.ige.training.snapshot.mode === 'solo') {
+   try { return res.json({ ok: true, demo: action === 'dummy' ? global.ige.training.addSoloDummy() : global.ige.training.killSoloPlayer() }); }
+   catch (error) { return res.status(400).json({ ok: false, error: error.message }); }
+  }
   if (action === 'stop') { res.json({ ok: true }); setTimeout(() => process.emit('SIGTERM'), 100); return; }
   res.status(400).json({ ok: false, error: 'Unknown sandbox action' });
  });

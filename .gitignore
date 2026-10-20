@@ -139,3 +139,18 @@ videoChatConfig.js
 assets/js/videoChatConfig.js
 
 .idea/
+
+# Local outputs and tooling caches
+.tokensave/
+backups/
+reports/
+video/
+dist/
+__pycache__/
+/*.json.log
+/live-stats-*.json
+/transfer-*.json
+/dodge-desktop-audit.json
+/character-report-summary.json
+/server-startup.log.err*
+test/helpers/battlebot-dodge-benchmark-result.json
