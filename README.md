@@ -26,6 +26,14 @@ Open [http://127.0.0.1/](http://127.0.0.1/). From the main page, join a fight, s
 
 Controls: **WASD** to move, the mouse to aim, left click to fire, **1–4** to switch equipment.
 
+## Download
+
+Get the Windows game from [GitHub Releases](https://github.com/OkayOkay101/BattleFightLegacy/releases/latest). Download `BattleFight-Portable-1.0.0-no-touhou.exe` and run it; no install is needed.
+
+- Releases on GitHub are the **GitHub edition**: every character except Reimu & Marisa, whose Touhou Project fan-work guidelines do not list GitHub as a distribution channel. See [Releasing](docs/en/releasing.md#editions).
+- The EXE is not code-signed. If Windows shows "Windows protected your PC", check the file's SHA256 against the release page, then choose **More info → Run anyway**.
+- Credits and licenses ship inside the app in `licenses/`; see [Third-party notices](docs/licenses/THIRD-PARTY-NOTICES.md) and [Character credits](docs/licenses/CHARACTER-CREDITS.md).
+
 ## Windows portable app
 
 Run `dist/portable/BattleFight-Portable-1.0.0.exe`. It runs the game and its server on your computer, includes local visuals and AI inference, has no audio, and needs no Node.js, Python or internet connection. Your settings and custom content are kept in your per-user data folder, so they survive replacing the EXE.
@@ -37,7 +45,7 @@ npm install
 npm run desktop:build
 ```
 
-See the [development guide](docs/en/development.md) for prerequisites and details.
+For the GitHub edition use `npm run desktop:build:github`. See the [development guide](docs/en/development.md) for prerequisites and [Releasing](docs/en/releasing.md) for publishing a release.
 
 ## Documentation — English first
 
@@ -46,6 +54,7 @@ See the [development guide](docs/en/development.md) for prerequisites and detail
 - [Architecture and combat](docs/en/architecture.md)
 - [AI and training](docs/en/ai-training.md)
 - [Development and standalone packaging](docs/en/development.md)
+- [Releasing](docs/en/releasing.md)
 - [Custom Units and Custom Weapons](docs/en/custom-units.md)
 - [Release and validation notes](docs/en/release-notes.md)
 - [Licenses and redistribution evidence](docs/en/licenses.md)
@@ -81,11 +90,19 @@ BattleFight เป็นเกมต่อสู้เป็นทีมมุ�
 
 การควบคุม: **WASD** เดิน, เมาส์เล็ง, คลิกซ้ายยิง, **1–4** เปลี่ยนอุปกรณ์
 
+### ดาวน์โหลด
+
+ดาวน์โหลดเกม Windows ได้ที่ [GitHub Releases](https://github.com/OkayOkay101/BattleFightLegacy/releases/latest) เลือกไฟล์ `BattleFight-Portable-1.0.0-no-touhou.exe` แล้วเปิดได้เลย ไม่ต้องติดตั้ง
+
+- release บน GitHub เป็น**รุ่น GitHub** ที่มีตัวละครครบทุกตัว ยกเว้น Reimu & Marisa เพราะแนวปฏิบัติแฟนเวิร์กของ Touhou Project ไม่ได้ระบุ GitHub เป็นช่องทางเผยแพร่ ดู[การปล่อยเกม](docs/th/releasing.md#รุ่นของเกม)
+- EXE ยังไม่ได้เซ็นดิจิทัล ถ้า Windows ขึ้นหน้าต่าง "Windows protected your PC" ให้ตรวจ SHA256 กับหน้า release ก่อน แล้วกด **More info (ข้อมูลเพิ่มเติม) → Run anyway (เรียกใช้ต่อไป)**
+- เครดิตและ license อยู่ในแอปที่โฟลเดอร์ `licenses/` ดู [Third-party notices](docs/licenses/THIRD-PARTY-NOTICES.md) และ [เครดิตตัวละคร](docs/licenses/CHARACTER-CREDITS.md)
+
 ### แอป Windows แบบ portable
 
 เปิด `dist/portable/BattleFight-Portable-1.0.0.exe` แอปรันทั้งเกมและเซิร์ฟเวอร์ในเครื่อง มีภาพและ AI inference ในตัว ไม่มีเสียง ไม่ต้องติดตั้ง Node.js หรือ Python และไม่ต้องต่ออินเทอร์เน็ต การตั้งค่าและข้อมูล custom เก็บไว้ในโฟลเดอร์ข้อมูลของผู้ใช้ จึงยังอยู่แม้เปลี่ยนไฟล์ EXE
 
-build ใหม่ด้วย `npm install` และ `npm run desktop:build` ดู prerequisites และรายละเอียดใน [คู่มือพัฒนา](docs/th/development.md)
+build ใหม่ด้วย `npm install` และ `npm run desktop:build` ส่วนรุ่น GitHub ใช้ `npm run desktop:build:github` ดู prerequisites ใน [คู่มือพัฒนา](docs/th/development.md) และวิธีปล่อย release ใน[การปล่อยเกม](docs/th/releasing.md)
 
 ### เอกสาร
 
@@ -94,6 +111,7 @@ build ใหม่ด้วย `npm install` และ `npm run desktop:build` �
 - [โครงสร้างและการต่อสู้](docs/th/architecture.md)
 - [AI และการฝึก](docs/th/ai-training.md)
 - [การพัฒนาและแพ็กเกจ standalone](docs/th/development.md)
+- [การปล่อยเกม](docs/th/releasing.md)
 - [ยูนิตและอาวุธสร้างเอง](docs/th/custom-units.md)
 - [บันทึกรุ่นและการตรวจรับ](docs/th/release-notes.md)
 - [License และหลักฐานสิทธิ์เผยแพร่](docs/th/licenses.md)

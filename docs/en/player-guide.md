@@ -4,6 +4,8 @@
 
 ## Start and choose a mode
 
+Download the Windows game from [GitHub Releases](https://github.com/OkayOkay101/BattleFightLegacy/releases/latest). The file on GitHub is `BattleFight-Portable-1.0.0-no-touhou.exe`, the **GitHub edition**: every character except Reimu & Marisa (see [Releasing](releasing.md#editions)). Windows may warn that the EXE is not signed; check its SHA256 against the release page, then choose **More info → Run anyway**.
+
 For Windows standalone, run the portable `.exe`. It starts its own local server and game window; Node, Python and the training toolchain are not required. Keep browser-server instructions separate from portable play. To run from source, follow [Development](development.md).
 
 Choose **Spectate** to watch Blue and Red bots, or **Play Game** to select a character and join Blue against Red. Use **Enter Game** after selecting options. The desktop edition offers play and AI selection, not training.
@@ -20,7 +22,7 @@ The web game and the 2026-10-09 portable build provide [Custom Units and Weapons
 
 Source equipment no longer offers Stardust Storm/Debris Strike as extra cross-character choices. PewPew keeps its native versions; previously saved selections remain compatible. Replacing a native skill with a custom weapon can disable skill-dependent forms/resources/summons. Edits apply to the next arena, not one already running. Custom characters are not included in normal matches or Neural training.
 
-## Solo Test (current source)
+## Solo Test
 
 Open **Solo Test** on the main page. Choose any of the 45 playable characters (Morrow is selected initially), then **Start test**. A separate local arena opens in a browser tab or an Electron window. Enter the arena using **Enter Game**; the selected character spawns directly, without a character picker or automatic opponents.
 
@@ -31,7 +33,11 @@ Open **Solo Test** on the main page. Choose any of the 45 playable characters (M
 
 Use the existing movement, equipment, camera and statistics controls. Morrow's Compass/Banked projectiles are now 44×44 world pixels and its marker is 64×64; their collision dimensions were enlarged accordingly. Atlas shows a constant-width attack band along the wall-clipped route, warns for 0.8 seconds and damages a target once. Banked Delivery travels to the marker's center before following the aim direction captured on cast. Marker lifetime is 7 seconds; replacement, death and reset clean it up.
 
-Solo uses native characters rather than custom clones. Custom Unit adapters remain limited to the original 44 supported prototypes. Solo does not add Morrow or custom units to Neural training. These changes require the current source; an older portable EXE does not include them until rebuilt.
+Solo uses native characters rather than custom clones. Custom Unit adapters remain limited to the original 44 supported prototypes. Solo does not add Morrow or custom units to Neural training. Solo Test and Morrow are in the 2026-10-20 portable build; EXEs from 2026-10-09 and earlier do not have them.
+
+## Renamed characters and skills
+
+From 2026-10-21 some names changed; gameplay did not. Corkmaster is now **Cork** (skills **Shot!, Blow!, Bait!, Block!**), Manish's Morphling weapon is now **Morph**, and Marigold's Malevolent Orchid is now **Orchid**.
 
 ## Controls and cameras
 

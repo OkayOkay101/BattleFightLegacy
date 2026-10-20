@@ -4,7 +4,9 @@
 
 English is the default documentation language. Every guide has a corresponding Thai page. These guides describe the current local implementation; historical evaluation reports are dated snapshots, not live training status.
 
-Updated **2026-10-09**. Start with the player guide for normal play, Custom Units for the local experiment editor, or Development for server/training/build commands.
+Updated **2026-10-21**. Start with the player guide for normal play, Custom Units for the local experiment editor, Development for server/training/build commands, or Releasing to publish a build.
+
+Download the Windows game from [GitHub Releases](https://github.com/OkayOkay101/BattleFightLegacy/releases/latest). Releases on GitHub are the **GitHub edition**, without Reimu & Marisa; see [Releasing](releasing.md#editions).
 
 | Guide | Contents |
 |---|---|
@@ -14,6 +16,7 @@ Updated **2026-10-09**. Start with the player guide for normal play, Custom Unit
 | [Architecture](architecture.md) | Client/server, game definitions, physics, skills, projectiles and attribution |
 | [AI and training](ai-training.md) | Heuristic/Neural models, observations, PPO, checkpoints and promotion |
 | [Development](development.md) | Prerequisites, commands, training stop behavior and offline packaging |
+| [Releasing](releasing.md) | Full and GitHub editions, build checks, draft and publish a GitHub release |
 | [Licenses](licenses.md) | License scope, asset provenance, notices and unresolved evidence |
 | [Component inventory](license-inventory.md) | Exact dependency versions, copied notices and distribution evidence |
 | [Credits](credits.md) | Taro contributors, dependencies and AI-assisted development |
