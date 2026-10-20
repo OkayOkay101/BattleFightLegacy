@@ -118,7 +118,7 @@
 
 ### Task 13: Nadia
 **Files:** Create `packages/sim/src/kits/nadia.ts`; Test `packages/sim/test/kits/nadia.test.ts`
-- [ ] **Step 1:** test ตามข้อมูลเดิม: Sword Slash ระยะสั้น, Frozen Dash (ระยะไกลขึ้นเมื่อยืนนิ่ง), Teleportation หน่วงก่อนวาร์ป ไม่วาร์ปเข้ากำแพง, Elemental Freeze ทำให้ช้า + รับดาเมจไม่เกิน 30 ภายใน 2 วิ → FAIL
+- [ ] **Step 1:** test ตามข้อมูลเดิม: Sword Slash ระยะสั้น, Frozen Dash **พุ่งระยะตายตัวตามทิศเคอร์เซอร์เสมอ (ไม่ขึ้นกับการยืนนิ่งหรือระยะเคอร์เซอร์) ชนกำแพงแล้วหยุด** (Q594), Teleportation หน่วงก่อนวาร์ปไปจุดเคอร์เซอร์ ไม่วาร์ปเข้ากำแพง (Q595), Elemental Freeze ทำให้ช้า + รับดาเมจไม่เกิน 30 ภายใน 2 วิ → FAIL
 - [ ] **Step 2:** implement
 - [ ] **Step 3:** PASS → commit
 
@@ -145,7 +145,7 @@
 
 ### Task 17: Dual Assassin (ตัวโจทย์ภายใน)
 **Files:** Create `packages/sim/src/kits/dualAssassin.ts`, `packages/sim/src/systems/clones.ts`; Test `packages/sim/test/kits/dualAssassin.test.ts`, `apps/web/test/bundle-exclusion.test.ts`
-- [ ] **Step 1:** test: Death Prophecy โดนแล้วสร้างโคลน; Quick Thrust สั่งโคลนโจมตี; Clean Swap ยิงโดนโคลนแล้ววาร์ป; Flawless Finisher ทุกร่างพุ่ง; **bundle ของ `apps/web` ไม่มีสตริง/ข้อมูลของ Dual Assassin** (Q288) → FAIL
+- [ ] **Step 1:** test: Death Prophecy โดนแล้วสร้างโคลน; Quick Thrust แดชระยะตายตัวตามทิศเคอร์เซอร์ (Q594) และสั่งโคลนโจมตี; Clean Swap ยิงโดนโคลนแล้ววาร์ป; Flawless Finisher วาร์ประยะสั้นไปจุดเป้าหมายทั้งตัวจริงและโคลน (Q595); **bundle ของ `apps/web` ไม่มีสตริง/ข้อมูลของ Dual Assassin** (Q288) → FAIL
 - [ ] **Step 2:** implement ระบบโคลนแบบทั่วไป (ใช้ซ้ำกับตัวเรียกลูกน้องภายหลัง — Q235); ข้อมูลอ่านจาก `packages/data/internal/` เฉพาะใน benchmark/test
 - [ ] **Step 3:** PASS → commit
 

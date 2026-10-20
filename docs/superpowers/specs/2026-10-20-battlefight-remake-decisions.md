@@ -652,6 +652,9 @@
 
 | Q593 | เครื่องมือผลิตภาพซีรีส์ | บันทึกเป็น "เครื่องมือ motion graphics ของ Claude (รอระบุ)"; เลือกตอนทำตอนนำร่อง (Q590) ด้วย spike เทียบฉากสั้น |
 
+| Q594 | สกิลแดช | **แดชระยะตายตัวตามทิศเคอร์เซอร์เสมอ**; ตัดเงื่อนไข "ยืนนิ่งแล้วพุ่งไกลขึ้น" ของ Frozen Dash (เป็นข้อจำกัดของ engine เก่า) — ใช้กับทุกสกิลแดช: Frozen Dash (Nadia), Shorthop (Crackshot), Umbral Dash (Shadow Dancer), Quick Thrust (Dual Assassin); ชนกำแพงแล้วหยุด (Q246) |
+| Q595 | วาร์ป | ไม่ใช้กฎ Q594 — วาร์ปยังเลือกจุดได้ (point target): Teleportation (Nadia), Bush Man Teleport, **Flawless Finisher (Dual Assassin) = วาร์ประยะสั้น ไม่ใช่แดช** |
+
 ## เลื่อนไว้โดยผู้ใช้
 - Q593 เครื่องมือ motion graphics สำหรับซีรีส์ — ผู้ใช้ระบุภายหลัง
 - Q437 ความร้อน/ล็อกเป้าของตัวละคร 2 ผู้เล่น — ผู้ใช้บาลานซ์เองภายหลัง
