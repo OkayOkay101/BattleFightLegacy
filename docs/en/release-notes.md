@@ -1,8 +1,20 @@
-# Release and Validation Notes — 2026-10-09
+# Release and Validation Notes
 
 [ภาษาไทย](../th/release-notes.md) · [Documentation](index.md)
 
-## Current source
+## 2026-10-20 — Solo Test and Morrow
+
+Commit `39afe69` on `codex/battlefight-bots`.
+
+- **Solo Test:** an isolated arena with no bots for any of the 45 menu characters, no saved custom unit required. It adds stationary target dummies, death/respawn, reset and an owned process that shuts down with the session. The menu opens it in a popup (browser) or through Electron IPC.
+- **Morrow:** new character with Compass Bolt, Banked shot, a route marker that expires after 7 seconds, and Atlas (800 ms warning, one hit per target, clipped at walls). Morrow is not part of production training or custom cloning.
+- **Fixes found during validation:** larger projectile and marker collision/render sizes; Atlas keeps its streamed dimensions; Banked first leg and marker redirect corrected; earliest raycast hit retained; Morrow timers cleaned up with the sandbox; target dummies no longer spawn overlapping.
+- **Sixth Diva and Emo & Sky:** all eight skills fire, render with valid textures and damage a target in the real browser client. Sixth Diva's self-damage is a designed health cost (10 HP per blade/shot; Hexa-Shift trades health for speed or a temporary heal). Emo & Sky's skill 3 and Brillant Catastrophe have built-in delays of up to about 6.5 seconds. The original export file still contains the older item-position scripts, remote image URLs and bullet makers that are destroyed on contact; this source has those fixes.
+- **Repository:** the original `.gitignore` was restored after being overwritten, and local outputs (backups, reports, dist, video, caches, result JSON) are ignored.
+
+**Validation:** the Solo/Morrow/projectile selection passed 17/17 on 2026-10-20 (45/45 in the 2026-10-12 QA run, see [Solo Test QA](../qa/2026-10-12-solo-test.md)). The full suite was not rerun. No EXE was rebuilt, so `dist/portable` still predates Solo Test and Morrow. Run `npm run desktop:build` to include them.
+
+## 2026-10-09 — Custom Units and Custom Weapons
 
 - Custom Units supports all 44 playable originals with separate compiled IDs, forms, resources and player/heuristic arenas.
 - Custom Weapons adds local versioned CRUD, single/spread/burst settings, per-slot selection, immutable snapshots and server-authoritative damage.
@@ -10,7 +22,7 @@
 - Equipment offers native and saved custom weapons. Stardust Storm/Debris Strike are removed as extra cross-character options; PewPew's originals and previously saved compatible equipment remain supported. Native equipment is not duplicated as a saved-only option.
 - English/Thai guides, API/storage reference, AI development credit and local license evidence are refreshed. Production training definitions, schemas and Champion promotion criteria are unchanged.
 
-## Existing portable artifact
+### Portable artifact (2026-10-09)
 
 | Field | Verified build snapshot |
 |---|---|
@@ -23,7 +35,7 @@
 
 This EXE includes Custom Weapons and the startup/posthumous projectile fixes. It predates the latest source equipment-catalog change and this documentation refresh. No new EXE or GitHub Release is created by the documentation publication. Build again to include those later source changes. Local records are per-user data and do not become bundled sample units/weapons.
 
-## Validation evidence and limits
+### Validation evidence and limits
 
 The implementation's full 508-case run completed with 502 passed, two native Stardust fixture failures and four skipped opt-in training/optimizer/CLI cases. Both failures fired before the engine clock initialized. The native fixtures now wait for the real clock; the focused corrected run passed 17/17, including real Box2D single/spread/burst/native hits. The entire 508-case command was not rerun after that fixture correction.
 
