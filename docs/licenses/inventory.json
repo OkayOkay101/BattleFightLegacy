@@ -1,11 +1,11 @@
 {
   "snapshot": {
     "date": "2026-10-21",
-    "sourceCommit": "e83b8ae77cc70e4371bb5947ead31b1794abdfed",
+    "sourceCommit": "d049f7b2bf0884907086304a10842337dd479518",
     "counts": {
       "npm": 769,
       "python": 12,
-      "assets": 2837,
+      "assets": 2836,
       "embeddedHeaders": 14,
       "npmMetadataOnly": 0,
       "npmCollectedUpstream": 31,
@@ -17398,8 +17398,8 @@
     },
     {
       "component": "assets/fonts/verdana_12pt.png",
-      "status": "Open: provenance unconfirmed; not rendered",
-      "reason": "Bitmap of Verdana glyphs inherited from the Isogenic Engine at the initial commit. ClientScore, its only user, is never instantiated, so removing the load is an option."
+      "status": "Resolved: removed on 2026-10-21",
+      "reason": "Bitmap of Verdana glyphs inherited from the Isogenic Engine with unconfirmed provenance. It was loaded but never rendered, so the file, its loader and the unused ClientScore class were removed."
     },
     {
       "component": "Reimu & Marisa (Touhou Project fan content)",

@@ -18,7 +18,7 @@
 | Node สำหรับพัฒนา, Python interpreter และ Tcl/Tk | เก็บ notice แล้วใน `docs/licenses/texts/tool-runtimes`: `LICENSE.txt` ของ Python และ `license.terms` ของ Tcl/Tk จาก interpreter ที่ติดตั้ง, `LICENSE` ของ Node.js ตามเวอร์ชันที่ใช้ | เครื่องมือเซิร์ฟเวอร์ source/ฝึก/GUI ไม่รวมใน standalone |
 | Sprite, tileset และ UI ที่นำเข้า | **Public Domain** ตามที่เจ้าของโปรเจกต์ยืนยัน (2026-10-20) | เกม source และ desktop resources |
 | `arcade.ttf` | ฟอนต์ Arcade Alternate ของ Abdul Muizz bin Haji Kasim ([dafont](https://www.dafont.com/arcade-alternate.font)) ใช้ได้ทั้งส่วนตัวและเชิงพาณิชย์โดยให้เครดิต ให้เครดิตแล้วใน `THIRD-PARTY-NOTICES.md` | Desktop preparer คัดลอกโดยตรง |
-| `verdana_12pt.png` | bitmap ตัวอักษร Verdana ที่มากับ Isogenic Engine ยังยืนยันที่มาไม่ได้ โหลดตอนเปิดเกมแต่ไม่ได้แสดงผล (ไม่มีการสร้าง `ClientScore`) | Desktop preparer คัดลอกโดยตรง |
+| `verdana_12pt.png` | **เอาออกแล้วเมื่อ 2026-10-21** เป็น bitmap ตัวอักษร Verdana ที่มากับ Isogenic Engine ยืนยันที่มาไม่ได้ เกมโหลดไฟล์แต่ไม่ได้แสดงผล | ไม่ได้แนบไปแล้ว |
 | เสียง | มีรายการใน manifest เก่า แต่ standalone ลบเสียงและอ้างอิง การนำออกไม่ได้ยืนยัน license ของสำเนาที่อยู่ที่อื่น | ไม่รวมใน standalone ออฟไลน์ปัจจุบัน |
 
 Phaser ถูกประกาศใน dependencies แต่การประกาศอย่างเดียวไม่พิสูจน์ว่าเกมบน browser เรียกใช้ ต้องตรวจ imports/vendor แยก Renderer ปัจจุบันใช้ Pixi งานเอกสารนี้ไม่ upgrade หรือลบ dependency
@@ -50,6 +50,6 @@ npm ทั้ง 31 ตัวที่ไม่มีไฟล์ license มี
 
 แก้แล้วเมื่อ 2026-10-21: Sukune และ Tenkai เป็นแฟนเวิร์กของ Len'en Project ตามแนวปฏิบัติของ JynX (CC BY-SA 4.0 ที่เจอก่อนหน้าเป็น license ของข้อความในวิกิ Len'en ไม่ใช่ของตัวละคร), เปลี่ยนชื่อ Morphling, Malevolent Orchid และชื่อของ Corkmaster เป็น Morph, Orchid และ Cork (สกิล Shot, Blow, Bait, Block) แล้ว, Dual Assassin ได้รับอนุญาตจากผู้ร่วมสร้างให้ใช้เฉพาะในเกมนี้
 
-ยังค้างอยู่: ช่องทางเผยแพร่ fan content ของ Touhou (แนวปฏิบัติไม่ได้ระบุ GitHub) และที่มาของ `verdana_12pt.png`
+ยังค้างอยู่: ช่องทางเผยแพร่ fan content ของ Touhou (แนวปฏิบัติไม่ได้ระบุ GitHub) (release บน GitHub ยังเป็น draft จนกว่าเจ้าของโปรเจกต์จะตัดสินใจ) ส่วน `verdana_12pt.png` เอาออกแล้วเมื่อ 2026-10-21
 
 การพบพาธเดียวกันใน asset inventory ไม่ครอบคลุมไฟล์ที่เปลี่ยนชื่อ/แปลง `packagedNodeModule` ตรวจตำแหน่งตาม lock ใน app.asar ไม่ใช่ทุก hoisted path หรือ binary dependency ของ Chromium การตรวจ notice ครบต้องใช้ต้นฉบับ vendor mapping และ notice runtime ร่วมกัน

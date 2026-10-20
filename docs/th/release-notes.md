@@ -16,7 +16,7 @@ Commit `39afe69` บน `codex/battlefight-bots`
 
 **แก้ Atlas:** Atlas Unfolded แสดงเส้นเตือนแต่ไม่เคยทำดาเมจ เพราะเกมใช้ physics Planck ซึ่ง `rayCast` รับ `(point1, point2, callback)` แต่ Atlas ส่ง callback เป็นตัวแรก raycast จึงไม่เจอยูนิตและกำแพงไม่ตัดเส้น ตอนนี้ใช้ลำดับของ Planck แล้ว (engine อื่นยังใช้ลำดับ Box2D) และทำดาเมจ 30 ตามที่ตั้งไว้ มี regression test ครอบคลุมลำดับพารามิเตอร์ของ Planck
 
-**Build EXE ใหม่แล้ว:** `dist/portable/BattleFight-Portable-1.0.0.exe` ขนาด 129,143,802 bytes SHA256 `01292d696116238d6cf87a86af572a174131e599e07219f49285aa19f6702ce5` Windows x64 ยังไม่เซ็นดิจิทัล มี Solo Test, Morrow, การแก้ Atlas และโฟลเดอร์ `licenses/` ที่รวม notice ของ Taro ไลบรารีเบราว์เซอร์ npm และ THIRD-PARTY-NOTICES.md สคริปต์แพ็กเกจแก้ให้นำภาพ `/assets/morrow` จาก `src/assets/morrow` เหมือนเซิร์ฟเวอร์ source ผล build ไม่มีภาพหาย และไม่มียูนิตที่ใช้ภาพสำรอง ทดสอบ desktop ผ่าน 19/19 และ smoke test ของ Electron ผ่าน 1/1
+**Build EXE ใหม่แล้ว:** `dist/portable/BattleFight-Portable-1.0.0.exe` ขนาด 129,135,705 bytes SHA256 `8a95e53557f19bebb25e2cade757729a4a028297925b2febdf6b4d78c5b7a3eb` Windows x64 ยังไม่เซ็นดิจิทัล มี Solo Test, Morrow, การแก้ Atlas และโฟลเดอร์ `licenses/` ที่รวม notice ของ Taro ไลบรารีเบราว์เซอร์ npm และ THIRD-PARTY-NOTICES.md สคริปต์แพ็กเกจแก้ให้นำภาพ `/assets/morrow` จาก `src/assets/morrow` เหมือนเซิร์ฟเวอร์ source ผล build ไม่มีภาพหาย และไม่มียูนิตที่ใช้ภาพสำรอง ทดสอบ desktop ผ่าน 19/19 และ smoke test ของ Electron ผ่าน 1/1
 
 **เปลี่ยนชื่อ (2026-10-21):** อาวุธ Morphling เป็น Morph, Malevolent Orchid เป็น Orchid และ Corkmaster เป็น Cork พร้อมสกิล Shot, Blow, Bait และ Block เปลี่ยนเฉพาะชื่อที่แสดง ไม่ได้เปลี่ยน key ของตัวแปรภายใน
 

@@ -638,7 +638,7 @@ function prepareDesktopPackage(options = {}) {
 	};
 	const sourceGame = JSON.parse(fs.readFileSync(path.join(repoRoot, 'src/game.json'), 'utf8'));
 	const game = rewriteGameAssets(removeAudioData(sourceGame), context, stats);
-	for (const relative of ['assets/images/favicon.png', 'assets/fonts/arcade.ttf', 'assets/fonts/verdana_12pt.png']) {
+	for (const relative of ['assets/images/favicon.png', 'assets/fonts/arcade.ttf']) {
 		const source = path.join(repoRoot, relative);
 		if (!fs.existsSync(source)) throw new Error('Missing required UI file: ' + source);
 		if (relative.endsWith('.png') && !validImage(fs.readFileSync(source), '.png')) throw new Error('Invalid UI image: ' + source);

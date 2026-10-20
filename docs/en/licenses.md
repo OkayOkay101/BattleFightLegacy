@@ -18,7 +18,7 @@ Snapshot: **2026-10-20**. This is a source/evidence register, not a declaration 
 | Development Node, Python interpreter and Tcl/Tk | Notices collected in `docs/licenses/texts/tool-runtimes`: Python `LICENSE.txt` and Tcl/Tk `license.terms` from the installed interpreter, Node.js `LICENSE` for the installed version | Source server/training/GUI tools; not included in standalone |
 | Imported sprites, tilesets and UI images | **Public domain**, per the project owner (statement, 2026-10-20) | Source game and desktop resources |
 | `arcade.ttf` | Arcade Alternate by Abdul Muizz bin Haji Kasim ([dafont](https://www.dafont.com/arcade-alternate.font)): free for personal and commercial use with credit; credited in `THIRD-PARTY-NOTICES.md` | Copied by desktop preparation |
-| `verdana_12pt.png` | Bitmap of Verdana glyphs inherited from the Isogenic Engine; provenance unconfirmed. Loaded at startup but never rendered (`ClientScore` is never created) | Copied by desktop preparation |
+| `verdana_12pt.png` | **Removed on 2026-10-21.** Bitmap of Verdana glyphs inherited from the Isogenic Engine with unconfirmed provenance; it was loaded but never rendered | Not shipped |
 | Audio | Some historical manifest entries exist; standalone preparation removes audio and its references. Removing an asset does not establish a license for any copy elsewhere | Excluded from the current offline standalone |
 
 Phaser is declared in package dependencies. A declaration alone does not prove that browser gameplay executes it; inspect runtime imports/vendor mappings separately. The current browser renderer uses Pixi. No dependency upgrade/removal is performed by this documentation task.
@@ -50,6 +50,6 @@ All 31 npm packages that ship no license file now have a collected text: 16 from
 
 Resolved on 2026-10-21: Sukune and Tenkai are Len'en Project fan content made under JynX's derivative works guidelines (the CC BY-SA 4.0 notice found earlier is the Len'en Wiki text license, not the characters'); Morphling, Malevolent Orchid and the Corkmaster names were renamed to Morph, Orchid and Cork (skills Shot, Blow, Bait, Block); Dual Assassin is used with its co-creator's permission for this game only.
 
-Still open: Touhou fan-content distribution channel (the guidelines do not list GitHub) and `verdana_12pt.png` provenance.
+Still open: Touhou fan-content distribution channel (the guidelines do not list GitHub) (the GitHub release is a draft until the project owner decides). `verdana_12pt.png` was removed on 2026-10-21.
 
 Same-path presence in the asset inventory does not detect every renamed/transformed asset. `packagedNodeModule` checks each locked location in app.asar, not every possible hoisted path or Chromium binary dependency. Full notice coverage needs the original texts, vendor mapping and runtime notice file together.

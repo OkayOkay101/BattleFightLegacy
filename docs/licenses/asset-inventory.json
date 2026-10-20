@@ -20130,16 +20130,6 @@
       "distributionEvidence": "Same-path inspection only; transformed/renamed references require asset manifest review"
     },
     {
-      "path": "assets/fonts/verdana_12pt.png",
-      "bytes": 8876,
-      "sha256": "42ec01c95e9634c6037ec0f8954ec8acd40f5515c6515cd55f087af77ebd4413",
-      "recordedSourceUrls": [],
-      "vendorPackage": null,
-      "licenseStatus": "Bitmap of Verdana glyphs from the Isogenic Engine sample assets; loaded but never rendered; provenance unconfirmed",
-      "standaloneAtSameRelativePath": true,
-      "distributionEvidence": "Same-path inspection only; transformed/renamed references require asset manifest review"
-    },
-    {
       "path": "assets/images/blocked.jpg",
       "bytes": 25363,
       "sha256": "a672b6abd0fb8217b2701ed4f31e08260e0ab700a22c86b87e2fc5130a1b183c",

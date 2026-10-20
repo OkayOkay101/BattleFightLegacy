@@ -6,7 +6,6 @@ var igeClientConfig = {
 
 		'/gameClasses/Player.js',
 		'/gameClasses/Unit.js',
-		'/gameClasses/ClientScore.js',
 		'/gameClasses/MinimapUnit.js',
 		'/gameClasses/Region.js',
 
