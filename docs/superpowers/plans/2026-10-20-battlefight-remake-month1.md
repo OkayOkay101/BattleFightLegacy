@@ -106,7 +106,7 @@
 
 ### Task 11: Input คีย์บอร์ด/เมาส์ → คำสั่ง
 **Files:** Create `packages/client/src/input/{keyboardMouse.ts,bindings.ts}`; Test `packages/client/test/input.test.ts`
-- [ ] **Step 1:** test: WASD/เมาส์สร้าง `Command` ที่ถูกต้อง; ปุ่ม 1–4/ลูกล้อสลับเวท (Q224); Shift ค้าง = queue flag; ตั้งปุ่มใหม่ได้ (Q62) → FAIL
+- [ ] **Step 1:** test: WASD/เมาส์สร้าง `Command` ที่ถูกต้อง; **ทุกตัวละครใช้ 4 ปุ่มสั่ง 4 สกิลโดยตรง** (Q596) ยกเว้น Gavin ที่ปุ่ม 1–4/ลูกล้อสลับเวทแล้วยิงปุ่มเดียว (Q212, Q224); Shift ค้าง = queue flag; ตั้งปุ่มใหม่ได้ (Q62) → FAIL
 - [ ] **Step 2:** implement (จอย/จอสัมผัสเป็นเฟส 2)
 - [ ] **Step 3:** PASS → commit
 
@@ -118,7 +118,7 @@
 
 ### Task 13: Nadia
 **Files:** Create `packages/sim/src/kits/nadia.ts`; Test `packages/sim/test/kits/nadia.test.ts`
-- [ ] **Step 1:** test ตามข้อมูลเดิม: Sword Slash ระยะสั้น, Frozen Dash **พุ่งระยะตายตัวตามทิศเคอร์เซอร์เสมอ (ไม่ขึ้นกับการยืนนิ่งหรือระยะเคอร์เซอร์) ชนกำแพงแล้วหยุด** (Q594), Teleportation หน่วงก่อนวาร์ปไปจุดเคอร์เซอร์ ไม่วาร์ปเข้ากำแพง (Q595), Elemental Freeze ทำให้ช้า + รับดาเมจไม่เกิน 30 ภายใน 2 วิ → FAIL
+- [ ] **Step 1:** test ตามข้อมูลเดิม: Sword Slash **เป็น hitbox พื้นที่โค้งระยะประชิด ไม่ใช่กระสุน** (Q597), Frozen Dash **พุ่งระยะตายตัวตามทิศเคอร์เซอร์เสมอ (ไม่ขึ้นกับการยืนนิ่งหรือระยะเคอร์เซอร์) ชนกำแพงแล้วหยุด** (Q594), Teleportation หน่วงก่อนวาร์ปไปจุดเคอร์เซอร์ ไม่วาร์ปเข้ากำแพง (Q595), Elemental Freeze ทำให้ช้า + **ดาเมจรวมที่รับได้ไม่เกิน 30 ตลอด 2 วิ** (Q600) → FAIL
 - [ ] **Step 2:** implement
 - [ ] **Step 3:** PASS → commit
 
@@ -145,7 +145,7 @@
 
 ### Task 17: Dual Assassin (ตัวโจทย์ภายใน)
 **Files:** Create `packages/sim/src/kits/dualAssassin.ts`, `packages/sim/src/systems/clones.ts`; Test `packages/sim/test/kits/dualAssassin.test.ts`, `apps/web/test/bundle-exclusion.test.ts`
-- [ ] **Step 1:** test: Death Prophecy โดนแล้วสร้างโคลน; Quick Thrust แดชระยะตายตัวตามทิศเคอร์เซอร์ (Q594) และสั่งโคลนโจมตี; Clean Swap ยิงโดนโคลนแล้ววาร์ป; Flawless Finisher วาร์ประยะสั้นไปจุดเป้าหมายทั้งตัวจริงและโคลน (Q595); **bundle ของ `apps/web` ไม่มีสตริง/ข้อมูลของ Dual Assassin** (Q288) → FAIL
+- [ ] **Step 1:** test: Death Prophecy โดนแล้วสร้างโคลน; Quick Thrust แดชระยะตายตัวตามทิศเคอร์เซอร์ (Q594) และสั่งโคลนโจมตี; Clean Swap ยิงกระสุนแบบเลือก point target หรือ unit target (กระสุนวิ่งตามโคลนที่เลือก) โดนโคลนแล้ววาร์ป และกระสุนยังถูกขวางได้ (Q604); Flawless Finisher วาร์ประยะสั้นไปจุดเป้าหมายทั้งตัวจริงและโคลน (Q595); **bundle ของ `apps/web` ไม่มีสตริง/ข้อมูลของ Dual Assassin** (Q288) → FAIL
 - [ ] **Step 2:** implement ระบบโคลนแบบทั่วไป (ใช้ซ้ำกับตัวเรียกลูกน้องภายหลัง — Q235); ข้อมูลอ่านจาก `packages/data/internal/` เฉพาะใน benchmark/test
 - [ ] **Step 3:** PASS → commit
 
