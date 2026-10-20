@@ -51,7 +51,7 @@
     "cookie-parser": "^1.4.6",
     "ejs": "^3.1.8",
     "express": "^4.18.1",
-    "helmet": "^5.1.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^8.5.1",
     "msgpack-lite": "^0.1.26",
     "node-arguments": "0.0.1",
