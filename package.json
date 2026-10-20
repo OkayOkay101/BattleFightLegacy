@@ -91,6 +91,6 @@
     "pixi.js-legacy": "6.2.2",
     "rollbar": "^2.25.0",
     "sweetalert2": "11.4.0",
-    "typescript": "^4.7.4"
+    "typescript": "^7.0.2"
   }
 }
