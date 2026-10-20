@@ -2,7 +2,7 @@
 
 [ภาษาไทย](../th/license-inventory.md) · [License guide](licenses.md)
 
-Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; metadata alone is not complete permission evidence. This source dependency table is not itself the complete executable bill of materials.
+Snapshot: 2026-10-20, local evidence. Copied license texts are linked below; metadata alone is not complete permission evidence. This source dependency table is not itself the complete executable bill of materials.
 
 ## npm
 
@@ -30,7 +30,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | @babel/template | 7.18.6 / 7.18.6 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules__babel_template@7.18.6/LICENSE) | not found |
 | @babel/traverse | 7.18.9 / 7.18.9 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules__babel_traverse@7.18.9/LICENSE) | not found |
 | @babel/types | 7.18.9 / 7.18.9 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules__babel_types@7.18.9/LICENSE) | not found |
-| @electron-internal/extract-zip | 1.0.5 / 1.0.5 | transitive development | BSD-2-Clause | Metadata only; license text not found | not found |
+| @electron-internal/extract-zip | 1.0.5 / 1.0.5 | transitive development | BSD-2-Clause | [LICENSE](../licenses/texts/npm-upstream/@electron-internal__extract-zip@1.0.5/LICENSE) | not found |
 | @electron/asar | 3.4.1 / 3.4.1 | transitive development | MIT | [LICENSE.md](../licenses/texts/npm/node_modules__electron_asar@3.4.1/LICENSE.md) | not found |
 | @electron/fuses | 1.8.0 / 1.8.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules__electron_fuses@1.8.0/LICENSE) | not found |
 | ansi-styles | 4.3.0 / 4.3.0 | transitive development | MIT | [license](../licenses/texts/npm/node_modules__electron_fuses_node_modules_ansi-styles@4.3.0/license) | not found |
@@ -134,7 +134,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | @types/fs-extra | 9.0.13 / 9.0.13 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules__types_fs-extra@9.0.13/LICENSE) | not found |
 | @types/http-cache-semantics | 4.2.0 / 4.2.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules__types_http-cache-semantics@4.2.0/LICENSE) | not found |
 | @types/json-schema | 7.0.11 / 7.0.11 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules__types_json-schema@7.0.11/LICENSE) | not found |
-| @types/json5 | 0.0.29 / 0.0.29 | transitive development | MIT | Metadata only; license text not found | not found |
+| @types/json5 | 0.0.29 / 0.0.29 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/@types__json5@0.0.29/LICENSE) | not found |
 | @types/keyv | 3.1.4 / 3.1.4 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules__types_keyv@3.1.4/LICENSE) | not found |
 | @types/ms | 2.1.0 / 2.1.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules__types_ms@2.1.0/LICENSE) | not found |
 | @types/node | 18.0.6 / 18.0.6 | direct development | MIT | [LICENSE](../licenses/texts/npm/node_modules__types_node@18.0.6/LICENSE) | not found |
@@ -162,7 +162,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | ajv | 6.12.6 / 6.12.6 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_ajv@6.12.6/LICENSE) | yes |
 | ansi-regex | 5.0.1 / 5.0.1 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_ansi-regex@5.0.1/license) | not found |
 | ansi-styles | 3.2.1 / 3.2.1 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_ansi-styles@3.2.1/license) | yes |
-| app-builder-lib | 26.17.0 / 26.17.0 | transitive development | MIT | Metadata only; license text not found | not found |
+| app-builder-lib | 26.17.0 / 26.17.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/app-builder-lib@26.17.0/LICENSE) | not found |
 | @electron/get | 3.1.0 / 3.1.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_app-builder-lib_node_modules__electron_get@3.1.0/LICENSE) | not found |
 | fs-extra | 8.1.0 / 8.1.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_app-builder-lib_node_modules__electron_get_node_modules_fs-extra@8.1.0/LICENSE) | not found |
 | semver | 6.3.1 / 6.3.1 | transitive development | ISC | [LICENSE](../licenses/texts/npm/node_modules_app-builder-lib_node_modules__electron_get_node_modules_semver@6.3.1/LICENSE) | not found |
@@ -181,7 +181,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | json-buffer | 3.0.1 / 3.0.1 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_app-builder-lib_node_modules_json-buffer@3.0.1/LICENSE) | not found |
 | json-schema-traverse | 1.0.0 / 1.0.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_app-builder-lib_node_modules_json-schema-traverse@1.0.0/LICENSE) | not found |
 | jsonfile | 4.0.0 / 4.0.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_app-builder-lib_node_modules_jsonfile@4.0.0/LICENSE) | not found |
-| keyv | 4.5.4 / 4.5.4 | transitive development | MIT | Metadata only; license text not found | not found |
+| keyv | 4.5.4 / 4.5.4 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/keyv@4.5.4/LICENSE) | not found |
 | lowercase-keys | 2.0.0 / 2.0.0 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_app-builder-lib_node_modules_lowercase-keys@2.0.0/license) | not found |
 | mimic-response | 3.1.0 / 3.1.0 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_app-builder-lib_node_modules_mimic-response@3.1.0/license) | not found |
 | minimatch | 10.2.6 / 10.2.6 | transitive development | BlueOak-1.0.0 | [LICENSE.md](../licenses/texts/npm/node_modules_app-builder-lib_node_modules_minimatch@10.2.6/LICENSE.md) | not found |
@@ -199,14 +199,14 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | asn1 | 0.2.6 / 0.2.6 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_asn1@0.2.6/LICENSE) | yes |
 | asn1js | 3.0.10 / 3.0.10 | transitive development | BSD-3-Clause | [LICENSE](../licenses/texts/npm/node_modules_asn1js@3.0.10/LICENSE) | not found |
 | tslib | 2.8.1 / 2.8.1 | transitive development | 0BSD | [LICENSE.txt](../licenses/texts/npm/node_modules_asn1js_node_modules_tslib@2.8.1/LICENSE.txt) | not found |
-| assert-plus | 1.0.0 / 1.0.0 | transitive runtime | MIT | Metadata only; license text not found | yes |
+| assert-plus | 1.0.0 / 1.0.0 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm-upstream/assert-plus@1.0.0/LICENSE) | yes |
 | async | 3.2.3 / 3.2.3 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_async@3.2.3/LICENSE) | yes |
 | async-exit-hook | 2.0.1 / 2.0.1 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_async-exit-hook@2.0.1/license) | not found |
 | asynckit | 0.4.0 / 0.4.0 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_asynckit@0.4.0/LICENSE) | yes |
 | at-least-node | 1.0.0 / 1.0.0 | transitive development | ISC | [LICENSE](../licenses/texts/npm/node_modules_at-least-node@1.0.0/LICENSE) | not found |
 | aws-sign2 | 0.7.0 / 0.7.0 | transitive runtime | Apache-2.0 | [LICENSE](../licenses/texts/npm/node_modules_aws-sign2@0.7.0/LICENSE) | yes |
 | aws4 | 1.13.2 / 1.13.2 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_aws4@1.13.2/LICENSE) | yes |
-| babel-plugin-transform-remove-console | 6.9.4 / 6.9.4 | direct development | MIT | Metadata only; license text not found | not found |
+| babel-plugin-transform-remove-console | 6.9.4 / 6.9.4 | direct development | MIT | [LICENSE](../licenses/texts/npm-upstream/babel-plugin-transform-remove-console@6.9.4/LICENSE) | not found |
 | balanced-match | 1.0.2 / 1.0.2 | transitive runtime | MIT | [LICENSE.md](../licenses/texts/npm/node_modules_balanced-match@1.0.2/LICENSE.md) | yes |
 | base64-js | 1.5.1 / 1.5.1 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_base64-js@1.5.1/LICENSE) | not found |
 | bcrypt-pbkdf | 1.0.2 / 1.0.2 | transitive runtime | BSD-3-Clause | [LICENSE](../licenses/texts/npm/node_modules_bcrypt-pbkdf@1.0.2/LICENSE) | yes |
@@ -235,7 +235,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | bytestreamjs | 2.0.1 / 2.0.1 | transitive development | BSD-3-Clause | [LICENSE](../licenses/texts/npm/node_modules_bytestreamjs@2.0.1/LICENSE) | not found |
 | cacheable-lookup | 5.0.4 / 5.0.4 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_cacheable-lookup@5.0.4/LICENSE) | not found |
 | cacheable-request | 2.1.4 / 2.1.4 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_cacheable-request@2.1.4/LICENSE) | yes |
-| lowercase-keys | 1.0.0 / 1.0.0 | transitive runtime | MIT | Metadata only; license text not found | yes |
+| lowercase-keys | 1.0.0 / 1.0.0 | transitive runtime | MIT | [license](../licenses/texts/npm-upstream/lowercase-keys@1.0.0/license) | yes |
 | call-bind | 1.0.2 / 1.0.2 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_call-bind@1.0.2/LICENSE) | not found |
 | call-bind-apply-helpers | 1.0.2 / 1.0.2 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_call-bind-apply-helpers@1.0.2/LICENSE) | yes |
 | call-bound | 1.0.4 / 1.0.4 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_call-bound@1.0.4/LICENSE) | yes |
@@ -244,7 +244,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | caseless | 0.12.0 / 0.12.0 | transitive runtime | Apache-2.0 | [LICENSE](../licenses/texts/npm/node_modules_caseless@0.12.0/LICENSE) | yes |
 | chalk | 2.4.2 / 2.4.2 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_chalk@2.4.2/license) | yes |
 | chownr | 3.0.0 / 3.0.0 | transitive development | BlueOak-1.0.0 | [LICENSE.md](../licenses/texts/npm/node_modules_chownr@3.0.0/LICENSE.md) | not found |
-| chromium-pickle-js | 0.2.0 / 0.2.0 | transitive development | MIT | Metadata only; license text not found | not found |
+| chromium-pickle-js | 0.2.0 / 0.2.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/chromium-pickle-js@0.2.0/LICENSE) | not found |
 | ci-info | 4.4.0 / 4.4.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_ci-info@4.4.0/LICENSE) | not found |
 | cliui | 8.0.1 / 8.0.1 | transitive development | ISC | [LICENSE.txt](../licenses/texts/npm/node_modules_cliui@8.0.1/LICENSE.txt) | not found |
 | clone-response | 1.0.2 / 1.0.2 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_clone-response@1.0.2/LICENSE) | yes |
@@ -252,23 +252,23 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | color-name | 1.1.3 / 1.1.3 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_color-name@1.1.3/LICENSE) | yes |
 | combined-stream | 1.0.8 / 1.0.8 | transitive runtime | MIT | [License](../licenses/texts/npm/node_modules_combined-stream@1.0.8/License) | yes |
 | commander | 5.1.0 / 5.1.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_commander@5.1.0/LICENSE) | not found |
-| compare-version | 0.1.2 / 0.1.2 | transitive development | MIT | Metadata only; license text not found | not found |
+| compare-version | 0.1.2 / 0.1.2 | transitive development | MIT | [README-license-section.md](../licenses/texts/npm-upstream/compare-version@0.1.2/README-license-section.md) | not found |
 | concat-map | 0.0.1 / 0.0.1 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_concat-map@0.0.1/LICENSE) | yes |
-| console-polyfill | 0.3.0 / 0.3.0 | transitive development | MIT | Metadata only; license text not found | not found |
+| console-polyfill | 0.3.0 / 0.3.0 | transitive development | MIT | [README-license-section.md](../licenses/texts/npm-upstream/console-polyfill@0.3.0/README-license-section.md) | not found |
 | content-disposition | 0.5.4 / 0.5.4 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_content-disposition@0.5.4/LICENSE) | yes |
 | safe-buffer | 5.2.1 / 5.2.1 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_content-disposition_node_modules_safe-buffer@5.2.1/LICENSE) | yes |
 | content-type | 1.0.4 / 1.0.4 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_content-type@1.0.4/LICENSE) | yes |
 | convert-source-map | 1.8.0 / 1.8.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_convert-source-map@1.8.0/LICENSE) | not found |
 | cookie | 0.4.1 / 0.4.1 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_cookie@0.4.1/LICENSE) | yes |
 | cookie-parser | 1.4.6 / 1.4.6 | direct runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_cookie-parser@1.4.6/LICENSE) | yes |
-| cookie-signature | 1.0.6 / 1.0.6 | transitive runtime | MIT | Metadata only; license text not found | yes |
+| cookie-signature | 1.0.6 / 1.0.6 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm-upstream/cookie-signature@1.0.6/LICENSE) | yes |
 | core-util-is | 1.0.3 / 1.0.3 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_core-util-is@1.0.3/LICENSE) | yes |
-| cross-dirname | 0.1.0 / 0.1.0 | transitive development | MIT | Metadata only; license text not found | not found |
+| cross-dirname | 0.1.0 / 0.1.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/cross-dirname@0.1.0/LICENSE) | not found |
 | cross-env | 7.0.3 / 7.0.3 | direct development | MIT | [LICENSE](../licenses/texts/npm/node_modules_cross-env@7.0.3/LICENSE) | not found |
 | cross-spawn | 7.0.6 / 7.0.6 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_cross-spawn@7.0.6/LICENSE) | not found |
 | dashdash | 1.14.1 / 1.14.1 | transitive runtime | MIT | [LICENSE.txt](../licenses/texts/npm/node_modules_dashdash@1.14.1/LICENSE.txt) | yes |
 | debug | 4.3.4 / 4.3.4 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_debug@4.3.4/LICENSE) | yes |
-| decache | 3.1.0 / 3.1.0 | transitive development | MIT | Metadata only; license text not found | not found |
+| decache | 3.1.0 / 3.1.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/decache@3.1.0/LICENSE) | not found |
 | decode-uri-component | 0.2.0 / 0.2.0 | transitive runtime | MIT | [license](../licenses/texts/npm/node_modules_decode-uri-component@0.2.0/license) | yes |
 | decompress-response | 3.3.0 / 3.3.0 | transitive runtime | MIT | [license](../licenses/texts/npm/node_modules_decompress-response@3.3.0/license) | yes |
 | deep-is | 0.1.4 / 0.1.4 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_deep-is@0.1.4/LICENSE) | not found |
@@ -282,7 +282,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | dir-compare | 4.2.0 / 4.2.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_dir-compare@4.2.0/LICENSE) | not found |
 | p-limit | 3.1.0 / 3.1.0 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_dir-compare_node_modules_p-limit@3.1.0/license) | not found |
 | dir-glob | 3.0.1 / 3.0.1 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_dir-glob@3.0.1/license) | not found |
-| dmg-builder | 26.17.0 / 26.17.0 | transitive development | MIT | Metadata only; license text not found | not found |
+| dmg-builder | 26.17.0 / 26.17.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/dmg-builder@26.17.0/LICENSE) | not found |
 | dns-packet | 1.3.4 / 1.3.4 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_dns-packet@1.3.4/LICENSE) | yes |
 | dns-socket | 1.6.3 / 1.6.3 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_dns-socket@1.6.3/LICENSE) | yes |
 | doctrine | 3.0.0 / 3.0.0 | transitive development | Apache-2.0 | [LICENSE](../licenses/texts/npm/node_modules_doctrine@3.0.0/LICENSE), [LICENSE.closure-compiler](../licenses/texts/npm/node_modules_doctrine@3.0.0/LICENSE.closure-compiler), [LICENSE.esprima](../licenses/texts/npm/node_modules_doctrine@3.0.0/LICENSE.esprima) | not found |
@@ -324,7 +324,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | encodeurl | 1.0.2 / 1.0.2 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_encodeurl@1.0.2/LICENSE) | yes |
 | end-of-stream | 1.4.5 / 1.4.5 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_end-of-stream@1.4.5/LICENSE) | not found |
 | env-paths | 3.0.0 / 3.0.0 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_env-paths@3.0.0/license) | not found |
-| err-code | 2.0.3 / 2.0.3 | transitive development | MIT | Metadata only; license text not found | not found |
+| err-code | 2.0.3 / 2.0.3 | transitive development | MIT | [README-license-section.md](../licenses/texts/npm-upstream/err-code@2.0.3/README-license-section.md) | not found |
 | error-stack-parser | 2.0.6 / 2.0.6 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_error-stack-parser@2.0.6/LICENSE) | not found |
 | es-abstract | 1.19.1 / 1.19.1 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_es-abstract@1.19.1/LICENSE) | not found |
 | es-define-property | 1.0.1 / 1.0.1 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_es-define-property@1.0.1/LICENSE) | yes |
@@ -376,7 +376,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | eslint-visitor-keys | 3.3.0 / 3.3.0 | transitive development | Apache-2.0 | [LICENSE](../licenses/texts/npm/node_modules_espree_node_modules_eslint-visitor-keys@3.3.0/LICENSE) | not found |
 | esquery | 1.4.0 / 1.4.0 | transitive development | BSD-3-Clause | [license.txt](../licenses/texts/npm/node_modules_esquery@1.4.0/license.txt) | not found |
 | estraverse | 5.3.0 / 5.3.0 | transitive development | BSD-2-Clause | [LICENSE.BSD](../licenses/texts/npm/node_modules_esquery_node_modules_estraverse@5.3.0/LICENSE.BSD) | not found |
-| esrecurse | 4.3.0 / 4.3.0 | transitive development | BSD-2-Clause | Metadata only; license text not found | not found |
+| esrecurse | 4.3.0 / 4.3.0 | transitive development | BSD-2-Clause | [LICENSE.md](../licenses/texts/npm-upstream/esrecurse@4.3.0/LICENSE.md) | not found |
 | estraverse | 5.3.0 / 5.3.0 | transitive development | BSD-2-Clause | [LICENSE.BSD](../licenses/texts/npm/node_modules_esrecurse_node_modules_estraverse@5.3.0/LICENSE.BSD) | not found |
 | estraverse | 4.3.0 / 4.3.0 | transitive development | BSD-2-Clause | [LICENSE.BSD](../licenses/texts/npm/node_modules_estraverse@4.3.0/LICENSE.BSD) | not found |
 | esutils | 2.0.3 / 2.0.3 | transitive development | BSD-2-Clause | [LICENSE.BSD](../licenses/texts/npm/node_modules_esutils@2.0.3/LICENSE.BSD) | not found |
@@ -399,7 +399,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | fast-uri | 3.1.8 / 3.1.8 | transitive development | BSD-3-Clause | [LICENSE](../licenses/texts/npm/node_modules_fast-uri@3.1.8/LICENSE) | not found |
 | fastq | 1.13.0 / 1.13.0 | transitive development | ISC | [LICENSE](../licenses/texts/npm/node_modules_fastq@1.13.0/LICENSE) | not found |
 | file-entry-cache | 6.0.1 / 6.0.1 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_file-entry-cache@6.0.1/LICENSE) | not found |
-| filelist | 1.0.3 / 1.0.3 | transitive runtime | Apache-2.0 | Metadata only; license text not found | yes |
+| filelist | 1.0.3 / 1.0.3 | transitive runtime | Apache-2.0 | [LICENSE](../licenses/texts/npm-upstream/filelist@1.0.3/LICENSE) | yes |
 | brace-expansion | 2.0.1 / 2.0.1 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_filelist_node_modules_brace-expansion@2.0.1/LICENSE) | not found |
 | minimatch | 5.0.1 / 5.0.1 | transitive runtime | ISC | [LICENSE](../licenses/texts/npm/node_modules_filelist_node_modules_minimatch@5.0.1/LICENSE) | not found |
 | fill-range | 7.0.1 / 7.0.1 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_fill-range@7.0.1/LICENSE) | not found |
@@ -450,7 +450,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | helmet | 5.1.0 / 5.1.0 | direct runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_helmet@5.1.0/LICENSE) | yes |
 | hosted-git-info | 4.1.0 / 4.1.0 | transitive development | ISC | [LICENSE](../licenses/texts/npm/node_modules_hosted-git-info@4.1.0/LICENSE) | not found |
 | lru-cache | 6.0.0 / 6.0.0 | transitive development | ISC | [LICENSE](../licenses/texts/npm/node_modules_hosted-git-info_node_modules_lru-cache@6.0.0/LICENSE) | not found |
-| http-cache-semantics | 3.8.1 / 3.8.1 | transitive runtime | BSD-2-Clause | Metadata only; license text not found | yes |
+| http-cache-semantics | 3.8.1 / 3.8.1 | transitive runtime | BSD-2-Clause | [LICENSE](../licenses/texts/npm-upstream/http-cache-semantics@3.8.1/LICENSE) | yes |
 | http-errors | 2.0.0 / 2.0.0 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_http-errors@2.0.0/LICENSE) | yes |
 | http-proxy-agent | 7.0.2 / 7.0.2 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_http-proxy-agent@7.0.2/LICENSE) | not found |
 | http-signature | 1.2.0 / 1.2.0 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_http-signature@1.2.0/LICENSE) | yes |
@@ -460,13 +460,13 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | ieee754 | 1.2.1 / 1.2.1 | transitive runtime | BSD-3-Clause | [LICENSE](../licenses/texts/npm/node_modules_ieee754@1.2.1/LICENSE) | yes |
 | ignore | 5.2.0 / 5.2.0 | transitive development | MIT | [LICENSE-MIT](../licenses/texts/npm/node_modules_ignore@5.2.0/LICENSE-MIT) | not found |
 | import-fresh | 3.3.0 / 3.3.0 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_import-fresh@3.3.0/license) | not found |
-| imurmurhash | 0.1.4 / 0.1.4 | transitive development | MIT | Metadata only; license text not found | not found |
+| imurmurhash | 0.1.4 / 0.1.4 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/imurmurhash@0.1.4/LICENSE) | not found |
 | inflight | 1.0.6 / 1.0.6 | transitive development | ISC | [LICENSE](../licenses/texts/npm/node_modules_inflight@1.0.6/LICENSE) | not found |
 | inherits | 2.0.4 / 2.0.4 | transitive runtime | ISC | [LICENSE](../licenses/texts/npm/node_modules_inherits@2.0.4/LICENSE) | yes |
 | int64-buffer | 0.1.10 / 0.1.10 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_int64-buffer@0.1.10/LICENSE) | yes |
 | internal-slot | 1.0.3 / 1.0.3 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_internal-slot@1.0.3/LICENSE) | not found |
 | into-stream | 3.1.0 / 3.1.0 | transitive runtime | MIT | [license](../licenses/texts/npm/node_modules_into-stream@3.1.0/license) | yes |
-| ip | 1.1.5 / 1.1.5 | transitive runtime | MIT | Metadata only; license text not found | yes |
+| ip | 1.1.5 / 1.1.5 | transitive runtime | MIT | [README-license-section.md](../licenses/texts/npm-upstream/ip@1.1.5/README-license-section.md) | yes |
 | ip-regex | 2.1.0 / 2.1.0 | transitive runtime | MIT | [license](../licenses/texts/npm/node_modules_ip-regex@2.1.0/license) | yes |
 | ipaddr.js | 1.9.1 / 1.9.1 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_ipaddr.js@1.9.1/LICENSE) | yes |
 | is_js | 0.9.0 / 0.9.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_is_js@0.9.0/LICENSE) | not found |
@@ -491,13 +491,13 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | is-symbol | 1.0.4 / 1.0.4 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_is-symbol@1.0.4/LICENSE) | not found |
 | is-typedarray | 1.0.0 / 1.0.0 | transitive runtime | MIT | [LICENSE.md](../licenses/texts/npm/node_modules_is-typedarray@1.0.0/LICENSE.md) | yes |
 | is-weakref | 1.0.2 / 1.0.2 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_is-weakref@1.0.2/LICENSE) | not found |
-| isarray | 1.0.0 / 1.0.0 | transitive runtime | MIT | Metadata only; license text not found | yes |
+| isarray | 1.0.0 / 1.0.0 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm-upstream/isarray@1.0.0/LICENSE) | yes |
 | isbinaryfile | 5.0.7 / 5.0.7 | transitive development | MIT | [LICENSE.txt](../licenses/texts/npm/node_modules_isbinaryfile@5.0.7/LICENSE.txt) | not found |
 | isexe | 2.0.0 / 2.0.0 | transitive development | ISC | [LICENSE](../licenses/texts/npm/node_modules_isexe@2.0.0/LICENSE) | not found |
 | ismobilejs | 1.1.1 / 1.1.1 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_ismobilejs@1.1.1/LICENSE) | not found |
 | isstream | 0.1.2 / 0.1.2 | transitive runtime | MIT | [LICENSE.md](../licenses/texts/npm/node_modules_isstream@0.1.2/LICENSE.md) | yes |
 | isurl | 1.0.0 / 1.0.0 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_isurl@1.0.0/LICENSE) | yes |
-| jake | 10.8.5 / 10.8.5 | transitive runtime | Apache-2.0 | Metadata only; license text not found | yes |
+| jake | 10.8.5 / 10.8.5 | transitive runtime | Apache-2.0 | [LICENSE](../licenses/texts/npm-upstream/jake@10.8.5/LICENSE) | yes |
 | ansi-styles | 4.3.0 / 4.3.0 | transitive runtime | MIT | [license](../licenses/texts/npm/node_modules_jake_node_modules_ansi-styles@4.3.0/license) | not found |
 | chalk | 4.1.2 / 4.1.2 | transitive runtime | MIT | [license](../licenses/texts/npm/node_modules_jake_node_modules_chalk@4.1.2/license) | not found |
 | color-convert | 2.0.1 / 2.0.1 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_jake_node_modules_color-convert@2.0.1/LICENSE) | not found |
@@ -525,7 +525,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | jwa | 1.4.1 / 1.4.1 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_jwa@1.4.1/LICENSE) | yes |
 | jws | 3.2.2 / 3.2.2 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_jws@3.2.2/LICENSE) | yes |
 | keyv | 3.0.0 / 3.0.0 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_keyv@3.0.0/LICENSE) | yes |
-| lazy-val | 1.0.5 / 1.0.5 | transitive development | MIT | Metadata only; license text not found | not found |
+| lazy-val | 1.0.5 / 1.0.5 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/lazy-val@1.0.5/LICENSE) | not found |
 | levn | 0.4.1 / 0.4.1 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_levn@0.4.1/LICENSE) | not found |
 | locate-path | 2.0.0 / 2.0.0 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_locate-path@2.0.0/license) | not found |
 | lodash | 4.17.21 / 4.17.21 | direct runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_lodash@4.17.21/LICENSE) | yes |
@@ -559,11 +559,11 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | mkdirp | 0.5.6 / 0.5.6 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_mkdirp@0.5.6/LICENSE) | not found |
 | ms | 2.1.2 / 2.1.2 | transitive runtime | MIT | [license.md](../licenses/texts/npm/node_modules_ms@2.1.2/license.md) | yes |
 | msgpack-lite | 0.1.26 / 0.1.26 | direct runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_msgpack-lite@0.1.26/LICENSE) | yes |
-| natural-compare | 1.4.0 / 1.4.0 | transitive development | MIT | Metadata only; license text not found | not found |
+| natural-compare | 1.4.0 / 1.4.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/natural-compare@1.4.0/LICENSE) | not found |
 | negotiator | 0.6.3 / 0.6.3 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_negotiator@0.6.3/LICENSE) | yes |
 | node-abi | 4.35.0 / 4.35.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_node-abi@4.35.0/LICENSE) | not found |
 | semver | 7.8.5 / 7.8.5 | transitive development | ISC | [LICENSE](../licenses/texts/npm/node_modules_node-abi_node_modules_semver@7.8.5/LICENSE) | not found |
-| node-api-version | 0.2.1 / 0.2.1 | transitive development | MIT | Metadata only; license text not found | not found |
+| node-api-version | 0.2.1 / 0.2.1 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/node-api-version@0.2.1/LICENSE) | not found |
 | semver | 7.8.5 / 7.8.5 | transitive development | ISC | [LICENSE](../licenses/texts/npm/node_modules_node-api-version_node_modules_semver@7.8.5/LICENSE) | not found |
 | node-arguments | 0.0.1 / 0.0.1 | direct runtime | License evidence not found | [LICENSE](../licenses/texts/npm/node_modules_node-arguments@0.0.1/LICENSE) | yes |
 | node-gyp | 12.4.0 / 12.4.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_node-gyp@12.4.0/LICENSE) | not found |
@@ -639,7 +639,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | range-parser | 1.2.1 / 1.2.1 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_range-parser@1.2.1/LICENSE) | yes |
 | rate-limiter-flexible | 2.3.7 / 2.3.7 | direct runtime | ISC | [LICENSE.md](../licenses/texts/npm/node_modules_rate-limiter-flexible@2.3.7/LICENSE.md) | yes |
 | raw-body | 2.5.1 / 2.5.1 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_raw-body@2.5.1/LICENSE) | yes |
-| read-binary-file-arch | 1.0.6 / 1.0.6 | transitive development | MIT | Metadata only; license text not found | not found |
+| read-binary-file-arch | 1.0.6 / 1.0.6 | transitive development | MIT | [README-license-section.md](../licenses/texts/npm-upstream/read-binary-file-arch@1.0.6/README-license-section.md) | not found |
 | readable-stream | 2.3.7 / 2.3.7 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_readable-stream@2.3.7/LICENSE) | yes |
 | regexpp | 3.2.0 / 3.2.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_regexpp@3.2.0/LICENSE) | not found |
 | request | 2.88.2 / 2.88.2 | direct runtime | Apache-2.0 | [LICENSE](../licenses/texts/npm/node_modules_request@2.88.2/LICENSE) | yes |
@@ -661,7 +661,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | safe-buffer | 5.1.2 / 5.1.2 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_safe-buffer@5.1.2/LICENSE) | yes |
 | safer-buffer | 2.1.2 / 2.1.2 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_safer-buffer@2.1.2/LICENSE) | yes |
 | sanitize-filename | 1.6.4 / 1.6.4 | transitive development | WTFPL OR ISC | [LICENSE.md](../licenses/texts/npm/node_modules_sanitize-filename@1.6.4/LICENSE.md) | not found |
-| sanitizer | 0.1.3 / 0.1.3 | direct runtime | Apache-2.0 | Metadata only; license text not found | yes |
+| sanitizer | 0.1.3 / 0.1.3 | direct runtime | Apache-2.0 | [LICENSE](../licenses/texts/npm-upstream/sanitizer@0.1.3/LICENSE) | yes |
 | sax | 1.6.1 / 1.6.1 | transitive development | BlueOak-1.0.0 | [LICENSE.md](../licenses/texts/npm/node_modules_sax@1.6.1/LICENSE.md) | not found |
 | semver | 6.3.0 / 6.3.0 | transitive development | ISC | [LICENSE](../licenses/texts/npm/node_modules_semver@6.3.0/LICENSE) | yes |
 | semver-compare | 1.0.0 / 1.0.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_semver-compare@1.0.0/LICENSE) | not found |
@@ -707,7 +707,7 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | tar | 7.5.22 / 7.5.22 | transitive development | BlueOak-1.0.0 | [LICENSE.md](../licenses/texts/npm/node_modules_tar@7.5.22/LICENSE.md) | not found |
 | yallist | 5.0.0 / 5.0.0 | transitive development | BlueOak-1.0.0 | [LICENSE.md](../licenses/texts/npm/node_modules_tar_node_modules_yallist@5.0.0/LICENSE.md) | not found |
 | temp | 0.9.4 / 0.9.4 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_temp@0.9.4/LICENSE) | not found |
-| temp-file | 3.4.0 / 3.4.0 | transitive development | MIT | Metadata only; license text not found | not found |
+| temp-file | 3.4.0 / 3.4.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/temp-file@3.4.0/LICENSE) | not found |
 | rimraf | 2.6.3 / 2.6.3 | transitive development | ISC | [LICENSE](../licenses/texts/npm/node_modules_temp_node_modules_rimraf@2.6.3/LICENSE) | not found |
 | text-table | 0.2.0 / 0.2.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_text-table@0.2.0/LICENSE) | not found |
 | timed-out | 4.0.1 / 4.0.1 | transitive runtime | MIT | [license](../licenses/texts/npm/node_modules_timed-out@4.0.1/license) | yes |
@@ -717,13 +717,13 @@ Snapshot: 2026-10-09, local evidence. Copied license texts are linked below; met
 | fdir | 6.5.0 / 6.5.0 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_tinyglobby_node_modules_fdir@6.5.0/LICENSE) | not found |
 | picomatch | 4.0.7 / 4.0.7 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_tinyglobby_node_modules_picomatch@4.0.7/LICENSE) | not found |
 | tmp | 0.2.7 / 0.2.7 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_tmp@0.2.7/LICENSE) | not found |
-| tmp-promise | 3.0.3 / 3.0.3 | transitive development | MIT | Metadata only; license text not found | not found |
+| tmp-promise | 3.0.3 / 3.0.3 | transitive development | MIT | [LICENSE](../licenses/texts/npm-upstream/tmp-promise@3.0.3/LICENSE) | not found |
 | to-fast-properties | 2.0.0 / 2.0.0 | transitive development | MIT | [license](../licenses/texts/npm/node_modules_to-fast-properties@2.0.0/license) | not found |
 | to-regex-range | 5.0.1 / 5.0.1 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_to-regex-range@5.0.1/LICENSE) | not found |
 | toidentifier | 1.0.1 / 1.0.1 | transitive runtime | MIT | [LICENSE](../licenses/texts/npm/node_modules_toidentifier@1.0.1/LICENSE) | yes |
 | tough-cookie | 2.5.0 / 2.5.0 | transitive runtime | BSD-3-Clause | [LICENSE](../licenses/texts/npm/node_modules_tough-cookie@2.5.0/LICENSE) | yes |
-| traverse-chain | 0.1.0 / 0.1.0 | transitive development | MIT | Metadata only; license text not found | not found |
-| truncate-utf8-bytes | 1.0.2 / 1.0.2 | transitive development | WTFPL | Metadata only; license text not found | not found |
+| traverse-chain | 0.1.0 / 0.1.0 | transitive development | MIT | [README-license-section.md](../licenses/texts/npm-upstream/traverse-chain@0.1.0/README-license-section.md) | not found |
+| truncate-utf8-bytes | 1.0.2 / 1.0.2 | transitive development | WTFPL | [LICENSE](../licenses/texts/npm-upstream/truncate-utf8-bytes@1.0.2/LICENSE) | not found |
 | tsconfig-paths | 3.14.1 / 3.14.1 | transitive development | MIT | [LICENSE](../licenses/texts/npm/node_modules_tsconfig-paths@3.14.1/LICENSE) | not found |
 | json5 | 1.0.1 / 1.0.1 | transitive development | MIT | [LICENSE.md](../licenses/texts/npm/node_modules_tsconfig-paths_node_modules_json5@1.0.1/LICENSE.md) | not found |
 | tslib | 1.14.1 / 1.14.1 | transitive development | 0BSD | [LICENSE.txt](../licenses/texts/npm/node_modules_tslib@1.14.1/LICENSE.txt) | not found |

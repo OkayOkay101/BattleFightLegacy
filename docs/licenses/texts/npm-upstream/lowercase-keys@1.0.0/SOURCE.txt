@@ -1,0 +1,4 @@
+Upstream license text for lowercase-keys@1.0.0
+Fetched: 2026-10-20
+URL: https://raw.githubusercontent.com/sindresorhus/lowercase-keys/HEAD/license
+Note: taken from the repository's default branch, which may be newer than the installed version; the installed package itself ships no license file.

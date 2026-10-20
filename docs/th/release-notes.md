@@ -16,7 +16,7 @@ Commit `39afe69` บน `codex/battlefight-bots`
 
 **แก้ Atlas:** Atlas Unfolded แสดงเส้นเตือนแต่ไม่เคยทำดาเมจ เพราะเกมใช้ physics Planck ซึ่ง `rayCast` รับ `(point1, point2, callback)` แต่ Atlas ส่ง callback เป็นตัวแรก raycast จึงไม่เจอยูนิตและกำแพงไม่ตัดเส้น ตอนนี้ใช้ลำดับของ Planck แล้ว (engine อื่นยังใช้ลำดับ Box2D) และทำดาเมจ 30 ตามที่ตั้งไว้ มี regression test ครอบคลุมลำดับพารามิเตอร์ของ Planck
 
-**Build EXE ใหม่แล้ว:** `dist/portable/BattleFight-Portable-1.0.0.exe` ขนาด 129,138,987 bytes SHA256 `e83138e2f93a95ab1970e219dcc85e3c2dbe0accdcd1db136cbbb720d6c0b8fc` Windows x64 ยังไม่เซ็นดิจิทัล มี Solo Test, Morrow และการแก้ Atlas สคริปต์แพ็กเกจแก้ให้นำภาพ `/assets/morrow` จาก `src/assets/morrow` เหมือนเซิร์ฟเวอร์ source ผล build ไม่มีภาพหาย และไม่มียูนิตที่ใช้ภาพสำรอง ทดสอบ desktop ผ่าน 19/19 และ smoke test ของ Electron ผ่าน 1/1
+**Build EXE ใหม่แล้ว:** `dist/portable/BattleFight-Portable-1.0.0.exe` ขนาด 129,142,881 bytes SHA256 `5d6f7c431c167fed07423c1ea35b95481abcc7e2cf8310d9452225873cde6929` Windows x64 ยังไม่เซ็นดิจิทัล มี Solo Test, Morrow, การแก้ Atlas และโฟลเดอร์ `licenses/` ที่รวม notice ของ Taro ไลบรารีเบราว์เซอร์ npm และ THIRD-PARTY-NOTICES.md สคริปต์แพ็กเกจแก้ให้นำภาพ `/assets/morrow` จาก `src/assets/morrow` เหมือนเซิร์ฟเวอร์ source ผล build ไม่มีภาพหาย และไม่มียูนิตที่ใช้ภาพสำรอง ทดสอบ desktop ผ่าน 19/19 และ smoke test ของ Electron ผ่าน 1/1
 
 **ทดลองเล่น EXE:** เล่นผ่านเบราว์เซอร์ที่ต่อกับเซิร์ฟเวอร์ใน EXE โดยส่ง input ผ่านเครือข่ายของเกม โหมด Play Game สู้กับ AI ได้ มี kill feed สด สกิลของ Sixth Diva ยิงออกและเห็นกระสุนครบ ใน Solo Test สกิลทั้ง 4 ของ Emo & Sky มีภาพและทำดาเมจหุ่นเป้า Morrow ทำดาเมจ 12 (Compass Bolt), 22 (Banked Delivery) และ 30 (Atlas) ไม่มี script error ส่วนหน้าต่าง Electron ตรวจด้วย smoke test ไม่ได้เล่นด้วยมือ
 

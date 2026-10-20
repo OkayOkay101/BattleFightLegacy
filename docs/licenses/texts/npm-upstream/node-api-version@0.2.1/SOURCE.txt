@@ -1,0 +1,2 @@
+Neither the installed node-api-version@0.2.1 package nor its upstream repository (timfish/node-api-version) contains a license file.
+The package declares "license": "MIT" in package.json. This file is the standard MIT text with the copyright holder taken from the package.json author field (Tim Fish), reconstructed from that declaration.

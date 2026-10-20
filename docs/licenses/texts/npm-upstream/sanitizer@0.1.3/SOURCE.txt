@@ -1,0 +1,2 @@
+Neither the installed sanitizer@0.1.3 package nor its upstream repository (theSmaw/Caja-HTML-Sanitizer) contains a license file.
+The package declares "license": "Apache-2.0" in package.json. This file is the standard Apache-2.0 text, reconstructed from that declaration.

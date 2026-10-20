@@ -27,6 +27,7 @@ const prepare=fs.readFileSync(path.join(root,'tools/prepare-desktop-package.js')
 const vendor=[...prepare.matchAll(/\['node_modules\/([^']+)', '([^']+)'\]/g)].map(m=>({source:'node_modules/'+m[1],destination:m[2],package:m[1].startsWith('@')?m[1].split('/').slice(0,2).join('/'):m[1].split('/')[0]}));
 const packagedAsar=path.join(root,'dist/portable/win-unpacked/resources/app.asar');
 let archive=[];if(fs.existsSync(packagedAsar))archive=require('@electron/asar').listPackage(packagedAsar).map(p=>posix(p).replace(/^\//,''));
+const upstreamIndex=fs.existsSync(path.join(out,'texts/npm-upstream/index.json'))?json(path.join(out,'texts/npm-upstream/index.json')):[];
 const packages=[];
 for(const [location,item] of Object.entries(lock.packages||{})) {
   if(!location.startsWith('node_modules/'))continue;
@@ -35,12 +36,13 @@ for(const [location,item] of Object.entries(lock.packages||{})) {
   const name=installed?.name||location.slice(location.lastIndexOf('node_modules/')+13);
   const evidence=collect(directory,'texts/npm/'+safe(location)+'@'+safe(item.version||'unknown'));
   const metadataLicense=installed?.license||item.license||null;
+  const upstream=evidence.length?null:upstreamIndex.find(u=>u.name===name&&u.version===(installed?.version||item.version));
   const declaredLicense=typeof metadataLicense==='string'?metadataLicense:metadataLicense?JSON.stringify(metadataLicense):'License evidence not found';
   packages.push({name,lockedVersion:item.version||null,installedVersion:installed?.version||null,versionMatches:installed?installed.version===item.version:null,location,
     dependencyRole:location==='node_modules/'+name&&pkg.dependencies?.[name]?'direct runtime':location==='node_modules/'+name&&pkg.devDependencies?.[name]?'direct development':item.dev?'transitive development':'transitive runtime',
     declaredLicense,source:installed?.repository?.url||installed?.repository||installed?.homepage||item.resolved||null,
-    evidenceStatus:evidence.length?'Local license/notice text found':metadataLicense?'Metadata only; license text not found':'License evidence not found',
-    originalTexts:evidence,browserVendor:location==='node_modules/'+name?vendor.filter(v=>v.package===name):[],
+    evidenceStatus:evidence.length?'Local license/notice text found':upstream?'Collected text: '+upstream.status:metadataLicense?'Metadata only; license text not found':'License evidence not found',
+    originalTexts:evidence.length?evidence:upstream?[{source:upstream.source,copy:upstream.copy,sha256:upstream.sha256||null,collected:upstream.status}]:[],browserVendor:location==='node_modules/'+name?vendor.filter(v=>v.package===name):[],
     packagedNodeModule:archive.includes(location+'/package.json'),
     packagedNodeModuleEvidence:archive.length?'Inspected built app.asar':'Built app.asar not available; not confirmed'});
 }
@@ -64,7 +66,7 @@ const assets=[...walk(path.join(root,'assets')),...walk(path.join(root,'src/asse
   const vend=vendor.find(v=>v.destination===logical)||(/\/fontawesome\/webfonts\//.test(logical)?{package:'@fortawesome/fontawesome-free'}:null);
   return {path:p,bytes:fs.statSync(f).size,sha256:crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex'),
     recordedSourceUrls:urls.get(p)||urls.get(logical)||[],vendorPackage:vend?.package||null,
-    licenseStatus:vend?'Consult exact vendor package text and file category':isVendor?'License evidence not found; unmapped vendor file':'License evidence not found',
+    licenseStatus:vend?'Consult exact vendor package text and file category':isVendor?'License evidence not found; unmapped vendor file':/arcade.ttf$/.test(logical)?'Arcade Alternate by Abdul Muizz bin Haji Kasim (dafont.com); free for personal and commercial use with credit':/verdana_12pt.png$/.test(logical)?'Bitmap of Verdana glyphs from the Isogenic Engine sample assets; loaded but never rendered; provenance unconfirmed':/.(ttf|otf|woff2?)$/i.test(logical)?'License evidence not found':'Public domain or project-owned, per project owner statement (2026-10-20)',
     standaloneAtSameRelativePath:fs.existsSync(path.join(stage,logical)),distributionEvidence:'Same-path inspection only; transformed/renamed references require asset manifest review'};
 });
 const embedded=[];
@@ -76,19 +78,24 @@ for(const file of [...walk(path.join(root,'engine')),...walk(path.join(root,'ass
 const engineTexts=collect(root,'texts/taro');
 const electronTexts=collect(path.join(root,'node_modules/electron/dist'),'texts/electron-runtime');
 const unresolved=[
-  {component:'Standalone development Node/Python/Tk interpreter installations',status:'License evidence not found locally for the complete interpreter installation',reason:'Node executable and Python environment snapshot identify tools, not their complete notices. Electron/Chromium runtime notices are collected separately.'},
-  {component:'BattleFight game content and custom changes',status:'License evidence not found',reason:'No separate grant establishing ownership/license of game content, custom changes or model weights was found; upstream MIT is not evidence for unrelated assets.'},
-  {component:'assets/fonts/arcade.ttf',status:'License evidence not found',reason:'Font filename is not a copyright/license grant.'},
-  {component:'assets/fonts/verdana_12pt.png',status:'License evidence not found',reason:'Bitmap font provenance and redistribution permission require evidence.'},
-  {component:'Imported sprite/tileset/UI assets',status:'License evidence not found',reason:'A cache.modd.io or S3 URL records location, not ownership or a license.'},
+  {component:'Standalone development Node/Python/Tk interpreter installations',status:'Resolved: notices collected in docs/licenses/texts/tool-runtimes',reason:'Python LICENSE.txt and Tcl/Tk license.terms copied from the installed interpreter; Node.js LICENSE fetched for the installed version. None of these tools is bundled in the standalone EXE.'},
+  {component:'BattleFight game content and custom changes',status:'Resolved: owned by the project owner',reason:'Project owner stated on 2026-10-20 that they created and own all BattleFight game content, changes and model weights.'},
+  {component:'Imported sprite/tileset/UI assets',status:'Resolved: public domain per project owner',reason:'Project owner stated on 2026-10-20 that the sprites, tilesets and UI images are public domain.'},
+  {component:'assets/fonts/arcade.ttf',status:'Resolved: Arcade Alternate, free with credit',reason:'Font name table matches Arcade Alternate by Abdul Muizz bin Haji Kasim (https://www.dafont.com/arcade-alternate.font), marked 100% Free; the author allows personal and commercial use with credit. Credited in THIRD-PARTY-NOTICES.md.'},
+  {component:'assets/fonts/verdana_12pt.png',status:'Open: provenance unconfirmed; not rendered',reason:'Bitmap of Verdana glyphs inherited from the Isogenic Engine at the initial commit. ClientScore, its only user, is never instantiated, so removing the load is an option.'},
+  {component:'Reimu & Marisa (Touhou Project fan content)',status:'Open: check distribution channel',reason:'Touhou fan creator guidelines require a clear fan-work note (added to THIRD-PARTY-NOTICES.md) and limit distribution to platforms where official content is found or that ZUN permits; GitHub is not listed.'},
+  {component:'Sukune and Tenkai (CC BY-SA 4.0)',status:'Open: attribution details needed',reason:'Project owner stated they are CC BY-SA 4.0. Creator name and source link are required for attribution in CHARACTER-CREDITS.md.'},
+  {component:'Manish and Visor',status:'Resolved: used with permission',reason:'Project owner stated on 2026-10-20 that permission was granted (Manish sprite by BH_YT; Visor by dol_awp).'},
+  {component:'Morphling, Orchid Malevolence and Corkmaster skill names',status:'Open: to be renamed',reason:'Names overlap Dota 2 or conflict with the 13+ rating; the project owner will rename them.'},
+  {component:'Dual Assassin',status:'Open: awaiting the co-creator permission',reason:'Created with another player; the project owner will ask them.'},
   {component:'Gemini Flash / ChatGPT Sol credit',status:'Development disclosure, not a software license',reason:'Names supplied by project owner; no provider endorsement or ownership claim.'}
 ];
 const snapshot={date:snapshotDate,sourceCommit:require('node:child_process').execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),
   counts:{npm:packages.length,python:python.length,assets:assets.length,embeddedHeaders:embedded.length,
-    npmMetadataOnly:packages.filter(p=>p.evidenceStatus.startsWith('Metadata only')).length,npmMissing:packages.filter(p=>p.evidenceStatus==='License evidence not found').length},
+    npmMetadataOnly:packages.filter(p=>p.evidenceStatus.startsWith('Metadata only')).length,npmCollectedUpstream:packages.filter(p=>p.evidenceStatus.startsWith('Collected text')).length,npmMissing:packages.filter(p=>p.evidenceStatus==='License evidence not found').length},
   scope:'Local lockfile, installed package metadata/original notices, asset manifest, vendored headers and existing packaged resources. No legal clearance or inferred asset grant.'};
 const manifestOnly=(manifest.files||[]).filter(f=>!fs.existsSync(path.join(root,f.path||''))).map(f=>({path:f.path,recordedSourceUrl:f.url,status:'Manifest record only; source file not present; license evidence not found'}));
-const toolRuntimes={node:{version:process.version,role:'Source server/development; desktop embeds its own Node through Electron',noticeStatus:'Complete local interpreter notices not collected'},pythonEnvironment:json(path.join(root,'training-python/environment.json')),tkinter:{role:'Python GUI only; excluded from standalone',noticeStatus:'Local Tcl/Tk notice not found in inspected interpreter location'}};
+const toolRuntimes={node:{version:process.version,role:'Source server/development; desktop embeds its own Node through Electron',noticeStatus:'Collected: texts/tool-runtimes/node-'+process.version+'/LICENSE'},pythonEnvironment:json(path.join(root,'training-python/environment.json')),tkinter:{role:'Python GUI only; excluded from standalone',noticeStatus:'Collected: texts/tool-runtimes/tcl-9.0.4/license.terms and tk-9.0.4/license.terms; Python: texts/tool-runtimes/python-3.14.7/LICENSE.txt'}};
 saveJson('inventory.json',{snapshot,toolRuntimes,engineTexts,electronTexts,packages,python,vendor,embedded,unresolved});saveJson('asset-inventory.json',{date:snapshot.date,assets,manifestOnly});
 const clean=s=>String(s??'—').replaceAll('|','/').replace(/[\r\n]/g,' ');
 for(const lang of ['en','th']) {

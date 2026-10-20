@@ -2,22 +2,23 @@
 
 [English](../en/licenses.md) · [สารบัญ](index.md) · [ทะเบียนส่วนประกอบ](license-inventory.md)
 
-ข้อมูล ณ **2026-10-09** นี่เป็นทะเบียนหลักฐานจากไฟล์ ไม่ใช่การยืนยันว่าแอสเซ็ตทั้งหมดผ่านสิทธิ์แจกจ่ายแล้ว เก็บ license เดิมไว้ เอกสารนี้ไม่เปลี่ยนเงื่อนไขหรือกำหนดสิทธิ์ให้เนื้อหาที่แก้ไข
+ข้อมูล ณ **2026-10-20** นี่เป็นทะเบียนหลักฐานจากไฟล์ ไม่ใช่การยืนยันว่าแอสเซ็ตทั้งหมดผ่านสิทธิ์แจกจ่ายแล้ว เก็บ license เดิมไว้ เอกสารนี้ไม่เปลี่ยนเงื่อนไขหรือกำหนดสิทธิ์ให้เนื้อหาที่แก้ไข
 
 ## แยกสิทธิ์ตามส่วนประกอบ
 
 | ส่วนประกอบ | หลักฐานและขอบเขต | การใช้/แจกจ่าย |
 |---|---|---|
 | โค้ด Taro ต้นฉบับ | `LICENSE` ในรีโปเป็น MIT, copyright 2020 Mod Studio Inc. ต้องเก็บ notice เดิม ไม่ขยายหลักฐานนี้ไปถึงภาพอื่น | เซิร์ฟเวอร์จาก source และ engine ที่แพ็ก |
-| เนื้อหา BattleFight/ส่วนแก้ไข/model weights | **ไม่พบหลักฐาน license** สำหรับสิทธิ์เนื้อหาแยกหรือการมอบสิทธิ์ ต้องยืนยันเจ้าของ/เงื่อนไข ไม่อนุมานจาก package metadata | เกม source และ content/seed policies ที่ฝัง |
+| เนื้อหา BattleFight/ส่วนแก้ไข/model weights | **เป็นของเจ้าของโปรเจกต์** (ยืนยันโดยเจ้าของ 2026-10-20) | เกม source และ content/seed policies ที่ฝัง |
 | npm dependencies | เวอร์ชัน lock/ติดตั้งจริงและข้อความต้นฉบับในทะเบียน แยก direct/transitive และ runtime/development | บางส่วนอยู่ใน app.asar บางส่วนเฉพาะ source/development |
 | Browser vendor | Mapping ระบุ JS/CSS ที่คัดลอกและ package ต้นทาง | Browser assets จาก source และ desktop resources |
 | Electron/Chromium | MIT notice ของ Electron และ `LICENSES.chromium.html` ของ runtime; dependencies ของ Chromium ไม่ได้เป็น MIT ทั้งหมด | Runtime Windows portable |
 | Font Awesome Free 5.15.4 | ข้อความใน package แยกโค้ด MIT, web/desktop fonts OFL-1.1 และ SVG/JS icons CC-BY-4.0 ต้องดูชนิดไฟล์ ไม่เรียกทั้ง package ว่า MIT | คัดลอก CSS/webfonts สู่ desktop; ไอคอนตามไฟล์ที่ใช้จริง |
 | Torch/NumPy และ Python dependencies | Metadata `.dist-info` ที่ติดตั้งและ license/notice ต้นฉบับ แยก requirements ที่ pin กับเวอร์ชันติดตั้งจริง | ฝึก/พัฒนา ไม่รวมใน standalone |
-| Node สำหรับพัฒนา, Python interpreter และ Tcl/Tk | บันทึกเวอร์ชัน/environment ของเครื่องมือ แต่ไม่พบ notices ท้องถิ่นครบของ interpreter/Tcl/Tk ในตำแหน่งติดตั้งที่ตรวจ ส่วน runtime ที่ฝังใน Electron มี notices ที่รวบรวมแยกไว้ | เครื่องมือเซิร์ฟเวอร์ source/ฝึก/GUI; Python/Tk ภายนอกไม่รวมใน standalone |
-| Sprite, tileset และ UI ที่นำเข้า | **ไม่พบหลักฐาน license** ในส่วนที่ไม่มี grant คู่กัน URL cache/S3 บอกที่เก็บ ไม่ใช่สิทธิ์ | ดู inventory รายไฟล์และหลักฐานพาธในแพ็กเกจ |
-| `arcade.ttf`, `verdana_12pt.png` | **ไม่พบหลักฐาน license** ของไฟล์เหล่านี้ | Desktop preparer คัดลอกโดยตรง |
+| Node สำหรับพัฒนา, Python interpreter และ Tcl/Tk | เก็บ notice แล้วใน `docs/licenses/texts/tool-runtimes`: `LICENSE.txt` ของ Python และ `license.terms` ของ Tcl/Tk จาก interpreter ที่ติดตั้ง, `LICENSE` ของ Node.js ตามเวอร์ชันที่ใช้ | เครื่องมือเซิร์ฟเวอร์ source/ฝึก/GUI ไม่รวมใน standalone |
+| Sprite, tileset และ UI ที่นำเข้า | **Public Domain** ตามที่เจ้าของโปรเจกต์ยืนยัน (2026-10-20) | เกม source และ desktop resources |
+| `arcade.ttf` | ฟอนต์ Arcade Alternate ของ Abdul Muizz bin Haji Kasim ([dafont](https://www.dafont.com/arcade-alternate.font)) ใช้ได้ทั้งส่วนตัวและเชิงพาณิชย์โดยให้เครดิต ให้เครดิตแล้วใน `THIRD-PARTY-NOTICES.md` | Desktop preparer คัดลอกโดยตรง |
+| `verdana_12pt.png` | bitmap ตัวอักษร Verdana ที่มากับ Isogenic Engine ยังยืนยันที่มาไม่ได้ โหลดตอนเปิดเกมแต่ไม่ได้แสดงผล (ไม่มีการสร้าง `ClientScore`) | Desktop preparer คัดลอกโดยตรง |
 | เสียง | มีรายการใน manifest เก่า แต่ standalone ลบเสียงและอ้างอิง การนำออกไม่ได้ยืนยัน license ของสำเนาที่อยู่ที่อื่น | ไม่รวมใน standalone ออฟไลน์ปัจจุบัน |
 
 Phaser ถูกประกาศใน dependencies แต่การประกาศอย่างเดียวไม่พิสูจน์ว่าเกมบน browser เรียกใช้ ต้องตรวจ imports/vendor แยก Renderer ปัจจุบันใช้ Pixi งานเอกสารนี้ไม่ upgrade หรือลบ dependency
@@ -41,10 +42,12 @@ Phaser ถูกประกาศใน dependencies แต่การปร�
 
 อย่าลบเครดิตเดิม อ้างผู้ให้บริการรับรอง หรืออนุมานเจ้าของจากเครดิต AI ช่วยพัฒนา ไม่สรุปรวมว่าแอสเซ็ตที่ไม่ทราบสิทธิ์ใช้แจกจ่ายเชิงพาณิชย์ได้ สำหรับรายการที่ขาดหลักฐาน ต้องขอผู้สร้าง/ต้นทาง เวอร์ชัน ข้อความ license หรือหนังสืออนุญาต เครดิตที่ต้องแสดง และสิทธิ์แจกจ่ายสำเนาที่แก้ไข/ออฟไลน์จากเจ้าของโปรเจกต์
 
-## ช่องว่าง notice ของ standalone ปัจจุบัน
+## Notice ที่แนบไปกับ standalone
 
-Release ที่ unpack ไว้วันที่ 2026-10-09 มี `LICENSE.electron.txt` และ `LICENSES.chromium.html` ที่ application root แต่ preparer ปัจจุบัน **ไม่คัดลอก Taro `LICENSE` ลง desktop-data** ส่วน root app.asar มี desktop code/package/dependencies แทนเอกสารทั้งรีโป จากการตรวจไม่พบไฟล์ vendor `LICENSE` ใต้ `assets/desktop-vendor` ที่คัดลอก Header ใน JS/CSS และ module notice บางส่วนอาจยังอยู่ แต่ไม่ใช่ audit notices รวมที่สมบูรณ์
+ตั้งแต่ 2026-10-20 desktop preparer สร้างโฟลเดอร์ `licenses/` ใน `desktop-data` ประกอบด้วย `LICENSE` ของ Taro, license ต้นฉบับของไลบรารีเบราว์เซอร์ที่คัดลอก (รวม Font Awesome), ข้อความ license ของ npm ที่ฝังใน EXE แต่ไม่มีไฟล์ license (`npm/<package>@<version>/` พร้อม `SOURCE.txt`), [THIRD-PARTY-NOTICES.md](../licenses/THIRD-PARTY-NOTICES.md) และ [CHARACTER-CREDITS.md](../licenses/CHARACTER-CREDITS.md) ส่วน notice ของ Electron/Chromium อยู่ที่ application root เหมือนเดิม ไม่ได้ฝัง `docs/licenses` ทั้งโฟลเดอร์ (27 MB)
 
-เอกสาร `docs/licenses` ที่เพิ่มครั้งนี้ **ไม่ได้ถูกฝังใน EXE เดิมอัตโนมัติ** งาน packaging ถัดไปควรแนบ notices ของ engine/เกม/dependencies/ฟอนต์ที่เกี่ยวข้องและแก้สิทธิ์แอสเซ็ตที่ยังไม่ทราบ ก่อนอ้างว่าแพ็กเกจผ่านสิทธิ์เผยแพร่ครบ งานนี้บันทึกช่องว่าง ไม่ rebuild หรือเปลี่ยนแพ็กเกจ
+npm ทั้ง 31 ตัวที่ไม่มีไฟล์ license มีข้อความแล้ว: 16 ตัวจาก repository ต้นทาง, 6 ตัวจากหัวข้อ License ใน README และ 9 ตัวเป็นข้อความมาตรฐานของ license ที่ประกาศใน `package.json` (ต้นทางไม่มีไฟล์) ดู [index](../licenses/texts/npm-upstream/index.json)
+
+ยังค้างอยู่: ช่องทางเผยแพร่ fan content ของ Touhou (แนวปฏิบัติไม่ได้ระบุ GitHub), ข้อมูลเครดิตของ Sukune และ Tenkai (CC BY-SA 4.0), การเปลี่ยนชื่อ Morphling, Orchid Malevolence และชื่อสกิลของ Corkmaster, การขออนุญาตผู้ร่วมสร้าง Dual Assassin และที่มาของ `verdana_12pt.png`
 
 การพบพาธเดียวกันใน asset inventory ไม่ครอบคลุมไฟล์ที่เปลี่ยนชื่อ/แปลง `packagedNodeModule` ตรวจตำแหน่งตาม lock ใน app.asar ไม่ใช่ทุก hoisted path หรือ binary dependency ของ Chromium การตรวจ notice ครบต้องใช้ต้นฉบับ vendor mapping และ notice runtime ร่วมกัน

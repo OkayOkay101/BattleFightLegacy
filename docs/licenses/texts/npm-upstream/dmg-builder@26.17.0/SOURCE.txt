@@ -1,0 +1,4 @@
+Upstream license text for dmg-builder@26.17.0
+Fetched: 2026-10-20
+URL: https://raw.githubusercontent.com/electron-userland/electron-builder/HEAD/LICENSE
+Note: taken from the repository's default branch, which may be newer than the installed version; the installed package itself ships no license file.

@@ -1,0 +1,2 @@
+Neither the installed chromium-pickle-js@0.2.0 package nor its upstream repository (electron/node-chromium-pickle-js) contains a license file.
+The package declares "license": "MIT" in package.json. This file is the standard MIT text with the copyright holder taken from the package.json author field (the chromium-pickle-js authors), reconstructed from that declaration.

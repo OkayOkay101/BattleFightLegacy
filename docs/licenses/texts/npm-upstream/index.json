@@ -1,0 +1,312 @@
+[
+  {
+    "name": "@electron-internal/extract-zip",
+    "version": "1.0.5",
+    "declaredLicense": "BSD-2-Clause",
+    "repository": "electron/extract-zip",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/electron/extract-zip/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/@electron-internal__extract-zip@1.0.5/LICENSE",
+    "sha256": "edab8abb78d9c5b36944c3e00aebf6a90eb32378993f49ac8a3904007029c629"
+  },
+  {
+    "name": "@types/json5",
+    "version": "0.0.29",
+    "declaredLicense": "MIT",
+    "repository": "DefinitelyTyped/DefinitelyTyped",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/@types__json5@0.0.29/LICENSE",
+    "sha256": "0a48f63d7d32a49d196dce4b2e0cbc236c2cc8fef42cb20e005e4d5f813cc8f6"
+  },
+  {
+    "name": "app-builder-lib",
+    "version": "26.17.0",
+    "declaredLicense": "MIT",
+    "repository": "electron-userland/electron-builder",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/electron-userland/electron-builder/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/app-builder-lib@26.17.0/LICENSE",
+    "sha256": "bed8d0ab3e6031817f775a641ff37313b0f5591bc8ba0ed79b978dafbd4231ce"
+  },
+  {
+    "name": "keyv",
+    "version": "4.5.4",
+    "declaredLicense": "MIT",
+    "repository": "jaredwray/keyv",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/jaredwray/keyv/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/keyv@4.5.4/LICENSE",
+    "sha256": "f3a25fb846504d92627388f112f326ce91a9202e65d787d0b6ec79c96076d84d"
+  },
+  {
+    "name": "assert-plus",
+    "version": "1.0.0",
+    "declaredLicense": "MIT",
+    "repository": "mcavage/node-assert-plus",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/mcavage/node-assert-plus/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/assert-plus@1.0.0/LICENSE",
+    "sha256": "97b1ec9f1e8d504b8f832cf15b48ec00b481f8fbc55d31050783e7c57869c172"
+  },
+  {
+    "name": "babel-plugin-transform-remove-console",
+    "version": "6.9.4",
+    "declaredLicense": "MIT",
+    "repository": "babel/minify",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/babel/minify/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/babel-plugin-transform-remove-console@6.9.4/LICENSE",
+    "sha256": "750094e0006d9249f2c95b261c3055399add5cb88c95d8fd111dae1d9b24bd0f"
+  },
+  {
+    "name": "lowercase-keys",
+    "version": "1.0.0",
+    "declaredLicense": "MIT",
+    "repository": "sindresorhus/lowercase-keys",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/sindresorhus/lowercase-keys/HEAD/license",
+    "copy": "texts/npm-upstream/lowercase-keys@1.0.0/license",
+    "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3"
+  },
+  {
+    "name": "chromium-pickle-js",
+    "version": "0.2.0",
+    "declaredLicense": "MIT",
+    "repository": "electron/node-chromium-pickle-js",
+    "status": "standard text from package.json license field",
+    "source": "node_modules/chromium-pickle-js/package.json",
+    "copy": "texts/npm-upstream/chromium-pickle-js@0.2.0/LICENSE",
+    "sha256": "2968c14dee98f951f98e19ef046fa1e8059793b1c49e6f730cd6496eb90bea87"
+  },
+  {
+    "name": "compare-version",
+    "version": "0.1.2",
+    "declaredLicense": "MIT",
+    "repository": "kevva/compare-version",
+    "status": "README license section",
+    "source": "node_modules/compare-version/README.md",
+    "copy": "texts/npm-upstream/compare-version@0.1.2/README-license-section.md",
+    "sha256": "c4d5e238f1312e3bdaa07431e4750557ddbd435eb3687494dd8ce7e20951dc24"
+  },
+  {
+    "name": "console-polyfill",
+    "version": "0.3.0",
+    "declaredLicense": "MIT",
+    "repository": "paulmillr/console-polyfill",
+    "status": "README license section",
+    "source": "node_modules/console-polyfill/README.md",
+    "copy": "texts/npm-upstream/console-polyfill@0.3.0/README-license-section.md",
+    "sha256": "9f3e4c90dfba667ff976255fd91866822c9a095682a6ef02ca5c1b4ea986f573"
+  },
+  {
+    "name": "cookie-signature",
+    "version": "1.0.6",
+    "declaredLicense": "MIT",
+    "repository": "visionmedia/node-cookie-signature",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/visionmedia/node-cookie-signature/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/cookie-signature@1.0.6/LICENSE",
+    "sha256": "0dd4e47333485760cf8c265db5a5e24ae8d7401064c6f2e19793ee81a5bef42f"
+  },
+  {
+    "name": "cross-dirname",
+    "version": "0.1.0",
+    "declaredLicense": "MIT",
+    "repository": "JumpLink/cross-dirname",
+    "status": "standard text from package.json license field",
+    "source": "node_modules/cross-dirname/package.json",
+    "copy": "texts/npm-upstream/cross-dirname@0.1.0/LICENSE",
+    "sha256": "a98aec0f14c17e3508f37ff902ddf3658cd8259d23f6ceda3b12e5429c2499e2"
+  },
+  {
+    "name": "decache",
+    "version": "3.1.0",
+    "declaredLicense": "MIT",
+    "repository": "dwyl/decache",
+    "status": "standard text from package.json license field",
+    "source": "node_modules/decache/package.json",
+    "copy": "texts/npm-upstream/decache@3.1.0/LICENSE",
+    "sha256": "498e089c478bb54d7882d2635aea45b735daffb3c6d6c675474335e973b801b7"
+  },
+  {
+    "name": "dmg-builder",
+    "version": "26.17.0",
+    "declaredLicense": "MIT",
+    "repository": "electron-userland/electron-builder",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/electron-userland/electron-builder/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/dmg-builder@26.17.0/LICENSE",
+    "sha256": "bed8d0ab3e6031817f775a641ff37313b0f5591bc8ba0ed79b978dafbd4231ce"
+  },
+  {
+    "name": "err-code",
+    "version": "2.0.3",
+    "declaredLicense": "MIT",
+    "repository": "IndigoUnited/js-err-code",
+    "status": "README license section",
+    "source": "node_modules/err-code/README.md",
+    "copy": "texts/npm-upstream/err-code@2.0.3/README-license-section.md",
+    "sha256": "5fb141b3454c428633675f8522e86fd53a6119b94df824fb7c0f613e590caa8e"
+  },
+  {
+    "name": "esrecurse",
+    "version": "4.3.0",
+    "declaredLicense": "BSD-2-Clause",
+    "repository": "estools/esrecurse",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/estools/esrecurse/HEAD/LICENSE.md",
+    "copy": "texts/npm-upstream/esrecurse@4.3.0/LICENSE.md",
+    "sha256": "cb1764d4708e870cc694de13d499af2e6ee98d2751026e3a3f79de608f4f4ea0"
+  },
+  {
+    "name": "filelist",
+    "version": "1.0.3",
+    "declaredLicense": "Apache-2.0",
+    "repository": "mde/filelist",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/mde/filelist/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/filelist@1.0.3/LICENSE",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "name": "http-cache-semantics",
+    "version": "3.8.1",
+    "declaredLicense": "BSD-2-Clause",
+    "repository": "pornel/http-cache-semantics",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/pornel/http-cache-semantics/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/http-cache-semantics@3.8.1/LICENSE",
+    "sha256": "ab868ad5a2ef5068560d9cd3b2180ec63c140bb4c5cae1ba779d300a0ac74fa3"
+  },
+  {
+    "name": "imurmurhash",
+    "version": "0.1.4",
+    "declaredLicense": "MIT",
+    "repository": "jensyt/imurmurhash-js",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/jensyt/imurmurhash-js/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/imurmurhash@0.1.4/LICENSE",
+    "sha256": "fa0943ddcaa857d901a9eb92254d89876297ecdfbc884d294a927df08ebcbbe8"
+  },
+  {
+    "name": "ip",
+    "version": "1.1.5",
+    "declaredLicense": "MIT",
+    "repository": "indutny/node-ip",
+    "status": "README license section",
+    "source": "node_modules/ip/README.md",
+    "copy": "texts/npm-upstream/ip@1.1.5/README-license-section.md",
+    "sha256": "fe1c16c13971a2e674150e6fbc6a9bd1ce24fb0bd6fbe0ce5ffbc57047f424c3"
+  },
+  {
+    "name": "isarray",
+    "version": "1.0.0",
+    "declaredLicense": "MIT",
+    "repository": "juliangruber/isarray",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/juliangruber/isarray/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/isarray@1.0.0/LICENSE",
+    "sha256": "68f12f6e2c33688699249c01d8f9623c534da20aa71989c57b061b7bc1676d14"
+  },
+  {
+    "name": "jake",
+    "version": "10.8.5",
+    "declaredLicense": "Apache-2.0",
+    "repository": "jakejs/jake",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/jakejs/jake/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/jake@10.8.5/LICENSE",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "name": "lazy-val",
+    "version": "1.0.5",
+    "declaredLicense": "MIT",
+    "repository": "develar/lazy-val",
+    "status": "standard text from package.json license field",
+    "source": "node_modules/lazy-val/package.json",
+    "copy": "texts/npm-upstream/lazy-val@1.0.5/LICENSE",
+    "sha256": "efe8f1903440d3e757fa3c91fdbbe410c496b7983f1a92420f252ce3b417e0ee"
+  },
+  {
+    "name": "natural-compare",
+    "version": "1.4.0",
+    "declaredLicense": "MIT",
+    "repository": "litejs/natural-compare-lite",
+    "status": "upstream license file",
+    "source": "https://raw.githubusercontent.com/litejs/natural-compare-lite/HEAD/LICENSE",
+    "copy": "texts/npm-upstream/natural-compare@1.4.0/LICENSE",
+    "sha256": "353fe762ba595bf1ffe786acf0f5984bb164205901d74f258af195fc8228c67d"
+  },
+  {
+    "name": "node-api-version",
+    "version": "0.2.1",
+    "declaredLicense": "MIT",
+    "repository": "timfish/node-api-version",
+    "status": "standard text from package.json license field",
+    "source": "node_modules/node-api-version/package.json",
+    "copy": "texts/npm-upstream/node-api-version@0.2.1/LICENSE",
+    "sha256": "fb1e5ad479c47d29a2f294bc7d0ddcf29eded9e3d7139faa641acc1d5d11dda1"
+  },
+  {
+    "name": "read-binary-file-arch",
+    "version": "1.0.6",
+    "declaredLicense": "MIT",
+    "repository": "samuelmaddock/read-binary-file-arch",
+    "status": "README license section",
+    "source": "node_modules/read-binary-file-arch/README.md",
+    "copy": "texts/npm-upstream/read-binary-file-arch@1.0.6/README-license-section.md",
+    "sha256": "daf005969aac8cb4283b3777361f0244f4cce898b9a983a60b7f0d9e96f559bf"
+  },
+  {
+    "name": "sanitizer",
+    "version": "0.1.3",
+    "declaredLicense": "Apache-2.0",
+    "repository": "theSmaw/Caja-HTML-Sanitizer",
+    "status": "standard text from package.json license field",
+    "source": "node_modules/sanitizer/package.json",
+    "copy": "texts/npm-upstream/sanitizer@0.1.3/LICENSE",
+    "sha256": "e7088e8fe384f2641078259e85a9c840f9934544246d71f5dc28cc3f60c36372"
+  },
+  {
+    "name": "temp-file",
+    "version": "3.4.0",
+    "declaredLicense": "MIT",
+    "repository": "develar/temp-file",
+    "status": "standard text from package.json license field",
+    "source": "node_modules/temp-file/package.json",
+    "copy": "texts/npm-upstream/temp-file@3.4.0/LICENSE",
+    "sha256": "efe8f1903440d3e757fa3c91fdbbe410c496b7983f1a92420f252ce3b417e0ee"
+  },
+  {
+    "name": "tmp-promise",
+    "version": "3.0.3",
+    "declaredLicense": "MIT",
+    "repository": "benjamingr/tmp-promise",
+    "status": "standard text from package.json license field",
+    "source": "node_modules/tmp-promise/package.json",
+    "copy": "texts/npm-upstream/tmp-promise@3.0.3/LICENSE",
+    "sha256": "a9fe3b5a69cb29f37d8159186c790faeee37fc2fa3bb061bdd388a2aadc67b87"
+  },
+  {
+    "name": "traverse-chain",
+    "version": "0.1.0",
+    "declaredLicense": "MIT",
+    "repository": "yuanchuan/traverse-chain",
+    "status": "README license section",
+    "source": "node_modules/traverse-chain/README.md",
+    "copy": "texts/npm-upstream/traverse-chain@0.1.0/README-license-section.md",
+    "sha256": "0a7c7ff089ae6dc1baefbb52fc83010606e27a5e6570ef56c11af7b4d5a73fe7"
+  },
+  {
+    "name": "truncate-utf8-bytes",
+    "version": "1.0.2",
+    "declaredLicense": "WTFPL",
+    "repository": "parshap/truncate-utf8-bytes",
+    "status": "standard text from package.json license field",
+    "source": "node_modules/truncate-utf8-bytes/package.json",
+    "copy": "texts/npm-upstream/truncate-utf8-bytes@1.0.2/LICENSE",
+    "sha256": "0356258391e190dc1d44ea01565cfe627fe44e27dad693a0a54c2483a7b223e5"
+  }
+]

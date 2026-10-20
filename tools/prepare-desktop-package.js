@@ -541,6 +541,36 @@ function copyVendor(repoRoot, stageRoot, stats) {
 	}
 }
 
+// Ship the notices the EXE needs: Taro's MIT license, each copied browser library's
+// license, upstream texts for bundled npm packages without one, and the project notices.
+const VENDOR_LICENSES = ['jquery', 'jquery-ui-dist', 'jquery-contextmenu', '@popperjs/core', 'bootstrap', 'lz-string', 'lodash', 'sweetalert2', 'pixi.js-legacy', '@fortawesome/fontawesome-free'];
+
+function copyNotices(repoRoot, stageRoot, stats) {
+	const target = path.join(stageRoot, 'licenses');
+	const copy = (source, relative) => {
+		if (!fs.existsSync(source)) throw new Error('Missing license notice: ' + source);
+		const destination = path.join(target, relative);
+		fs.mkdirSync(path.dirname(destination), { recursive: true });
+		fs.copyFileSync(source, destination);
+		stats.noticeFiles.push(relative.split(path.sep).join('/'));
+	};
+	copy(path.join(repoRoot, 'LICENSE'), path.join('taro', 'LICENSE'));
+	for (const name of ['THIRD-PARTY-NOTICES.md', 'CHARACTER-CREDITS.md']) copy(path.join(repoRoot, 'docs', 'licenses', name), name);
+	for (const pkg of VENDOR_LICENSES) {
+		const dir = path.join(repoRoot, 'node_modules', pkg);
+		const file = fs.existsSync(dir) && fs.readdirSync(dir).find(name => /^(licen[cs]e|copying)(\.(md|txt))?$/i.test(name));
+		if (!file) throw new Error('Missing license file for browser dependency: ' + pkg);
+		copy(path.join(dir, file), path.join('vendor', pkg, file));
+	}
+	const upstreamRoot = path.join(repoRoot, 'docs', 'licenses', 'texts', 'npm-upstream');
+	const inventory = JSON.parse(fs.readFileSync(path.join(repoRoot, 'docs', 'licenses', 'inventory.json'), 'utf8'));
+	const bundled = new Set(inventory.packages.filter(p => p.packagedNodeModule).map(p => `${p.name.replace('/', '__')}@${p.installedVersion || p.lockedVersion}`));
+	for (const dir of fs.readdirSync(upstreamRoot)) {
+		if (!bundled.has(dir)) continue;
+		for (const name of fs.readdirSync(path.join(upstreamRoot, dir))) copy(path.join(upstreamRoot, dir, name), path.join('npm', dir, name));
+	}
+}
+
 function copyPolicies(repoRoot, stageRoot, stats) {
 	const sourceDir = path.join(repoRoot, 'training-data', 'policies');
 	if (!fs.existsSync(sourceDir)) throw new Error('Seed policies are missing: ' + sourceDir);
@@ -598,7 +628,7 @@ function prepareDesktopPackage(options = {}) {
 		fs.rmSync(stageRoot, { recursive: true, force: true });
 	}
 	fs.mkdirSync(stageRoot, { recursive: true });
-	const stats = { files: [], sourceBytes: 0, stagedBytes: 0, pngBytesSaved: 0, missingVisuals: [], fallbackUnitCount: 0 };
+	const stats = { files: [], sourceBytes: 0, stagedBytes: 0, pngBytesSaved: 0, missingVisuals: [], fallbackUnitCount: 0, noticeFiles: [] };
 	copyRuntime(repoRoot, stageRoot);
 	transformSources(stageRoot);
 	const sourceManifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'src/assets/manifest.json'), 'utf8'));
@@ -618,6 +648,7 @@ function prepareDesktopPackage(options = {}) {
 	copyAssets(context, stats);
 	createFallbackAssets(stageRoot, context.missingUnits, stats);
 	copyVendor(repoRoot, stageRoot, stats);
+	copyNotices(repoRoot, stageRoot, stats);
 	copyPolicies(repoRoot, stageRoot, stats);
 
 	const gamePath = path.join(stageRoot, 'src/game.json');
