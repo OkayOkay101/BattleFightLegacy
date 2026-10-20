@@ -65,7 +65,7 @@
     "ws": "^8.8.1",
     "xss-filters": "^1.2.7",
     "lodash": "4.17.21",
-    "lz-string": "1.4.4"
+    "lz-string": "1.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.9",
