@@ -55,7 +55,7 @@
     "jsonwebtoken": "^8.5.1",
     "msgpack-lite": "^0.1.26",
     "node-arguments": "0.0.1",
-    "phaser": "^3.55.2",
+    "phaser": "^4.2.1",
     "public-ip": "^2.5.0",
     "q": "^1.5.1",
     "rate-limiter-flexible": "^2.3.7",
