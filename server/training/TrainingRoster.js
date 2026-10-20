@@ -12,6 +12,7 @@ const UNSCRIPTED_UNFINISHED_NAMES = ['Fleeting Dream', 'Team Spirit Breaker', 'C
 
 const EXCLUDED_UNITS = new Map([
 	['sarLaTkdF2', 'custom unit'],
+	['morrowRouteCartographer', 'menu-only unit'],
 	['McZTj7oVZ1', 'removed from training by request'], // Roboto
 	['BUcKqXTF16', 'removed from training by request'], // Zaprytos
 	['H6K6gpqlPE', 'removed from training by request'], // Sixth Diva

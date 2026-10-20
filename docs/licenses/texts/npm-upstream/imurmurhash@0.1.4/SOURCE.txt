@@ -1,0 +1,4 @@
+Upstream license text for imurmurhash@0.1.4
+Fetched: 2026-10-20
+URL: https://raw.githubusercontent.com/jensyt/imurmurhash-js/HEAD/LICENSE
+Note: taken from the repository's default branch, which may be newer than the installed version; the installed package itself ships no license file.

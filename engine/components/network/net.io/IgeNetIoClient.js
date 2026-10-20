@@ -55,7 +55,7 @@ var IgeNetIoClient = {
 					// console.log(server, self._state);
 					// if client's is not connected yet
 					if (self._state < 2) {
-						if (window.isStandalone) {
+						if (window.isStandalone && !window.isDesktopApp) {
 							console.log('connecting to a standalone server');
 							url = `ws://${window.location.hostname}:2001`;
 						} else {

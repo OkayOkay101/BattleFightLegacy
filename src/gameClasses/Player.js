@@ -62,7 +62,8 @@ var Player = IgeEntity.extend({
 		}
 
 		if (self._stats.playerJoined != true) {
-			if (self._stats.controlledBy == 'human' && !self._stats.isSpectator && ige.script) // spectators never enter match scripts
+			if (ige.training?.isCustomSandbox) ige.training.joinHuman(self);
+			else if (self._stats.controlledBy == 'human' && !self._stats.isSpectator && ige.script) // spectators never enter match scripts
 			{
 				ige.trigger.fire('playerJoinsGame', { playerId: self.id() });
 			}
@@ -371,7 +372,7 @@ var Player = IgeEntity.extend({
 	},
 
 	remove: function () {
-		if (this._stats.controlledBy == 'human' && ige.script) // do not send trigger for neutral player
+		if (this._stats.controlledBy == 'human' && !this._stats.isSpectator && ige.script) // spectators never entered the match
 		{
 			ige.trigger.fire('playerLeavesGame', { playerId: this.id() });
 		}

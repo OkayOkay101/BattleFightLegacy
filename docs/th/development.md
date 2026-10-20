@@ -1,0 +1,89 @@
+# การพัฒนาและแพ็กเกจ Standalone
+
+[English](../en/development.md) · [สารบัญ](index.md)
+
+## Prerequisites
+
+ทำงานในรีโป `taro-engine` ที่ซ้อนอยู่ ไม่ใช่ parent หรือเกม export ข้างเคียง Release Windows ปัจจุบัน build ด้วย Node 24.19.0 และ Electron 44.3.0 นี่เป็นสภาพแวดล้อมที่ตรวจแล้ว ไม่ได้รับรองทุก Node version ตาม README ต้นฉบับ เมื่อตั้งเครื่องพัฒนาให้ใช้ `npm ci` ติดตั้งตาม lockfile ซึ่งอาจเรียกอินเทอร์เน็ต
+
+Python จำเป็นเฉพาะการฝึก `training-python/environment.json` บันทึก Python 3.14.7, Torch 2.14.0+cpu และ NumPy 2.5.3 (ตรวจเมื่อ 2026-09-25) ส่วน `requirements.in` pin เวอร์ชัน Torch/NumPy ถ้าสร้าง environment ใหม่ให้ใช้ CPU wheels ที่เข้ากันได้จาก Torch index ทางการตามข้อมูลที่บันทึก Hardware/platform อื่นต้องหา wheels ที่รองรับและตรวจแยก GUI Python ต้องมี Tkinter ส่วน web controls เป็นทางเข้าอีกแบบ
+
+## คำสั่ง
+
+รันจาก root ของรีโป:
+
+```powershell
+npm run server
+npm run demo
+npm run train:status
+npm run train:3v3 -- --neural on --neural-schema 3 --workers 4 --speed max
+npm run train:stop
+npm run train:gui
+npm run desktop:build
+```
+
+คำสั่งเหล่านี้เป็นตัวเลือกตามงาน ไม่ใช่ script ที่ต้องรันต่อกัน `server`/`demo` เปิดเซิร์ฟเวอร์จากโค้ด โดย `demo` ขอ latest demo policy ตามการ resolve ของ runtime ให้ดูโมเดลที่ resolve จริงแทนสมมติว่า latest คือ champion `train:3v3` เริ่ม/ต่อการฝึก ค่า neural รุ่นใหม่เริ่มต้นคือ schema3 และสี่ workers โหมด max ต้องผ่าน parity preflight และอาจ fallback เป็น realtime เมื่อไม่ผ่าน ให้ตรวจ status/log ของ CLI
+
+เซิร์ฟเวอร์จาก source ปัจจุบันเปิดเว็บที่ `http://127.0.0.1/` (HTTP พอร์ต 80) ส่วน WebSocket ใช้พอร์ต 2001 หรือ `PORT`; ตั้ง `PORT` ไม่ได้เปลี่ยน HTTP พอร์ต 80 ของ source Desktop ใช้ HTTP/WebSocket loopback ที่เลือกพอร์ตว่างอัตโนมัติ หากพอร์ตชนให้อ่าน startup output
+
+`launch-ai-gui.bat` เป็น launcher Windows สำหรับ GUI/เซิร์ฟเวอร์ฝึก Portable ไม่ต้องใช้ไฟล์นี้ ห้ามเปลี่ยนโค้ด gameplay/schema/reward ขณะที่ production training ใช้ environment ที่ตรึงอยู่ และแยก diagnostics/fixtures ออกจาก optimizer/registry จริง
+
+## ตรวจ regression ของ Solo
+
+```powershell
+node --test test/solo-mode.test.js test/solo-ui.test.js test/morrow-skills.test.js
+node --test test/solo-api.test.js test/solo-runtime.test.js test/custom-sandbox.test.js
+```
+
+คำสั่งแรกตรวจรายชื่อตัวละคร definition การเชื่อม UI อังกฤษ/ไทย timer หมุด และ raycast ของ Atlas คำสั่งที่สองเปิดโปรเซส loopback จริง ตรวจสิทธิ์ API การเดิน ดาเมจกระสุนเมื่อ callback ซ้ำหรือสลับ fixture และเมื่อ Box2D สร้างการชนเอง การหักวิถี เส้นเตือนที่คงอยู่ การเริ่มใหม่ ตาย/เกิดใหม่ และหยุดโปรเซส ต้องอนุญาตให้เปิดพอร์ตในเครื่อง IPC และ preload สำหรับทดสอบเปิดเฉพาะเมื่อระบุการตั้งค่า test เท่านั้น การตรวจนี้ไม่ได้ยืนยันว่าสกิลทุกตัวละครผ่าน หรือยืนยันภาพใน Electron build
+
+## Checkpoint และการหยุด
+
+ตรวจ `train:status` ร่วมกับ PID จริง `supervisor.lock.json` timestamps และ checkpoint ตาม schema อย่าเปิด supervisor ซ้ำกับ data directory ที่มี lock สถานะ โมเดล optimizer และ match logs ใน `training-data` เป็น runtime data ในเครื่อง ไม่ใช่เอกสารหรือชุดฝึกที่จะฝังใน EXE
+
+**พฤติกรรมสำคัญ:** `train:stop` หยุดรับงานใหม่และเริ่มรอแมตช์ปัจจุบัน แต่ daemon จะบังคับตัด workers หลัง **30 วินาที** จึงไม่รับประกันว่าแมตช์ยาวจะจบครบ ใช้ helper ที่มีอยู่สำหรับรอโดยไม่ตัดตาม timeout นี้:
+
+```powershell
+node tools/stop-training-after-evaluation.js
+```
+
+ระหว่างประเมิน helper รอผลรอบ candidate ปัจจุบันแล้วส่ง stop ถ้าอยู่ train จะส่ง stop ทันที เมื่อ supervisor รับ stop ที่ค้างสถานะแล้ว จะลบ request ที่ใช้ไปเพื่อไม่ให้ CLI บังคับตัดหลัง 30 วินาที และรอแมตช์ที่เริ่มแล้วจบ ตรวจ run/lock เดิมและไม่แตะ run อื่น มี deadline การติดตาม 20 นาที หากหมดเวลาต้องตรวจสถานะ ไม่เริ่มใหม่สุ่มสี่สุ่มห้า แมตช์จบที่รอใช้ถูกเก็บสำหรับ resume และอาจยังไม่ครบ batch PPO ต้องยืนยัน `stopped`, active ศูนย์, PID ออกและ lock ถูกลบ ห้ามยอมรับแมตช์ล้มเหลว/บางส่วนเป็น trajectory เต็ม
+
+## Build ออฟไลน์
+
+`desktop:build` เตรียม local resources แล้วใช้ electron-builder สร้าง Windows x64 portable ที่ `dist/portable/BattleFight-Portable-1.0.0.exe` ขั้นเตรียม rewrite URL ที่รองรับเป็นพาธท้องถิ่น optimize PNG และลบทั้งไฟล์/อ้างอิงเสียง ฝัง metadata ของ pointers ที่อนุมัติและ policies หมายเลขที่มีให้เลือกเอง ไม่ฝัง Python, optimizer/checkpoint/match data หรือเครื่องมือเปลี่ยนการฝึก Seed เริ่มต้นตาม champion ที่อนุมัติ ไม่ใช่ candidate หมายเลขสูงสุด
+
+`desktop:build:github` สร้างรุ่นสำหรับ GitHub คือ `dist/portable/BattleFight-Portable-1.0.0-no-touhou.exe` ที่ไม่มี Reimu & Marisa (แฟนเวิร์ก Touhou Project ซึ่งแนวปฏิบัติไม่ได้ระบุ GitHub เป็นช่องทางเผยแพร่) ลบตัวละคร อาวุธ กระสุน animation สคริปต์สร้างตัว ตัวเลือกในเมนู และเครดิตเพลง แต่เก็บส่วนที่ตัวละครอื่นใช้ร่วม และแช่รายชื่อตัวละครของ Neural จาก source ไว้ใน `server/training/neural-roster.json` เพื่อให้ policy ที่ฝึกแล้วยังโหลดได้ `test/desktop-variant.test.js` ตรวจการลบนี้
+
+ภาพหายหรือ origin ที่ไม่รองรับอาจทำให้ preparation ล้มเหลว ไม่ควรเปลี่ยน error ให้พึ่งอินเทอร์เน็ตแบบเงียบ Browser vendor และ Font Awesome webfonts ถูกคัดลอกในเครื่อง แต่ README/license ต้นทางไม่ได้ถูกฝังอัตโนมัติเพียงเพราะอยู่ในรีโป ดู [ช่องว่าง notice](licenses.md)
+
+## พัฒนา editor Custom
+
+เซิร์ฟเวอร์ source ปกติมี `/api/custom-units` และ `/api/custom-weapons` ทั้งสอง editor ไม่ต้องใช้ Python Source เก็บข้อมูลใน `custom-units/` หรือพาธ `BATTLEFIGHT_CUSTOM_UNITS` ที่ตั้งไว้ Electron เก็บ `custom-units/` ใน user-data ของผู้ใช้และคงข้อมูลเมื่อเปลี่ยน EXE ไฟล์ผู้ใช้ snapshot สนามชั่วคราวและ build/log ที่สร้างเป็นข้อมูลในเครื่อง ไม่ใช่แอสเซ็ตสำหรับส่งใน source release
+
+ดู [API และการบันทึก](custom-units.md) สำหรับ token/origin, revision และวงจรสนาม Main server เปิดสนาม custom พร้อมกันได้หนึ่งสนาม เมื่อแก้ catalog/compiler ฝั่ง server ให้รีสตาร์ตเซิร์ฟเวอร์ และ reload browser เมื่อแก้ UI
+
+## เอกสารและการตรวจเฉพาะส่วน
+
+```powershell
+node docs/generate-license-inventory.cjs
+node docs/verify-documentation.cjs
+node --test test/custom-units.test.js test/custom-all-units.test.js test/custom-weapons.test.js test/custom-weapon-ui.test.js
+```
+
+Generator refresh หลักฐานในเครื่องและลงวันที่ตาม Asia/Bangkok ตั้ง `BATTLEFIGHT_DOCUMENTATION_DATE=YYYY-MM-DD` เพื่อระบุวันที่ทำซ้ำ เก็บ bytes ของ notices เดิม Verifier ตรวจหน้าคู่สองภาษา ลิงก์ เครดิต AI แฮช notices รายการ lockfile และตาราง schema/สถิติ การตรวจ runtime/UI/portable เป็นขั้นแยก ดู [บันทึกการตรวจ](release-notes.md)
+
+## คำสั่งตรวจ runtime
+
+ใช้เมื่อต้องการตรวจ implementation/release การเขียนเอกสารไม่ได้เปิดคำสั่งเหล่านี้:
+
+```powershell
+$env:TRAINING_PYTHON = (Resolve-Path training-python/.venv/Scripts/python.exe).Path
+node --test test/*.test.js
+npm run test:desktop:runtime
+$env:BATTLEFIGHT_SMOKE_POLICY = 'n-000052'
+$env:BATTLEFIGHT_SMOKE_SCHEMA = '3'
+npm run test:desktop:game
+```
+
+Candidate ตัวอย่างต้องมีใน resources ที่เตรียมแล้ว ไม่ใช่คำแนะนำเปลี่ยน default champion ต้องใช้พาธ Python เต็มเพราะ subprocess เปลี่ยน working directory การตรวจ Electron จริงต้องมี Windows environment ที่เปิด UI ได้ การ build/archive ผ่านไม่แทนการเปิด portable ด้วยมือ [รายงาน release](../reports/standalone-2026-10-01.md) แยกขอบเขตที่ตรวจไว้

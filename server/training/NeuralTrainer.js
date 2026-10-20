@@ -11,10 +11,19 @@ const { loadWeights } = require('./NeuralInference');
 const execFileAsync = promisify(execFile);
 
 class NeuralTrainer {
-	constructor({ dataDir, pythonExecutable, minimumDecisions = 8192 } = {}) {
+	constructor({ dataDir, pythonExecutable, minimumDecisions = 8192, schemaVersion = 1,
+		environmentHash, trainingProtocolVersion = 2, parentVersion, pythonRunner = execFileAsync } = {}) {
 		if (!dataDir) throw new TypeError('Neural training data directory is required');
 		this.dataDir = path.resolve(dataDir);
-		this.neuralDir = path.join(this.dataDir, 'neural');
+		if (![1, 2, 3].includes(schemaVersion)) throw new RangeError('Invalid neural schema');
+		if (schemaVersion >= 2 && !/^[a-f0-9]{64}$/.test(environmentHash || '')) throw new TypeError('Neural environment hash is required');
+		if (schemaVersion >= 2 && trainingProtocolVersion !== 2) throw new TypeError('Neural training requires protocol version 2');
+		this.schemaVersion = schemaVersion;
+		this.environmentHash = environmentHash;
+		this.trainingProtocolVersion = trainingProtocolVersion;
+		this.parentVersion = parentVersion;
+		this.pythonRunner = pythonRunner;
+		this.neuralDir = path.join(this.dataDir, schemaVersion >= 2 ? `neural-v${schemaVersion}` : 'neural');
 		this.pythonExecutable = pythonExecutable || resolvePython().executable;
 		this.minimumDecisions = minimumDecisions;
 		this.registry = new PolicyRegistry(this.dataDir);
@@ -25,8 +34,20 @@ class NeuralTrainer {
 		await fs.mkdir(this.neuralDir, { recursive: true });
 		const args = [path.resolve(__dirname, '../../training-python/train.py'),
 			'--data-dir', this.neuralDir, '--roster-hash', rosterHash];
+		args.push('--schema-version', String(this.schemaVersion), '--next-version', this.registry.nextNeuralVersion());
+		if (this.schemaVersion >= 2) {
+			args.push('--environment-hash', this.environmentHash, '--protocol-version', String(this.trainingProtocolVersion));
+			if (!this.manifest) {
+				const parent = this.parentVersion || this.registry.status().championVersion;
+				if (/^n-\d{6}$/.test(parent)) {
+					const parentSchema = this.registry.policy(parent)?.weights?.schemaVersion || 1;
+					const parentDir = parentSchema >= 2 ? `neural-v${parentSchema}` : 'neural';
+					args.push('--parent-checkpoint', path.join(this.dataDir, parentDir, `optimizer-${parent}.pt`));
+				}
+			}
+		}
 		if (batchFile) args.push('--batch', batchFile);
-		const { stdout } = await execFileAsync(this.pythonExecutable, args, {
+		const { stdout } = await this.pythonRunner(this.pythonExecutable, args, {
 			cwd: path.resolve(__dirname, '../../training-python'), maxBuffer: 1024 * 1024 * 4,
 			windowsHide: true
 		});
@@ -37,7 +58,15 @@ class NeuralTrainer {
 		const expectedPath = path.join(this.neuralDir, `weights-${manifest.version}.json`);
 		if (path.resolve(manifest.weightsPath) !== expectedPath) throw new Error('Neural weight path escaped data directory');
 		const envelope = JSON.parse(await fs.readFile(expectedPath, 'utf8'));
-		loadWeights(envelope);
+		const weights = loadWeights(envelope);
+		if (this.schemaVersion >= 2 && ['schemaVersion', 'observationSchemaVersion', 'actionSchemaVersion',
+			'schemaHash', 'environmentHash', 'trainingProtocolVersion', 'parentVersion'].some(key => manifest[key] !== weights[key])) {
+			throw new Error('Neural optimizer manifest metadata mismatch');
+		}
+		if (weights.schemaVersion !== this.schemaVersion || (this.schemaVersion >= 2 &&
+			(weights.environmentHash !== this.environmentHash || weights.trainingProtocolVersion !== this.trainingProtocolVersion))) {
+			throw new Error('Neural optimizer metadata mismatch');
+		}
 		this.registry.savePolicy({ kind: 'neural', version: manifest.version, weightsEnvelope: envelope });
 		this.manifest = manifest;
 		return this.registry.policy(manifest.version);
@@ -50,6 +79,14 @@ class NeuralTrainer {
 		if (!Array.isArray(rows) || rows.length < this.minimumDecisions) throw new RangeError('Neural PPO batch is too small');
 		if (rows.some(row => row.policyVersion !== this.manifest.version || row.rosterHash !== rosterHash)) {
 			throw new Error('Neural PPO batch mixes versions or roster hashes');
+		}
+		if (this.schemaVersion >= 2) {
+			const { getSchema } = require('./NeuralSchema');
+			if (rows.some(row => row.schemaVersion !== this.schemaVersion || row.schemaHash !== getSchema(this.schemaVersion).schemaHash ||
+				row.environmentHash !== this.environmentHash || row.trainingProtocolVersion !== this.trainingProtocolVersion)) {
+				throw new Error('Neural PPO batch mixes schema, environment or protocol metadata');
+			}
+			if (rows.filter(row => row.options?.length > 1).length < this.minimumDecisions) throw new RangeError('Neural PPO multi-option batch is too small');
 		}
 		const batchFile = path.join(this.neuralDir, `batch-${crypto.randomUUID()}.json`);
 		await fs.writeFile(batchFile, JSON.stringify(rows), { flag: 'wx' });

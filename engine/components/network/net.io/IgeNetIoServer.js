@@ -20,12 +20,17 @@ var IgeNetIoServer = {
 		this.snapshot = [];
 		this.sendQueue = {};
 		if (typeof data !== 'undefined') {
-			this._port = data;
+			this._port = data && typeof data === 'object' ? data.port : data;
 		}
 
 		// Start net.io
+		const desktopMode = process.env.BATTLEFIGHT_DESKTOP === '1';
+		const netIoOptions = desktopMode ? { port: 0, host: '127.0.0.1' } : this._port;
 		console.log(`Starting net.io listener on port ${this._port}`);
-		this._io = new this._netio(this._port, callback);
+		this._io = new this._netio(netIoOptions, function (error) {
+			if (!error && desktopMode) self._port = self._io._port;
+			if (typeof callback === 'function') callback(error);
+		});
 
 		// Setup listeners
 		this._io.on('connection', function () {
@@ -51,6 +56,12 @@ var IgeNetIoServer = {
 		// this.timeSyncStart();
 
 		return this._entity;
+	},
+	stop: function () {
+		if (!this._io || typeof this._io.stop !== 'function') return Promise.resolve();
+		return new Promise((resolve, reject) => {
+			this._io.stop((error) => error ? reject(error) : resolve());
+		});
 	},
 
 	/**

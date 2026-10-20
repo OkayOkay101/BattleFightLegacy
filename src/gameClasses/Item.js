@@ -248,6 +248,10 @@ var Item = IgeEntityPhysics.extend({
 	use: function () {
 		var self = this;
 		var now = ige.now;
+		if (self._stats.itemTypeId && self._stats.itemTypeId.indexOf('cw-') === 0) {
+			if (ige.isServer && ige.training && ige.training.isCustomSandbox && ige.training.useCustomWeapon) return ige.training.useCustomWeapon(self);
+			return false; // Custom projectiles are streamed; clients never fire them locally.
+		}
 		var owner = self.getOwnerUnit();
 		var player = owner && owner.getOwner();
 		var isUsed = false;
@@ -276,7 +280,7 @@ var Item = IgeEntityPhysics.extend({
 				}
 
 				self._stats.lastUsed = ige.now;
-				if (ige.isServer && ige.training && ige.training.isTrainingMode && ige.training.stats && player) {
+				if (ige.isServer && ige.training && (ige.training.isTrainingMode || ige.training.isExhibitionMode) && ige.training.stats && player) {
 					ige.training.nextEventId = (ige.training.nextEventId || 0) + 1;
 					ige.training.stats.recordItemUse({
 						eventId: `${self.id()}:use:${ige.training.nextEventId}`,

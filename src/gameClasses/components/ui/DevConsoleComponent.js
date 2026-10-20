@@ -6,14 +6,14 @@ var DevConsoleComponent = IgeEntity.extend({
 		var devDiv = $('#dev-console-table');
 
 		// graphs div accordion handle
-		devDiv.append('<div class="col-sm-12 my-2"><div id="graphs-div-accordion" class="px-2 py-1">Graphs</div></div>');
+		devDiv.append('<div class="col-sm-12 my-2"><div id="graphs-div-accordion" class="px-2 py-1" data-i18n="devConsole.graphs">Graphs</div></div>');
 
 		var graphsDiv = $('<div id="graphs-div"></div>');
 
 		if (mode != 'sandbox') {
 			var canvasDiv = $('<div class="col-sm-12 mb-2"></div>');
 
-			canvasDiv.append('<h6>Canvas:</h6>');
+			canvasDiv.append('<h6 data-i18n="devConsole.canvas">Canvas:</h6>');
 
 			statsPanels.fps = new Stats();
 			statsPanels.fps.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -28,7 +28,7 @@ var DevConsoleComponent = IgeEntity.extend({
 			graphsDiv.append(canvasDiv);
 
 			var engineDiv = $('<div class="col-sm-12 mb-2"></div>');
-			engineDiv.append('<h6>Engine:</h6>');
+			engineDiv.append('<h6 data-i18n="devConsole.engine">Engine:</h6>');
 
 			statsPanels.igefps = new Stats();
 			statsPanels.igefps.showPanel(3); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -65,7 +65,7 @@ var DevConsoleComponent = IgeEntity.extend({
 			// GS Div
 			var GSDiv = $('<div class="col-sm-12 mb-2"></div>');
 
-			GSDiv.append('<h6>GS:</h6>');
+			GSDiv.append('<h6 data-i18n="devConsole.gameServer">Game server:</h6>');
 
 			statsPanels.serverCpuUser = new Stats();
 			statsPanels.serverCpuUser.showPanel(3); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -84,7 +84,7 @@ var DevConsoleComponent = IgeEntity.extend({
 			// Connection div
 			var connectionDiv = $('<div class="col-sm-12 mb-2"></div>');
 
-			connectionDiv.append('<h6>Connection:</h6>');
+			connectionDiv.append('<h6 data-i18n="devConsole.connection">Connection:</h6>');
 
 			statsPanels.received = new Stats();
 			statsPanels.received.showPanel(3); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -136,7 +136,7 @@ var DevConsoleComponent = IgeEntity.extend({
 			devDiv.append(graphsDiv);
 
 			// tuning div accordion handle
-			devDiv.append('<div class="col-sm-12 my-2"><div id="tuning-div-accordion" class="px-2 py-1">Tuning</div></div>');
+			devDiv.append('<div class="col-sm-12 my-2"><div id="tuning-div-accordion" class="px-2 py-1" data-i18n="devConsole.tuning">Tuning</div></div>');
 
 			// Tuning Div
 			var tuningDiv = $('<div id="tuning-div" class="col-sm-12 mb-4"></div>');
@@ -227,7 +227,7 @@ var DevConsoleComponent = IgeEntity.extend({
 
 			devDiv.append(tuningDiv);
 
-			devDiv.append('<div class="col-sm-12 my-2"><div id="variables-div-accordion" class="px-2 py-1">Variables</div></div>');
+			devDiv.append('<div class="col-sm-12 my-2"><div id="variables-div-accordion" class="px-2 py-1" data-i18n="devConsole.variables">Variables</div></div>');
 			devDiv.append('<div id="variables-div"></div>');
 		}
 

@@ -975,7 +975,8 @@ var VariableComponent = IgeEntity.extend({
 
 				case 'getPlayerCount':
 					returnValue = ige.$$('player').filter(function (player) {
-						return (player._stats.controlledBy == 'human' || player._stats.isBattleBot === true) && player._stats.playerJoined == true;
+						return (player._stats.controlledBy == 'human' || player._stats.isBattleBot === true) &&
+							player._stats.playerJoined == true && !player._stats.isSpectator;
 					}).length;
 					break;
 
@@ -1449,7 +1450,10 @@ var VariableComponent = IgeEntity.extend({
 					var unit = entity;
 
 					if (unit && unit._category == 'unit') {
-						returnValue = unit._stats.type;
+						// Custom variants keep the prototype's script identity (for
+						// example Casker's self-exclusion), while rendering/stats use
+						// their separate actual type ID.
+						returnValue = ige.game.data.unitTypes[unit._stats.type]?.customUnit?.baseId || unit._stats.type;
 					} else if (typeof unit == 'string') {
 						// if unitTypeOfUnit is key of unit
 						returnValue = unit;
@@ -1778,7 +1782,9 @@ var VariableComponent = IgeEntity.extend({
 					break;
 
 				case 'humanPlayers':
-					returnValue = ige.$$('player').filter(function (player) { return player._stats.controlledBy == 'human'; });
+					returnValue = ige.$$('player').filter(function (player) {
+						return player._stats.controlledBy == 'human' && !player._stats.isSpectator;
+					});
 					break;
 
 				case 'matchPlayers':

@@ -1,0 +1,2 @@
+Neither the installed decache@3.1.0 package nor its upstream repository (dwyl/decache) contains a license file.
+The package declares "license": "MIT" in package.json. This file is the standard MIT text with the copyright holder taken from the package.json author field (@besarthoxhaj & @nelsonic), reconstructed from that declaration.

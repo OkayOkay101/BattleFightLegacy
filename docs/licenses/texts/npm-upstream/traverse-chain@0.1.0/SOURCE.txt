@@ -1,0 +1,2 @@
+License section copied from the installed package's README.md (node_modules/traverse-chain).
+No LICENSE file was found in the package or at the upstream repository root.

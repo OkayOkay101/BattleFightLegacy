@@ -4,11 +4,18 @@
     <div class="shop ui-text-scoreboard"></div>
 
     <span id="scoreboard-header">
-        <u id="leaderboard-title" class="cursor-pointer" onclick="ige.scoreboard && ige.scoreboard.toggleScores()">Leaderboard</u>
+        <u id="leaderboard-title" class="cursor-pointer" onclick="ige.scoreboard && ige.scoreboard.toggleScores()" data-i18n="scoreboard.title">Leaderboard</u>
         <div id="leaderboard-toggle" style="display: inline" class="pull-right"></div>
     </span>
     <div id="scoreboard" class="pull-right" style="padding: 10px 19px 0px 0px"></div>
 </div>
+
+<style>
+    .game-language-control { position: absolute; top: 8px; right: 10px; z-index: 10020; }
+    label.game-language-control { right: 92px; top: 13px; color: #fff; font-size: 12px; text-shadow: 0 1px 3px #000; }
+    select.game-language-control { padding: 3px 6px; border-radius: 5px; }
+    .menu-language-control { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 8px; }
+</style>
 
 <!-- player attribute -->
 <div id="my-score-div" class="game-ui position-absolute dark-bg score-div d-block user-select-none" style="bottom: 0; min-width: 250px; right: 0">
@@ -32,5 +39,17 @@
         <span id='updatefps'>0</span> fps
     </small>
 </div>
+
+<section id="kill-feed" aria-label="Recent eliminations" data-i18n-aria-label="feed.label" class="kill-feed-panel">
+    <h2 data-i18n="feed.label">Recent eliminations</h2>
+    <div id="kill-feed-entries" role="log" aria-live="polite" aria-relevant="additions"></div>
+</section>
+
+<style>
+    .kill-feed-panel { position: absolute; top: 14px; left: 12px; z-index: 40; width: min(360px, 42vw); pointer-events: none; color: #fff; text-shadow: 0 1px 3px #000; }
+    .kill-feed-panel h2 { margin: 0 0 5px; font-size: .78rem; font-weight: 700; opacity: .8; }
+    .kill-feed-entry { margin: 3px 0; padding: 5px 8px; border-radius: 5px; background: rgba(8, 14, 25, .72); font-size: .82rem; overflow-wrap: anywhere; }
+    @media (max-width: 600px) { .kill-feed-panel { top: 116px; left: 6px; width: min(280px, 58vw); } .kill-feed-entry { font-size: .72rem; } }
+</style>
 
 <span class="pointer-events-none ui-text-center-lg"></span>

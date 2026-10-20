@@ -17,6 +17,23 @@ ACTIVATE_API = f"{SERVER_BASE_URL}/api/training/activate"
 WORKERS_API = f"{SERVER_BASE_URL}/api/training/workers"
 EXPORT_BUNDLE_API = f"{SERVER_BASE_URL}/api/training/sync/export-bundle"
 IMPORT_BUNDLE_API = f"{SERVER_BASE_URL}/api/training/sync/import-bundle"
+DEMO_STATUS_API = f"{SERVER_BASE_URL}/api/demo/status"
+DEMO_POLICIES_API = f"{SERVER_BASE_URL}/api/demo/policies"
+
+def format_v2_telemetry(train):
+    phase = {"train": "ฝึก / Train", "selection": "คัดเลือก / Selection", "final-test": "ทดสอบสุดท้าย / Final test"}.get(train.get("phase"), "—")
+    lines = [f"สคีมา / Schema {train.get('schemaVersion', 1)} · Protocol {train.get('trainingProtocolVersion', 1)} · {phase}",
+             f"การตัดสินใจ / Decisions {train.get('pendingDecisions', 0)} · หลายตัวเลือก / Multi-option {train.get('pendingMultiOptionDecisions', 0)} / 8192"]
+    metrics = train.get("updateMetrics") or {}
+    diagnostics = [f"{key}: {value:.4f}" for key, value in metrics.items() if isinstance(value, (int, float))]
+    if diagnostics:
+        lines.append("PPO · " + " · ".join(diagnostics))
+    opponents = train.get("opponentMetrics") or train.get("perOpponent") or (train.get("lastEvaluation") or {}).get("opponents") or {}
+    for role, result in opponents.items():
+        lower = result.get("lowerBound")
+        bound = f"{lower * 100:.1f}%" if isinstance(lower, (int, float)) else "—"
+        lines.append(f"{role} · {result.get('version', '')}: ชนะ/เสมอ/แพ้ W/D/L {result.get('wins', 0)}/{result.get('draws', 0)}/{result.get('losses', 0)} · {result.get('games', 0)} games · ขอบล่าง / Lower {bound}")
+    return "\n".join(lines)
 
 class BattleFightTrainerApp(tk.Tk):
     def __init__(self):
@@ -95,6 +112,8 @@ class BattleFightTrainerApp(tk.Tk):
         self.s_matches = self._add_stat_box(stats_grid, 1, 1, "แมตช์ที่เสร็จสิ้น", "0", "#cbd5e1")
         # Stat 6: Workers & Speed
         self.s_speed = self._add_stat_box(stats_grid, 1, 2, "WORKERS / SPEED", "- W / 1.0x", "#c084fc")
+        self.telemetry_lbl = ttk.Label(self, text="", wraplength=770, justify="left")
+        self.telemetry_lbl.pack(fill="x", padx=24, pady=4)
 
         # Quick Control Panel
         control_card = ttk.Frame(self, style="Card.TFrame", padding=14)
@@ -139,10 +158,15 @@ class BattleFightTrainerApp(tk.Tk):
         sel_frame.pack(side="left")
         ttk.Label(sel_frame, text="เลือกโมเดลเล่นในเกม:", font=("Segoe UI", 9, "bold"), background="#1e293b", foreground="#94a3b8").pack(side="left", padx=(0, 6))
         
-        self.policy_var = tk.StringVar(value="latest")
+        self.policy_var = tk.StringVar(value="champion")
         self.policy_combo = ttk.Combobox(sel_frame, textvariable=self.policy_var, state="readonly", width=18)
         self.policy_combo.pack(side="left", padx=(0, 6))
         self.policy_combo.bind("<<ComboboxSelected>>", self.on_policy_change)
+        ttk.Label(sel_frame, text="Red:", background="#1e293b").pack(side="left")
+        self.red_policy_var = tk.StringVar(value="champion")
+        self.red_policy_combo = ttk.Combobox(sel_frame, textvariable=self.red_policy_var, state="readonly", width=14)
+        self.red_policy_combo.pack(side="left", padx=(0, 6))
+        self.red_policy_combo.bind("<<ComboboxSelected>>", self.on_policy_change)
 
         # Cloud Sync Buttons (Kaggle Sync)
         sync_frame = ttk.Frame(ctrl_row2, style="Card.TFrame")
@@ -277,8 +301,12 @@ class BattleFightTrainerApp(tk.Tk):
                 req2 = urllib.request.Request(POLICIES_API)
                 with urllib.request.urlopen(req2, timeout=3) as res2:
                     pdata = json.loads(res2.read().decode())
-
-                self.after(0, lambda: self._update_ui_data(data, pdata))
+                try:
+                    with urllib.request.urlopen(DEMO_STATUS_API, timeout=3) as demo_res:
+                        ddata = json.loads(demo_res.read().decode())
+                except Exception:
+                    ddata = {}
+                self.after(0, lambda: self._update_ui_data(data, pdata, ddata))
             except Exception as e:
                 self.after(0, lambda: self._handle_poll_error(str(e)))
 
@@ -286,7 +314,7 @@ class BattleFightTrainerApp(tk.Tk):
         if self.is_running_loop:
             self.after(2500, self.poll_status)
 
-    def _update_ui_data(self, data, pdata):
+    def _update_ui_data(self, data, pdata, ddata=None):
         if not data.get("ok"):
             return
         
@@ -311,6 +339,7 @@ class BattleFightTrainerApp(tk.Tk):
         st_text = state.upper() + (f" ({phase})" if phase else "")
         self.s_state.configure(text=st_text)
         self.s_server_pol.configure(text=data.get("serverPolicy", "baseline"))
+        self.telemetry_lbl.configure(text=format_v2_telemetry(train))
         
         champ = train.get("championVersion") or reg.get("championVersion") or "base"
         cand = train.get("candidateVersion") or "-"
@@ -341,12 +370,17 @@ class BattleFightTrainerApp(tk.Tk):
 
         # Policies Combobox
         if pdata.get("ok"):
-            policies = pdata.get("policies", [])
-            active = reg.get("activeVersion", "baseline")
-            if tuple(policies) != self.policy_combo["values"]:
-                self.policy_combo["values"] = policies
-            if self.policy_var.get() != active:
-                self.policy_var.set(active)
+            policies = ["champion"] + pdata.get("policies", [])
+            demo = (ddata or {}).get("demo", {})
+            requested = demo.get("requestedModels", {})
+            resolved = demo.get("resolvedModels", demo.get("models", {}))
+            for team, combo, variable in [("blue", self.policy_combo, self.policy_var), ("red", self.red_policy_combo, self.red_policy_var)]:
+                if tuple(policies) != combo["values"]:
+                    combo["values"] = policies
+                if requested.get(team) and self.focus_get() != combo:
+                    variable.set("champion" if requested[team] == "latest" else requested[team])
+            if resolved:
+                self.s_server_pol.configure(text=f"Blue {requested.get('blue', 'champion')} → {resolved.get('blue', '—')}\nRed {requested.get('red', 'champion')} → {resolved.get('red', '—')}")
 
     def _handle_poll_error(self, err_msg):
         self.badge_lbl.configure(text="OFFLINE", bg="#dc2626", fg="#ffffff")
@@ -361,7 +395,7 @@ class BattleFightTrainerApp(tk.Tk):
             workers = self.worker_var.get()
             self.log(f"กำลังส่งคำสั่งเริ่มเทรน AI ด้วย {workers} workers...")
             self.btn_toggle_train.configure(text="⏳ กำลังเริ่ม...", bg="#64748b")
-            body = {"workers": workers, "neural": True, "speed": "max"}
+            body = {"workers": workers, "neural": True, "schemaVersion": 3, "speed": "max"}
             threading.Thread(target=self._api_post, args=(START_API, body), daemon=True).start()
 
     def on_policy_change(self, event):
@@ -369,7 +403,7 @@ class BattleFightTrainerApp(tk.Tk):
         if not val:
             return
         self.log(f"เปลี่ยนโมเดลเล่นในเกมเป็น: {val}")
-        threading.Thread(target=self._api_post, args=(ACTIVATE_API, {"version": val}), daemon=True).start()
+        threading.Thread(target=self._api_post, args=(DEMO_POLICIES_API, {"blue": val, "red": self.red_policy_var.get()}), daemon=True).start()
 
     def _api_post(self, url, body_dict):
         try:

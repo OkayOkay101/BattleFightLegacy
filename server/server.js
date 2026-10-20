@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const path = require('path');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const http = require('http');
 const cluster = require('cluster');
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 _ = require('lodash');
@@ -77,6 +78,10 @@ var Server = IgeClass.extend({
 		self.totalProjectilesCreated = 0;
 		self.retryCount = 0;
 		self.maxRetryCount = 3;
+		self._httpServer = null;
+		self.httpPort = null;
+		self.wsPort = null;
+		self._desktopReadySent = false;
 		self.postReqTimestamps = []
 		self.started_at = new Date();
 		self.lastSnapshot = [];
@@ -186,7 +191,7 @@ var Server = IgeClass.extend({
 		}
 
 		// periodicaly update user coins to db for inapp purchase
-		setInterval(function () {
+		self._coinUpdateInterval = setInterval(function () {
 			if (Object.keys(self.coinUpdate || {}).length > 0) {
 				self.postConsumeCoinsForUsers();
 			}
@@ -245,11 +250,22 @@ var Server = IgeClass.extend({
 	},
 	startWebServer: function () {
 		const app = express();
-		const port = 80;
+		const desktopMode = process.env.BATTLEFIGHT_DESKTOP === '1';
+		const port = desktopMode ? 0 : 80;
 
 		app.use(bodyParser.urlencoded({ extended: false }));
 		// parse application/json
 		app.use(bodyParser.json());
+		require('./custom-units/CustomUnitRoutes').registerCustomRoutes(app, this);
+		// Source checkouts use installed vendor files; packaged builds carry these
+		// assets already. Keep the sandbox offline in both environments.
+		if (desktopMode) {
+			const vendors = { bootstrap: 'bootstrap/dist', jquery: 'jquery', 'jquery-ui': 'jquery-ui-dist',
+				'jquery-contextmenu': 'jquery-contextmenu', fontawesome: '@fortawesome/fontawesome-free',
+				popper: '@popperjs/core/dist', 'lz-string': 'lz-string', lodash: 'lodash',
+				sweetalert2: 'sweetalert2/dist', pixi: 'pixi.js-legacy/dist/browser' };
+			for (const [name, folder] of Object.entries(vendors)) app.use('/assets/desktop-vendor/' + name, express.static(path.resolve('node_modules', folder)));
+		}
 
 		app.set('view engine', 'ejs');
 		app.set('views', path.resolve('src'));
@@ -266,14 +282,25 @@ var Server = IgeClass.extend({
 		];
 		// Fast loading: serve pre-compressed gzip game.json (280KB instead of 12MB)
 		app.get('/src/game.json', (req, res) => {
+			if (process.env.BATTLEFIGHT_SANDBOX) {
+				const document = JSON.parse(fs.readFileSync(path.resolve('./src/game.json'), 'utf8'));
+				require('./custom-units/SandboxRuntime').loadSnapshot(document.data, process.env.BATTLEFIGHT_SANDBOX);
+				return res.json(document);
+			}
 			const acceptEncoding = req.headers['accept-encoding'] || '';
+			const jsonPath = path.resolve('./src/game.json');
 			const gzPath = path.resolve('./src/game.json.gz');
-			if (acceptEncoding.includes('gzip') && fs.existsSync(gzPath)) {
+			res.vary('Accept-Encoding');
+			res.setHeader('Cache-Control', 'no-cache');
+			// Source edits must not leave browsers loading an older game definition.
+			const gzipIsCurrent = fs.existsSync(gzPath) &&
+				fs.statSync(gzPath).mtimeMs >= fs.statSync(jsonPath).mtimeMs;
+			if (acceptEncoding.includes('gzip') && gzipIsCurrent) {
 				res.setHeader('Content-Type', 'application/json');
 				res.setHeader('Content-Encoding', 'gzip');
 				return res.sendFile(gzPath);
 			}
-			return res.sendFile(path.resolve('./src/game.json'));
+			return res.sendFile(jsonPath);
 		});
 
 		const SECONDS_IN_A_WEEK = 7 * 24 * 60 * 60;
@@ -290,37 +317,42 @@ var Server = IgeClass.extend({
 			}
 		}));
 
+		app.use('/assets/morrow', express.static(path.resolve('./src/assets/morrow/')));
 		app.use('/assets', express.static(path.resolve('./assets/'), { cacheControl: 7 * 24 * 60 * 60 * 1000 }));
 
-		// Proxy CDN assets: serve local file first, then fall back to real CDN
-		const http = require('http');
-		const https = require('https');
-		const makeCdnProxy = (cdnHost) => {
-			const localDir = path.resolve(`./assets/${cdnHost}`);
-			return (req, res, next) => {
-				const localFile = path.join(localDir, req.path);
-				// try local first
-				if (fs.existsSync(localFile) && fs.statSync(localFile).isFile()) {
-					return res.sendFile(localFile);
-				}
-				// fallback: proxy from real CDN
-				const cdnUrl = `https://${cdnHost}${req.path}`;
-				const client = cdnUrl.startsWith('https') ? https : http;
-				const proxyReq = client.get(cdnUrl, (proxyRes) => {
-					res.writeHead(proxyRes.statusCode, proxyRes.headers);
-					proxyRes.pipe(res);
-				});
-				proxyReq.on('error', () => res.status(404).send('Not found'));
+		if (!desktopMode) {
+			// Browser build retains the CDN proxy behavior.
+			const https = require('https');
+			const makeCdnProxy = (cdnHost) => {
+				const localDir = path.resolve(`./assets/${cdnHost}`);
+				return (req, res, next) => {
+					const localFile = path.join(localDir, req.path);
+					if (fs.existsSync(localFile) && fs.statSync(localFile).isFile()) {
+						return res.sendFile(localFile);
+					}
+					const proxyReq = https.get(`https://${cdnHost}${req.path}`, (proxyRes) => {
+						res.writeHead(proxyRes.statusCode, proxyRes.headers);
+						proxyRes.pipe(res);
+					});
+					proxyReq.on('error', () => res.status(404).send('Not found'));
+				};
 			};
-		};
-		app.use('/cache.modd.io', makeCdnProxy('cache.modd.io'));
-		app.use('/modd.s3.amazonaws.com', makeCdnProxy('modd.s3.amazonaws.com'));
+			app.use('/cache.modd.io', makeCdnProxy('cache.modd.io'));
+			app.use('/modd.s3.amazonaws.com', makeCdnProxy('modd.s3.amazonaws.com'));
+		}
 
-		const trainingCli = require('./training/TrainingCli');
+		const trainingCli = desktopMode ? null : require('./training/TrainingCli');
 		const { PolicyRegistry } = require('./training/PolicyRegistry');
-		const trainingDataDir = path.resolve(__dirname, '../training-data');
+		const desktopSelection = require('./training/DesktopSelection');
+		const trainingDataDir = path.resolve(process.env.BATTLEFIGHT_USER_DATA || path.resolve(__dirname, '../training-data'));
+		const selectionFile = process.env.BATTLEFIGHT_SELECTION_FILE;
+		const persistDesktopSelection = (selection) => {
+			if (!desktopMode || !selectionFile) return;
+			desktopSelection.saveSelection(selectionFile, selection);
+		};
 
 		app.get('/api/training/status', async (req, res) => {
+			if (desktopMode) return res.status(404).json({ ok: false, error: 'Training is unavailable in desktop mode' });
 			try {
 				const currentStatus = await trainingCli.status({ dataDir: trainingDataDir });
 				const registry = new PolicyRegistry(trainingDataDir);
@@ -353,6 +385,36 @@ var Server = IgeClass.extend({
 			}
 		});
 
+		app.get('/api/demo/status', (req, res) => {
+			if (!ige.training?.isExhibitionMode) return res.status(503).json({ ok: false, error: 'Exhibition is not running' });
+			res.json({ ok: true, demo: ige.training.status() });
+		});
+
+		app.post('/api/demo/policies', (req, res) => {
+			if (ige.training?.isCustomSandbox) return res.status(403).json({ ok: false, error: 'The custom arena uses heuristic only' });
+			if (!ige.training?.isExhibitionMode) return res.status(503).json({ ok: false, error: 'Exhibition is not running' });
+			const blueVersion = req.body?.blue;
+			const redVersion = req.body?.red;
+			if (typeof blueVersion !== 'string' || typeof redVersion !== 'string') {
+				return res.status(400).json({ ok: false, error: 'Choose a model for both teams' });
+			}
+			const registry = new PolicyRegistry(trainingDataDir);
+			try {
+				const { resolveDemoPolicy } = require('./training/DemoRuntime');
+				const blue = resolveDemoPolicy(registry, blueVersion);
+				const red = resolveDemoPolicy(registry, redVersion);
+				persistDesktopSelection({ blue: blueVersion, red: redVersion });
+				ige.trainingPolicy = blue;
+				res.json({ ok: true, demo: ige.training.setPolicies(blue, red, { blue: blueVersion, red: redVersion }) });
+			} catch (error) {
+				res.status(error.message.startsWith('Unknown demo policy:') ? 400 : 500).json({ ok: false, error: error.message });
+			}
+		});
+
+		if (desktopMode) {
+			app.use('/api/training', (_req, res) => res.status(404).json({ ok: false, error: 'Training is unavailable in desktop mode' }));
+		}
+
 		app.post('/api/training/start', async (req, res) => {
 			try {
 				const workers = req.body && req.body.workers ? Number(req.body.workers) : 4;
@@ -362,6 +424,7 @@ var Server = IgeClass.extend({
 					dataDir: trainingDataDir,
 					workers,
 					neural,
+					schemaVersion: neural === 'on' ? 2 : 1,
 					speed
 				});
 				res.json({ ok: true, result });
@@ -408,7 +471,8 @@ var Server = IgeClass.extend({
 				const pol = registry.policy(version);
 				if (pol) {
 					ige.trainingPolicy = pol;
-					if (ige.training) ige.training.policy = pol;
+					if (ige.training?.isExhibitionMode) ige.training.setPolicies(pol, pol);
+					else if (ige.training) ige.training.policy = pol;
 				}
 				res.json({ ok: true, registry: registry.status(), active: version });
 			} catch (error) {
@@ -557,11 +621,12 @@ var Server = IgeClass.extend({
 				selectedServer: null,
 				servers: [{
 					ip: '127.0.0.1',
-					port: 2001,
+					port: ige.server.wsPort || ige.server.gameServerPort,
 					playerCount: 0,
 					maxPlayers: 32,
 					acceptingPlayers: true
 				}],
+				desktopMode: process.env.BATTLEFIGHT_DESKTOP === '1',
 				createdBy: '',
 				menudiv: false,
 				trainingDemoPolicy: (ige.trainingPolicy && ige.trainingPolicy.version) || process.env.BATTLEFIGHT_DEMO_POLICY || '',
@@ -594,7 +659,47 @@ var Server = IgeClass.extend({
 
 			return res.render('index.ejs', options);
 		});
-		app.listen(port, () => console.log(`Express listening on port ${port}!`));
+		if (desktopMode) {
+			this._httpServer = http.createServer(app);
+			this._httpServer.on('error', (error) => this._reportDesktopStartupError(error));
+			this._httpServer.listen(port, '127.0.0.1', () => {
+				this.httpPort = this._httpServer.address().port;
+				console.log(`Express listening on loopback port ${this.httpPort}!`);
+				this._trySendDesktopReady();
+			});
+		} else {
+			app.listen(port, () => console.log(`Express listening on port ${port}!`));
+		}
+	},
+	_reportDesktopStartupError: function (error) {
+		if (process.env.BATTLEFIGHT_DESKTOP !== '1' || !process.parentPort) return;
+		process.parentPort.postMessage({ type: 'battlefight-error', message: error.stack || error.message });
+	},
+	_trySendDesktopReady: function () {
+		if (
+			process.env.BATTLEFIGHT_DESKTOP !== '1' ||
+			this._desktopReadySent ||
+			!this.gameLoaded ||
+			!Number.isInteger(this.httpPort) ||
+			!Number.isInteger(this.wsPort)
+		) return;
+		this._desktopReadySent = true;
+		const ready = { type: 'battlefight-ready', httpPort: this.httpPort, wsPort: this.wsPort };
+		if (process.parentPort) process.parentPort.postMessage(ready);
+		else if (process.send) process.send(ready);
+	},
+	shutdown: function () {
+		this.status = 'stopping';
+		for (const timer of [this._coinUpdateInterval, this._gameStatusInterval, this._socketStatsInterval]) {
+			if (timer) clearInterval(timer);
+		}
+		const closeHttp = this._httpServer && this._httpServer.listening
+			? new Promise((resolve) => this._httpServer.close(resolve))
+			: Promise.resolve();
+		const closeNetwork = ige.network && typeof ige.network.stop === 'function'
+			? ige.network.stop()
+			: Promise.resolve();
+		return Promise.all([closeHttp, closeNetwork, this.customUnitManager?.close()]).then(() => { this.status = 'stopped'; });
 	},
 
 	// run a specific game in this server
@@ -608,7 +713,9 @@ var Server = IgeClass.extend({
 		}
 
 		this.socket = {};
-		var port = process.env.PORT || 2001;
+		var desktopMode = process.env.BATTLEFIGHT_DESKTOP === '1';
+		var port = desktopMode ? 0 : (process.env.PORT || 2001);
+		self.port = port;
 
 		self.url = `http://${self.ip}:${port}`;
 
@@ -626,7 +733,14 @@ var Server = IgeClass.extend({
 		// Add the networking component
 		ige.network.debug(self.isDebugging);
 		// Start the network server
-		ige.network.start(self.port, function (data) {
+		ige.network.start(desktopMode ? { port: 0, host: '127.0.0.1' } : self.port, function (error) {
+			if (error) {
+				self._reportDesktopStartupError(error);
+				return;
+			}
+			self.wsPort = ige.network._port;
+			self.url = `ws://127.0.0.1:${self.wsPort}`;
+			self._trySendDesktopReady();
 
 			var domain = global.beUrl;
 
@@ -661,6 +775,7 @@ var Server = IgeClass.extend({
 				self.gameStartedAt = new Date();
 
 				ige.game.data = game.data;
+				if (process.env.BATTLEFIGHT_SANDBOX) self.customSandboxSnapshot = require('./custom-units/SandboxRuntime').loadSnapshot(game.data, process.env.BATTLEFIGHT_SANDBOX);
 				ige.game.cspEnabled = !!ige.game.data.defaultData.clientSidePredictionEnabled;
 
 				global.standaloneGame = game.data;
@@ -757,12 +872,28 @@ var Server = IgeClass.extend({
 						// }
 
 						try {
-							var registry = new (require('./training/PolicyRegistry').PolicyRegistry)();
-							if (!(ige.training && ige.training.isTrainingMode)) {
+							var desktopMode = process.env.BATTLEFIGHT_DESKTOP === '1';
+							var trainingDataDir = path.resolve(process.env.BATTLEFIGHT_USER_DATA || path.resolve(__dirname, '../training-data'));
+							var registry = new (require('./training/PolicyRegistry').PolicyRegistry)(trainingDataDir);
+							if (self.customSandboxSnapshot) {
+								require('./custom-units/SandboxRuntime').installSandbox(ige, self.customSandboxSnapshot);
+							} else if (!(ige.training && ige.training.isTrainingMode)) {
 								var demo = require('./training/DemoRuntime');
-								var requestedPolicy = process.env.BATTLEFIGHT_DEMO_POLICY || 'latest';
-								ige.trainingPolicy = demo.resolveDemoPolicy(registry, requestedPolicy);
-								demo.installDemo(ige, ige.trainingPolicy);
+								var requestedPolicy = process.env.BATTLEFIGHT_DEMO_POLICY || 'champion';
+								if (desktopMode) {
+									var savedSelection = require('./training/DesktopSelection').loadSelection(process.env.BATTLEFIGHT_SELECTION_FILE);
+									var resolveSavedSelection = function (version) {
+										if (version === 'champion' || version === 'latest' || (typeof version === 'string' && registry.policy(version))) return version;
+										return requestedPolicy;
+									};
+									var selections = { blue: resolveSavedSelection(savedSelection.blue), red: resolveSavedSelection(savedSelection.red) };
+									var bluePolicy = demo.resolveDemoPolicy(registry, selections.blue);
+									ige.trainingPolicy = bluePolicy;
+									demo.installDemo(ige, bluePolicy, { registry, selections });
+								} else {
+									ige.trainingPolicy = demo.resolveDemoPolicy(registry, requestedPolicy);
+									demo.installDemo(ige, ige.trainingPolicy, { registry, selections: { blue: requestedPolicy, red: requestedPolicy } });
+								}
 								console.log('BattleFight active neural exhibition: 3v3, policy ' + ige.trainingPolicy.version);
 							} else {
 								ige.trainingPolicy = registry.policyForNewMatch();
@@ -774,9 +905,10 @@ var Server = IgeClass.extend({
 						ige.game.start();
 
 						self.gameLoaded = true;
+						self._trySendDesktopReady();
 
 						// send dev logs to developer every second
-						var logInterval = setInterval(function () {
+						self._gameStatusInterval = setInterval(function () {
 							// send only if developer client is connect
 							if (ige.isServer && ((self.developerClientId && ige.server.clients[self.developerClientId]) || process.env.ENV == 'standalone')) {
 								ige.variable.devLogs.status = ige.server.getStatus();
@@ -791,7 +923,7 @@ var Server = IgeClass.extend({
 							ige.unitBehaviourCount = 0;
 						}, 1000);
 
-						setInterval(function () {
+						self._socketStatsInterval = setInterval(function () {
 							var copyCount = Object.assign({}, self.socketConnectionCount);
 							self.socketConnectionCount = {
 								connected: 0,
@@ -806,6 +938,7 @@ var Server = IgeClass.extend({
 			})
 				.catch((err) => {
 					console.log('got error while loading game json', err);
+					self._reportDesktopStartupError(err);
 					ige.clusterClient && ige.clusterClient.kill('got error while loading game json');
 				});
 		});

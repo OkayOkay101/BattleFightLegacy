@@ -4,7 +4,23 @@ const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-const { start, stop, status, exportResults, resolveSpeed, writeJsonAtomic } = require('../server/training/TrainingCli');
+const { start, stop, status, exportResults, resolveSpeed, writeJsonAtomic, daemon } = require('../server/training/TrainingCli');
+
+test('daemon records a failed state and worker error when its supervisor rejects', async () => {
+	assert.equal(typeof daemon, 'function');
+	const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'battlefight-daemon-error-'));
+	try {
+		const runId = 'failed-worker-run';
+		const supervisor = { stopRequested: false, status: () => ({ runId, failed: 1 }),
+			start: async ({ onReady }) => { await onReady(); throw new Error('worker heap out of memory'); } };
+		await assert.rejects(daemon({ dataDir, 'run-id': runId, workers: '1' },
+			{ supervisorFactory: () => supervisor }), /worker heap out of memory/);
+		const report = JSON.parse(fs.readFileSync(path.join(dataDir, 'status.json'), 'utf8'));
+		assert.equal(report.state, 'failed');
+		assert.match(report.error, /worker heap out of memory/);
+		assert.equal(fs.existsSync(path.join(dataDir, 'supervisor.lock.json')), false);
+	} finally { fs.rmSync(dataDir, { recursive: true, force: true }); }
+});
 
 test('status replacement retries a temporary Windows rename lock', async () => {
 	const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'battlefight-status-retry-'));
@@ -67,12 +83,12 @@ test('default speed runs parity preflight before starting a detached accelerated
 	} finally { fs.rmSync(dataDir, { recursive: true, force: true }); }
 });
 
-test('neural CLI starts its detached trainer and keeps auto-activation off',
+test('legacy neural CLI starts its detached trainer and keeps auto-activation off',
 	{ skip: !process.env.TRAINING_PYTHON, timeout: 30000 }, async () => {
 		const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'battlefight-neural-cli-'));
 		try {
 		const started = await start({ dataDir, workers: '1', matches: '1', 'duration-ms': '1000',
-			neural: 'on', speed: 'realtime' });
+			neural: 'on', 'neural-schema': '1', speed: 'realtime' });
 		assert.equal(started.mode, 'neural');
 		assert.ok(started.candidateVersion, 'start must wait until the saved/new neural policy is initialized');
 		assert.equal(started.phase, 'train');
@@ -112,12 +128,12 @@ test('stop waits for an active match to finish before marking training stopped',
 		} finally { fs.rmSync(dataDir, { recursive: true, force: true }); }
 	});
 
-test('accelerated neural CLI proves parity with frozen neural decisions before using results',
+test('accelerated legacy neural CLI proves parity with frozen neural decisions before using results',
 	{ skip: !process.env.TRAINING_PYTHON, timeout: 45000 }, async () => {
 		const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'battlefight-neural-max-cli-'));
 		try {
 			const started = await start({ dataDir, workers: '1', matches: '1', 'duration-ms': '1000',
-				neural: 'on', speed: 'max' });
+				neural: 'on', 'neural-schema': '1', speed: 'max' });
 			assert.equal(started.speedMode, 'max');
 			assert.equal(started.parityStatus, 'passed');
 			assert.ok(started.parityDetails.every(entry => entry.neuralDecisions > 0));

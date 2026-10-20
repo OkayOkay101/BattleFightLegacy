@@ -1,6 +1,8 @@
 const { buildTrainingRoster } = require('./TrainingRoster');
 const { TrainingTrajectory } = require('./TrainingTrajectory');
 const { chooseNeuralAction } = require('./NeuralController');
+const { teamPotential } = require('./NeuralCombatSnapshot');
+const { ROSTER_IDS } = require('./NeuralObservation');
 
 const TEAM_CONFIG = {
 	blue: { playerTypeId: 'NZRmXbrEjA', leftSide: true },
@@ -23,18 +25,35 @@ function install(ige, config = {}) {
 		decideNeural(player, snapshot, simulatedAt) {
 			const policy = runtime.policyForPlayer(player);
 			if (policy?.kind !== 'neural' || !policy.weights) return null;
+			// Ghosts and scripted transformation units are outside the trained character roster.
+			// Keep the previous decision's timestamp so the next eligible life discounts this gap.
+			if (policy.weights.schemaVersion >= 2 && !ROSTER_IDS.includes(snapshot.self?.characterId)) return null;
 			try {
+				const isTrain = (config.split || 'train') === 'train';
+				const learnerSide = config.learnerSide || (typeof config.sideSwap === 'boolean' ? (config.sideSwap ? 'red' : 'blue') : null);
+				const isLearner = (!config.candidateVersion || policy.version === config.candidateVersion) &&
+					(!learnerSide || player._stats.trainingTeamId === learnerSide);
 				const choice = chooseNeuralAction({ weights: policy.weights, policyVersion: policy.version,
-					playerId: player.id(), simulatedAt, snapshot, training: config.split !== 'validation' });
+					playerId: player.id(), simulatedAt, snapshot,
+					training: isTrain && ((config.schemaVersion || policy.weights.schemaVersion || 1) === 1 || isLearner) });
 				if (runtime.stats?.trace) runtime.stats.trace.recordNeuralAction({ actorId: player.id(),
 					chosenIndex: choice.record.chosenIndex, action: choice.action });
-				if (config.split !== 'validation' &&
-					(!config.candidateVersion || policy.version === config.candidateVersion)) runtime.trajectory.record(choice.record);
+				if (isTrain && isLearner) {
+					if (choice.record.schemaVersion >= 2) Object.assign(choice.record, {
+						matchId: config.matchId || runtime.match?.matchId,
+						lifeId: player.getSelectedUnit?.()?.id(), teamId: player._stats.trainingTeamId,
+						potential: teamPotential(ige, player._stats.trainingTeamId)
+					});
+					runtime.trajectory.record(choice.record);
+				}
 				return choice.action;
 			} catch (error) {
 				runtime.neuralError = error.message;
 				return null;
 			}
+		},
+		recordExecution(player, executedAction, overrideReasons = []) {
+			runtime.trajectory.recordExecution(player.id(), executedAction, overrideReasons);
 		},
 		isOpponent(a, b) {
 			return !!(a && b && a !== b && a._stats && b._stats &&

@@ -1,0 +1,2 @@
+Neither the installed truncate-utf8-bytes@1.0.2 package nor its upstream repository (parshap/truncate-utf8-bytes) contains a license file.
+The package declares "license": "WTFPL" in package.json. This file is the standard WTFPL text, reconstructed from that declaration.

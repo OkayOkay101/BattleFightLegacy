@@ -1,19 +1,65 @@
 # BattleFight
 
-BattleFight is a local web game and offline Windows portable game built on the Taro engine, with team AI model selection, spectator cameras, a live kill feed, and English/Thai UI.
+BattleFight is a top-down team arena game built on the Taro engine. It runs as a local web game or as an offline Windows portable app. You can join the Blue team against AI, or watch heuristic and Neural bots fight each other. The UI is available in English and Thai.
 
-The updated game source and full documentation are on [codex/battlefight-bots](https://github.com/OkayOkay101/BattleFightPrivate/tree/codex/battlefight-bots). This main-branch page links to that edition.
+Current source documentation: **2026-10-20**. See the [release and validation notes](docs/en/release-notes.md) for what changed and what was tested.
+
+## Features
+
+- **Play or spectate:** join the Blue team, or watch the bots fight with spectator cameras, a live kill feed and match statistics.
+- **Team AI selection:** choose the AI model separately for Blue and Red.
+- **Solo Test:** an isolated arena with no bots. Choose any of the 45 playable characters, add stationary target dummies, test death and respawn, and reset at any time.
+- **Custom Units:** create a variant of any of the 44 supported characters and test it with player or heuristic control.
+- **Custom Weapons:** build single, spread or burst weapons and equip them in any slot.
+- **New character, Morrow:** Compass Bolt, a Banked shot that turns at a route marker, and Atlas, a line attack with a warning.
+
+Custom content is saved locally and never enters Neural training.
+
+## Play from source
+
+```powershell
+npm ci
+npm run demo
+```
+
+Open [http://127.0.0.1/](http://127.0.0.1/). From the main page, join a fight, spectate, or open **Solo Test**, **Custom Units** or **Custom Weapons**.
+
+Controls: **WASD** to move, the mouse to aim, left click to fire, **1–4** to switch equipment.
+
+## Download
+
+Get the Windows game from [GitHub Releases](https://github.com/OkayOkay101/BattleFightLegacy/releases/latest). Download `BattleFight-Portable-1.0.0-no-touhou.exe` and run it; no install is needed.
+
+- Releases on GitHub are the **GitHub edition**: every character except Reimu & Marisa, whose Touhou Project fan-work guidelines do not list GitHub as a distribution channel. See [Releasing](docs/en/releasing.md#editions).
+- The EXE is not code-signed. If Windows shows "Windows protected your PC", check the file's SHA256 against the release page, then choose **More info → Run anyway**.
+- Credits and licenses ship inside the app in `licenses/`; see [Third-party notices](docs/licenses/THIRD-PARTY-NOTICES.md) and [Character credits](docs/licenses/CHARACTER-CREDITS.md).
+
+## Windows portable app
+
+Run `dist/portable/BattleFight-Portable-1.0.0.exe`. It runs the game and its server on your computer, includes local visuals and AI inference, has no audio, and needs no Node.js, Python or internet connection. Your settings and custom content are kept in your per-user data folder, so they survive replacing the EXE.
+
+To rebuild it:
+
+```powershell
+npm install
+npm run desktop:build
+```
+
+For the GitHub edition use `npm run desktop:build:github`. See the [development guide](docs/en/development.md) for prerequisites and [Releasing](docs/en/releasing.md) for publishing a release.
 
 ## Documentation — English first
 
-- [Documentation index](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/index.md)
-- [Player guide](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/player-guide.md)
-- [Architecture and combat](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/architecture.md)
-- [AI and training](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/ai-training.md)
-- [Development and standalone packaging](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/development.md)
-- [Licenses and redistribution evidence](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/licenses.md)
-- [Component inventory](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/license-inventory.md)
-- [Credits](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/en/credits.md)
+- [Documentation index](docs/en/index.md)
+- [Player guide](docs/en/player-guide.md)
+- [Architecture and combat](docs/en/architecture.md)
+- [AI and training](docs/en/ai-training.md)
+- [Development and standalone packaging](docs/en/development.md)
+- [Releasing](docs/en/releasing.md)
+- [Custom Units and Custom Weapons](docs/en/custom-units.md)
+- [Release and validation notes](docs/en/release-notes.md)
+- [Licenses and redistribution evidence](docs/en/licenses.md)
+- [Component inventory](docs/en/license-inventory.md)
+- [Credits](docs/en/credits.md)
 
 ### AI-Assisted Development
 
@@ -21,20 +67,56 @@ BattleFight was developed with assistance from Gemini Flash and ChatGPT Sol.
 
 This development credit is separate from the heuristic and Neural bots that run inside the game. It does not imply provider endorsement or assign ownership. Upstream engine credit and third-party licenses remain separate; see the license guide before assuming the game assets share the engine license.
 
-โค้ดเกมและเอกสารล่าสุดอยู่ในสาขา [codex/battlefight-bots](https://github.com/OkayOkay101/BattleFightPrivate/tree/codex/battlefight-bots) หน้าหลักนี้ลิงก์ไปยังเวอร์ชันดังกล่าว
-
 ## เอกสารภาษาไทย
 
-BattleFight เป็นเกมเว็บในเครื่องและเกม Windows แบบ portable ออฟไลน์ที่พัฒนาบน Taro มีระบบเลือกโมเดล AI แยกทีม กล้องผู้ชม kill feed สด และ UI อังกฤษ–ไทย
+BattleFight เป็นเกมต่อสู้เป็นทีมมุมมองจากด้านบน พัฒนาบนเอนจิน Taro เล่นได้ทั้งแบบเกมเว็บในเครื่องและแอป Windows แบบ portable ที่ไม่ต้องใช้อินเทอร์เน็ต ลงเล่นในทีมฟ้าสู้กับ AI หรือดูบอท heuristic และ Neural สู้กันเองก็ได้ UI มีทั้งภาษาอังกฤษและไทย
 
-- [สารบัญเอกสาร](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/index.md)
-- [คู่มือผู้เล่น](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/player-guide.md)
-- [โครงสร้างและการต่อสู้](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/architecture.md)
-- [AI และการฝึก](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/ai-training.md)
-- [การพัฒนาและแพ็กเกจ standalone](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/development.md)
-- [License และหลักฐานสิทธิ์เผยแพร่](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/licenses.md)
-- [ทะเบียนส่วนประกอบ](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/license-inventory.md)
-- [เครดิต](https://github.com/OkayOkay101/BattleFightPrivate/blob/codex/battlefight-bots/docs/th/credits.md)
+เอกสาร source ปัจจุบันอัปเดต **2026-10-20** ดูสิ่งที่เปลี่ยนและผลการทดสอบได้ที่ [บันทึกรุ่นและการตรวจรับ](docs/th/release-notes.md)
+
+### ฟีเจอร์
+
+- **เล่นหรือดู:** ลงเล่นทีมฟ้า หรือดูบอทสู้กันพร้อมกล้องผู้ชม kill feed สด และสถิติแมตช์
+- **เลือก AI แยกทีม:** เลือกโมเดล AI แยกกันระหว่างทีมฟ้าและทีมแดง
+- **Solo Test:** สนามแยกที่ไม่มีบอท เลือกได้ทุกตัวละครที่เล่นได้ทั้ง 45 ตัว เพิ่มหุ่นเป้านิ่ง ทดสอบการตายและเกิดใหม่ และเริ่มใหม่ได้ทุกเมื่อ
+- **ยูนิตสร้างเอง:** สร้างตัวแปรจาก 44 ตัวละครที่รองรับ แล้วทดลองด้วยผู้เล่นหรือ heuristic
+- **อาวุธสร้างเอง:** สร้างอาวุธยิงเดี่ยว กระจาย หรือเป็นชุด แล้วใส่ช่องไหนก็ได้
+- **ตัวละครใหม่ Morrow:** Compass Bolt, Banked ที่เลี้ยวที่หมุดเส้นทาง และ Atlas ท่าโจมตีเป็นแนวที่มีเส้นเตือนก่อน
+
+ข้อมูล custom บันทึกในเครื่องและไม่เข้าการฝึก Neural
+
+### เล่นจาก source
+
+รัน `npm ci` และ `npm run demo` จากโฟลเดอร์นี้ แล้วเปิด [http://127.0.0.1/](http://127.0.0.1/) จากหน้าหลักเลือกลงเล่น ดูบอทสู้กัน หรือเปิด **Solo Test**, **ยูนิตสร้างเอง** หรือ **อาวุธสร้างเอง**
+
+การควบคุม: **WASD** เดิน, เมาส์เล็ง, คลิกซ้ายยิง, **1–4** เปลี่ยนอุปกรณ์
+
+### ดาวน์โหลด
+
+ดาวน์โหลดเกม Windows ได้ที่ [GitHub Releases](https://github.com/OkayOkay101/BattleFightLegacy/releases/latest) เลือกไฟล์ `BattleFight-Portable-1.0.0-no-touhou.exe` แล้วเปิดได้เลย ไม่ต้องติดตั้ง
+
+- release บน GitHub เป็น**รุ่น GitHub** ที่มีตัวละครครบทุกตัว ยกเว้น Reimu & Marisa เพราะแนวปฏิบัติแฟนเวิร์กของ Touhou Project ไม่ได้ระบุ GitHub เป็นช่องทางเผยแพร่ ดู[การปล่อยเกม](docs/th/releasing.md#รุ่นของเกม)
+- EXE ยังไม่ได้เซ็นดิจิทัล ถ้า Windows ขึ้นหน้าต่าง "Windows protected your PC" ให้ตรวจ SHA256 กับหน้า release ก่อน แล้วกด **More info (ข้อมูลเพิ่มเติม) → Run anyway (เรียกใช้ต่อไป)**
+- เครดิตและ license อยู่ในแอปที่โฟลเดอร์ `licenses/` ดู [Third-party notices](docs/licenses/THIRD-PARTY-NOTICES.md) และ [เครดิตตัวละคร](docs/licenses/CHARACTER-CREDITS.md)
+
+### แอป Windows แบบ portable
+
+เปิด `dist/portable/BattleFight-Portable-1.0.0.exe` แอปรันทั้งเกมและเซิร์ฟเวอร์ในเครื่อง มีภาพและ AI inference ในตัว ไม่มีเสียง ไม่ต้องติดตั้ง Node.js หรือ Python และไม่ต้องต่ออินเทอร์เน็ต การตั้งค่าและข้อมูล custom เก็บไว้ในโฟลเดอร์ข้อมูลของผู้ใช้ จึงยังอยู่แม้เปลี่ยนไฟล์ EXE
+
+build ใหม่ด้วย `npm install` และ `npm run desktop:build` ส่วนรุ่น GitHub ใช้ `npm run desktop:build:github` ดู prerequisites ใน [คู่มือพัฒนา](docs/th/development.md) และวิธีปล่อย release ใน[การปล่อยเกม](docs/th/releasing.md)
+
+### เอกสาร
+
+- [สารบัญเอกสาร](docs/th/index.md)
+- [คู่มือผู้เล่น](docs/th/player-guide.md)
+- [โครงสร้างและการต่อสู้](docs/th/architecture.md)
+- [AI และการฝึก](docs/th/ai-training.md)
+- [การพัฒนาและแพ็กเกจ standalone](docs/th/development.md)
+- [การปล่อยเกม](docs/th/releasing.md)
+- [ยูนิตและอาวุธสร้างเอง](docs/th/custom-units.md)
+- [บันทึกรุ่นและการตรวจรับ](docs/th/release-notes.md)
+- [License และหลักฐานสิทธิ์เผยแพร่](docs/th/licenses.md)
+- [ทะเบียนส่วนประกอบ](docs/th/license-inventory.md)
+- [เครดิต](docs/th/credits.md)
 
 ### การพัฒนาโดยใช้ AI ช่วย
 
@@ -111,6 +193,21 @@ npm run server --game=<gameID>
 Your game's Game ID can be found in your modd.io's game's sandbox ([example](https://beta.modd.io/sandbox/game/two-houses/scripts)). Go to menu -> about.
 
 <img src="./assets/images/gameid.png" width="600" alt="How to get game id">
+
+## BattleFight portable Windows app
+
+The Windows x64 portable Electron build runs the BattleFight game and its server on this computer. The packaged game assets and browser libraries are local, the app blocks renderer requests to non-local origins, and the standalone build contains no audio files or audio playback paths. Internet access is not required to play after the executable has been built.
+
+To build it on Windows, install the repository dependencies and run:
+
+```powershell
+npm install
+npm run desktop:build
+```
+
+The output is `dist/portable/BattleFight-Portable-1.0.0.exe` (the version follows `package.json`). The build stages a minimal runtime under `build/desktop-resources/` and uses lossless PNG recompression when the result is smaller; it does not modify the original game assets.
+
+The app keeps the Blue and Red AI selectors and game statistics. Training controls and training history are not included. On first launch, the bundled policy seed files are copied to `%APPDATA%\BattleFight\training-data\policies`; existing files are never overwritten. To add a policy manually, put its `n-<number>.json` file in that folder and restart the app. The selected Blue and Red policy versions are saved in `%APPDATA%\BattleFight\desktop-selection.json`. These writable files stay outside the executable so they persist across app updates.
 
 ## Quick start example - Run "Two Houses" locally
 

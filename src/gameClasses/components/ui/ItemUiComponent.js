@@ -3,6 +3,11 @@ var ItemUiComponent = IgeEntity.extend({
 	componentId: 'itemUi',
 
 	init: function () {
+		var self = this;
+		var i18n = ige.client && ige.client.i18n;
+		if (i18n) i18n.subscribe(function () {
+			ige.$$('item').forEach(function (item) { self.updateItemDescription(item); });
+		});
 		$('#backpack-items-div').on('mouseenter', '.inventory-item-button.inventory-slot>.item-div.draggable-item', function () {
 			$('.popover').popover('hide');
 			$(this).popover('show');
@@ -269,6 +274,10 @@ var ItemUiComponent = IgeEntity.extend({
 
 		return itemDiv;
 	},
+	_t: function (key, values) {
+		var i18n = ige.client && ige.client.i18n;
+		return i18n ? i18n.t(key, values) : key;
+	},
 	updateItemDescription: function (item) {
 		var inventorySlotIfPresent = item._stats.slotIndex;
 		if (item && item._stats && (inventorySlotIfPresent === 0 || inventorySlotIfPresent)) {
@@ -282,8 +291,9 @@ var ItemUiComponent = IgeEntity.extend({
 	},
 	getItemPopOverContent: function (stats) {
 		var info = '<div>';
+		var t = this._t.bind(this);
 		if (stats.description) {
-			info += `<p class="mb-1"><b>Description: </b><span class="item-description">${stats.description} </span></p>`;
+			info += `<p class="mb-1"><b>${t('item.description')}: </b><span class="item-description">${stats.description} </span></p>`;
 		}
 		if (stats && stats.bonus) {
 			if (stats.bonus.consume && Object.keys(stats.bonus.consume).length > 0) {
@@ -300,7 +310,7 @@ var ItemUiComponent = IgeEntity.extend({
 				}
 
 				if (consumeBonus) {
-					info += '<p class="mb-1"><b>Consume bonuses: </b></p>';
+					info += `<p class="mb-1"><b>${t('item.consumeBonuses')}: </b></p>`;
 					info += consumeBonus;
 				}
 			}
@@ -331,7 +341,7 @@ var ItemUiComponent = IgeEntity.extend({
 				}
 
 				if (passiveBonus) {
-					info += '<p class="mb-1"><b>Passive bonuses: </b></p>';
+					info += `<p class="mb-1"><b>${t('item.passiveBonuses')}: </b></p>`;
 					info += passiveBonus;
 				}
 			}
@@ -365,7 +375,7 @@ var ItemUiComponent = IgeEntity.extend({
 			}
 
 			if (costHtml) {
-				info += '<p class="mb-1"><b>Cost: </b>';
+				info += `<p class="mb-1"><b>${t('item.cost')}: </b>`;
 				info += costHtml;
 				info += '</p>';
 			}
@@ -381,30 +391,31 @@ var ItemUiComponent = IgeEntity.extend({
 	getAttrStr: function (attrName, itemValue) {
 		if (itemValue != 0 && itemValue != undefined) {
 			var attrStr;
+			var t = this._t.bind(this);
 			switch (attrName) {
 				// case 'isGun': attrStr = "<strong>Weapon type:</strong> "+((value == true)? "Range":"Melee"); break;
 				case 'price':
 					if (typeof itemValue !== 'object' || itemValue === {}) {
-						attrStr = '<strong>Price:</strong> free';
+						attrStr = `<strong>${t('item.price')}:</strong> ${t('item.free')}`;
 					} else {
 						attrStr = '';
 						for (var attrKey in itemValue) {
-							attrStr += `<strong>Price:</strong> ${itemValue[attrKey]}`;
+							attrStr += `<strong>${t('item.price')}:</strong> ${itemValue[attrKey]}`;
 						}
 					}
 					break;
-				case 'ammoSize': attrStr = `<strong>Magazine size:</strong> ${itemValue}`; break;
-				case 'ammoTotal': attrStr = `<strong>Ammo total:</strong> ${itemValue}`; break;
-				case 'fireRate': attrStr = `<strong>Fire rate:</strong> ${parseFloat(1000 / itemValue).toFixed(2)} round/s`; break;
-				case 'reloadRate': attrStr = `<strong>Reload time:</strong> ${parseFloat(itemValue / 1000).toFixed(2)} s`; break;
-				case 'bulletForce': attrStr = `<strong>Knock-back Force:</strong> ${parseFloat(itemValue).toFixed(0)}`; break;
-				case 'bulletDistance': attrStr = `<strong>Range:</strong> ${parseFloat(itemValue).toFixed(0)}`; break;
-				case 'recoilForce': attrStr = `<strong>Recoil:</strong> ${parseFloat(itemValue).toFixed(0)}`; break;
-				case 'movementSpeed': attrStr = `<strong>Speed bonus:</strong> ${parseFloat(itemValue.toFixed(1))}`; break;
-				case 'immunity': attrStr = `<strong>Immunity bonus:</strong> ${parseFloat(itemValue * 100).toFixed(0)}%`; break;
-				case 'maxStamina': attrStr = `<strong>Stamina bonus:</strong> ${parseFloat(itemValue.toFixed(0))}`; break;
-				case 'stunChance': attrStr = `<strong>Slow target chance:</strong> ${parseFloat(itemValue * 100).toFixed(0)}%`; break;
-				case 'slowChance': attrStr = `<strong>Stun target chance:</strong> ${parseFloat(itemValue * 100).toFixed(0)}%`; break;
+				case 'ammoSize': attrStr = `<strong>${t('item.magazineSize')}:</strong> ${itemValue}`; break;
+				case 'ammoTotal': attrStr = `<strong>${t('item.ammoTotal')}:</strong> ${itemValue}`; break;
+				case 'fireRate': attrStr = `<strong>${t('item.fireRate')}:</strong> ${parseFloat(1000 / itemValue).toFixed(2)} ${t('item.roundsPerSecond')}`; break;
+				case 'reloadRate': attrStr = `<strong>${t('item.reloadTime')}:</strong> ${parseFloat(itemValue / 1000).toFixed(2)} s`; break;
+				case 'bulletForce': attrStr = `<strong>${t('item.knockbackForce')}:</strong> ${parseFloat(itemValue).toFixed(0)}`; break;
+				case 'bulletDistance': attrStr = `<strong>${t('item.range')}:</strong> ${parseFloat(itemValue).toFixed(0)}`; break;
+				case 'recoilForce': attrStr = `<strong>${t('item.recoil')}:</strong> ${parseFloat(itemValue).toFixed(0)}`; break;
+				case 'movementSpeed': attrStr = `<strong>${t('item.speedBonus')}:</strong> ${parseFloat(itemValue.toFixed(1))}`; break;
+				case 'immunity': attrStr = `<strong>${t('item.immunityBonus')}:</strong> ${parseFloat(itemValue * 100).toFixed(0)}%`; break;
+				case 'maxStamina': attrStr = `<strong>${t('item.staminaBonus')}:</strong> ${parseFloat(itemValue.toFixed(0))}`; break;
+				case 'stunChance': attrStr = `<strong>${t('item.slowTargetChance')}:</strong> ${parseFloat(itemValue * 100).toFixed(0)}%`; break;
+				case 'slowChance': attrStr = `<strong>${t('item.stunTargetChance')}:</strong> ${parseFloat(itemValue * 100).toFixed(0)}%`; break;
 			}
 
 			return attrStr;

@@ -76,7 +76,7 @@ var ScoreboardComponent = IgeEntity.extend({
 										url: `/api/user/request/${ige.scoreboard.selectedUser.userId}`,
 										type: 'POST',
 										success: function (data) {
-											alert('request sent');
+											alert(ige.client.i18n ? ige.client.i18n.t('scoreboard.requestSent') : 'Request sent');
 										}
 									});
 									break;
@@ -85,15 +85,15 @@ var ScoreboardComponent = IgeEntity.extend({
 						},
 						items: {
 							addFriend: {
-								name: 'Add Friend'
+								name: ige.client.i18n ? ige.client.i18n.t('scoreboard.addFriend') : 'Add Friend'
 							},
 							separator: { type: 'cm_separator' },
 							unmute: {
-								name: `Unmute ${ige.scoreboard.selectedUser.userName}`,
+								name: ige.client.i18n ? ige.client.i18n.t('scoreboard.unmute', { name: ige.scoreboard.selectedUser.userName }) : `Unmute ${ige.scoreboard.selectedUser.userName}`,
 								visible: index > -1
 							},
 							mute: {
-								name: `Mute ${ige.scoreboard.selectedUser.userName}`,
+								name: ige.client.i18n ? ige.client.i18n.t('scoreboard.mute', { name: ige.scoreboard.selectedUser.userName }) : `Mute ${ige.scoreboard.selectedUser.userName}`,
 								visible: index === -1,
 								className: 'context-menu-item context-menu-hover context-menu-danger'
 							}

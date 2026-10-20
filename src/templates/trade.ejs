@@ -4,13 +4,13 @@
         <span id="trade-request-message"></span>
     </div>
     <div class="text-center" style="margin-top: 10px">
-        <span class="btn btn-success" id="accept-trade-request-button">Yes</span>
-        <span class="btn btn-light cancel-trade-request-button">No</span>
+        <span class="btn btn-success" id="accept-trade-request-button" data-i18n="common.yes">Yes</span>
+        <span class="btn btn-light cancel-trade-request-button" data-i18n="common.no">No</span>
     </div>
 </div>
 
 <div id="trade-div" class="dark-bg absolute-center">
-    <span id="trader-name"></span>'s offer
+    <span id="trader-name"></span><span data-i18n="trade.offerSuffix">'s offer</span>
     <div id="offer-trading-slots">
         <div id="offer-1" class="btn btn-light trade-offer-slot"></div>
         <div id="offer-2" class="btn btn-light trade-offer-slot"></div>
@@ -21,7 +21,7 @@
 
     <br />
     <br />
-    Your offer
+    <span data-i18n="trade.yourOffer">Your offer</span>
     <div id="user-trading-slots">
         <!-- <div id="item-13" name='13' class="btn btn-light inventory-slot"></div>
       <div id="item-14" name='14' class="btn btn-light inventory-slot"></div>
@@ -34,8 +34,8 @@
     <br />
     <small id="trade-message" class="float-left"></small>
     <div class="float-right">
-        <span class="btn btn-success" id="accept-trade-button">Accept</span>
-        <span class="btn btn-light cancel-trade-button">Cancel</span>
+        <span class="btn btn-success" id="accept-trade-button" data-i18n="trade.accept">Accept</span>
+        <span class="btn btn-light cancel-trade-button" data-i18n="common.cancel">Cancel</span>
     </div>
 </div>
 

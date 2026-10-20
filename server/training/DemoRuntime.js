@@ -1,16 +1,15 @@
-const fs = require('node:fs');
-const path = require('node:path');
+const { PolicyRegistry } = require('./PolicyRegistry');
 const { buildTrainingRoster } = require('./TrainingRoster');
 const { chooseNeuralAction } = require('./NeuralController');
+const { TrainingMatch } = require('./TrainingMatch');
+const { TrainingStats } = require('./TrainingStats');
 
-function resolveDemoPolicy(registry, requested = 'latest') {
-	let versions = [];
-	if (requested === 'latest') {
-		try { versions = fs.readdirSync(path.join(registry.directory, 'policies'))
-			.filter(name => /^n-\d+\.json$/.test(name))
-			.map(name => name.slice(0, -5)).sort().reverse(); }
-		catch (error) { /* A fresh install may not have any trained policy. */ }
-	} else versions = [requested];
+const MATCH_DURATION_MS = 300000;
+
+function resolveDemoPolicy(registry, requested = 'champion') {
+	const approved = registry.status();
+	const versions = requested === 'latest' || requested === 'champion'
+		? [approved.championVersion, approved.previousVersion, 'baseline'] : [requested];
 	for (const version of versions) {
 		const policy = registry.policy(version);
 		if (policy) return policy;
@@ -28,15 +27,126 @@ function demoIsOpponent(a, b) {
 		a._stats.trainingTeamId !== b._stats.trainingTeamId);
 }
 
-function installDemo(ige, policy) {
+function installDemo(ige, policy, options = {}) {
 	if (ige.training) throw new Error('Cannot run exhibition and training in the same process');
+	let roundNumber = 0;
+	let roundStartedAt = Date.now();
+	let round = new TrainingMatch({ matchId: `demo-${++roundNumber}`, startedAt: roundStartedAt,
+		maxDurationMs: MATCH_DURATION_MS });
+	let results = { blue: 0, red: 0, draws: 0 };
+	function advance(now = Date.now()) {
+		while (now - roundStartedAt >= MATCH_DURATION_MS) {
+			const result = round.finish(roundStartedAt + MATCH_DURATION_MS);
+			if (result.winner) results[result.winner]++;
+			else results.draws++;
+			roundStartedAt += MATCH_DURATION_MS;
+			if (options.registry) {
+				try {
+					const currentRegistry = new PolicyRegistry(options.registry.directory);
+					for (const teamId of ['blue', 'red']) {
+						const requested = runtime.requestedModels[teamId];
+						if (requested === 'champion' || requested === 'latest') runtime.policies[teamId] = resolveDemoPolicy(currentRegistry, requested);
+					}
+					runtime.policy = runtime.policies.blue;
+					ige.trainingPolicy = runtime.policy;
+				} catch (error) { runtime.neuralError = error.message; }
+			}
+			round = new TrainingMatch({ matchId: `demo-${++roundNumber}`, startedAt: roundStartedAt,
+				maxDurationMs: MATCH_DURATION_MS });
+		}
+	}
+	function registerCurrentBots() {
+		for (const player of ige.$$('player')) {
+			if (!player?._stats?.isBattleBot || !['blue', 'red'].includes(player._stats.trainingTeamId)) continue;
+			runtime.stats.registerPlayer({ playerId: player.id(), teamId: player._stats.trainingTeamId,
+				characterId: player._battleBot?.previousCharacter || null });
+			const unit = player.getSelectedUnit && player.getSelectedUnit();
+			if (unit && unit._stats?.attributes?.health?.value > 0 && player._battleBot?.previousCharacter) {
+				runtime.stats.startLife({ playerId: player.id(), lifeId: unit.id(),
+					characterId: player._battleBot.previousCharacter });
+			}
+		}
+	}
 	const runtime = {
 		isExhibitionMode: true,
+		get match() { advance(); return round; },
 		policy,
+		policies: { blue: policy, red: policy },
+		requestedModels: { blue: options.selections?.blue || (options.registry ? 'champion' : policy.version),
+			red: options.selections?.red || (options.registry ? 'champion' : policy.version) },
+		stats: new TrainingStats(),
 		neuralError: null,
-		policyForPlayer() { return policy; },
+		executionTelemetry: { decisions: 0, overriddenDecisions: 0, overrideReasons: {} },
+		recordExecution(player, executedAction, overrideReasons = []) {
+			runtime.executionTelemetry.decisions++;
+			if (overrideReasons.length) runtime.executionTelemetry.overriddenDecisions++;
+			for (const reason of overrideReasons) runtime.executionTelemetry.overrideReasons[reason] =
+				(runtime.executionTelemetry.overrideReasons[reason] || 0) + 1;
+		},
+		policyForPlayer(player) { advance(); return runtime.policies[player?._stats?.trainingTeamId] || runtime.policies.blue; },
+		resetExhibition() {
+			runtime.stats = new TrainingStats();
+			roundStartedAt = Date.now();
+			roundNumber = 0;
+			round = new TrainingMatch({ matchId: `demo-${++roundNumber}`, startedAt: roundStartedAt, maxDurationMs: MATCH_DURATION_MS });
+			results = { blue: 0, red: 0, draws: 0 };
+			runtime.executionTelemetry = { decisions: 0, overriddenDecisions: 0, overrideReasons: {} };
+		},
+		setPolicies(blue, red, selections = { blue: blue?.version, red: red?.version }) {
+			if (!blue || !red) throw new TypeError('Both demo policies are required');
+			runtime.requestedModels = { ...selections };
+			if (runtime.policies.blue.version !== blue.version || runtime.policies.red.version !== red.version) {
+				runtime.policies = { blue, red };
+				runtime.policy = blue;
+				runtime.stats = new TrainingStats();
+				registerCurrentBots();
+				roundStartedAt = Date.now();
+				roundNumber = 0;
+				round = new TrainingMatch({ matchId: `demo-${++roundNumber}`, startedAt: roundStartedAt,
+					maxDurationMs: MATCH_DURATION_MS });
+				results = { blue: 0, red: 0, draws: 0 };
+			}
+			return runtime.status();
+		},
+		recordBotDeath({ lifeId, victimId, victimTeamId, killerId, killerCharacterId, killerTeamId, at = Date.now() }) {
+			advance(at);
+			runtime.stats.recordDeath({ lifeId, victimId, killerId, killerCharacterId, at });
+			round.recordDeath({ lifeId, victimTeamId, killerTeamId });
+		},
+		status() {
+			const now = Date.now();
+			advance(now);
+			const players = runtime.stats.finish().players;
+			const teams = {};
+			for (const teamId of ['blue', 'red']) {
+				const teamPlayers = Object.values(players).filter(player => player.teamId === teamId);
+				const totals = { kills: 0, deaths: 0, assists: 0, damageDealt: 0, damageTaken: 0 };
+				for (const player of teamPlayers) for (const key of Object.keys(totals)) totals[key] += player[key] || 0;
+				const games = results.blue + results.red + results.draws;
+				teams[teamId] = { model: runtime.policies[teamId].version, requestedModel: runtime.requestedModels[teamId],
+					schemaVersion: runtime.policies[teamId].weights?.schemaVersion || 1,
+					wins: results[teamId], losses: results[teamId === 'blue' ? 'red' : 'blue'],
+					draws: results.draws, games, winRate: games ? (results[teamId] + results.draws * 0.5) / games : null,
+					...totals, kda: (totals.kills + totals.assists) / Math.max(1, totals.deaths),
+					players: teamPlayers.map(player => {
+						const entity = ige.$(player.playerId);
+						return { ...player, name: entity?._stats?.name || player.playerId,
+							character: ige.game?.data?.unitTypes?.[entity?._battleBot?.previousCharacter]?.name || null };
+					}) };
+			}
+			const humanPresent = ige.$$('player').some(player => player?._stats?.controlledBy === 'human' &&
+				player._stats.playerJoined && !player._stats.isSpectator);
+			return { models: { blue: runtime.policies.blue.version, red: runtime.policies.red.version },
+				requestedModels: { ...runtime.requestedModels },
+				resolvedModels: { blue: runtime.policies.blue.version, red: runtime.policies.red.version },
+				executionTelemetry: { ...runtime.executionTelemetry, overrideReasons: { ...runtime.executionTelemetry.overrideReasons } },
+				teams, round: { number: roundNumber, scores: { ...round.scores },
+					remainingMs: Math.max(0, MATCH_DURATION_MS - (now - roundStartedAt)), durationMs: MATCH_DURATION_MS },
+				humanPresent, neuralError: runtime.neuralError };
+		},
 		isOpponent: demoIsOpponent,
 		decideNeural(player, snapshot, simulatedAt) {
+			const policy = runtime.policyForPlayer(player);
 			if (policy.kind !== 'neural' || !policy.weights) return null;
 			try { return chooseNeuralAction({ weights: policy.weights, policyVersion: policy.version,
 				playerId: player.id(), simulatedAt, snapshot, training: false }).action; }
@@ -61,10 +171,20 @@ function installDemo(ige, policy) {
 					if (type?.attributes) bot.updatePlayerType({ attributes: JSON.parse(JSON.stringify(type.attributes)),
 						variables: type.variables || {} });
 					game._spawnBattleBotUnit(bot, position, leftSide ? 0 : Math.PI);
+					runtime.stats.registerPlayer({ playerId: bot.id(), teamId,
+						characterId: bot._battleBot.previousCharacter });
+					const selected = bot.getSelectedUnit && bot.getSelectedUnit();
+					if (selected) runtime.stats.startLife({ playerId: bot.id(), lifeId: selected.id(),
+						characterId: bot._battleBot.previousCharacter });
 				}
 			}
 		}
 	};
+	if (options.registry) runtime.policies = {
+		blue: resolveDemoPolicy(options.registry, runtime.requestedModels.blue),
+		red: resolveDemoPolicy(options.registry, runtime.requestedModels.red)
+	};
+	runtime.policy = runtime.policies.blue;
 	ige.training = runtime;
 	return runtime;
 }

@@ -1329,6 +1329,10 @@ var Unit = IgeEntityPhysics.extend({
 					unitId: ige.game.lastAttackingUnitId,
 					itemId: ige.game.lastAttackingItemId
 				};
+				var previousCombatContext = self._combatDamageContext;
+				var combatSource = require('./components/CombatAttribution').fromEntity(ige,
+					damageData.sourceProjectileId && ige.$(damageData.sourceProjectileId) || sourceUnit, damageData.sourceItemId);
+				self._combatDamageContext = combatSource;
 				if (trainingMode) {
 					var attackSourceItem = ige.$(damageData.sourceItemId);
 					self._trainingDamageContext = {
@@ -1340,11 +1344,11 @@ var Unit = IgeEntityPhysics.extend({
 				try {
 					ige.trigger && ige.trigger.fire('unitAttacksUnit', triggeredBy);
 					if (ige.script) ige.script.triggerEntity(self, 'entityGetsAttacked', triggeredBy);
-				} finally { self._trainingDamageContext = null; }
+				} finally { self._trainingDamageContext = null; self._combatDamageContext = previousCombatContext; }
 
 				var armor = this._stats.attributes.armor && this._stats.attributes.armor.value || 0;
 				var damageReduction = (0.05 * armor) / (1.5 + 0.04 * armor);
-				var ownerUnitBaseDamage = (sourceUnit != undefined) ? sourceUnit.getBaseDamage() : 0;
+				var ownerUnitBaseDamage = (!damageData.ignoreBaseDamage && sourceUnit != undefined) ? sourceUnit.getBaseDamage() : 0;
 				if (damageData.unitAttributes) {
 					_.forEach(damageData.unitAttributes, function (damageValue, damageAttrKey) {
 						var attribute = self._stats.attributes[damageAttrKey];
@@ -1362,8 +1366,9 @@ var Unit = IgeEntityPhysics.extend({
 									projectileId: damageData.sourceProjectileId
 								};
 							}
+							self._combatDamageContext = combatSource;
 							try { self.attribute.update(damageAttrKey, newValue, true); }
-							finally { self._trainingDamageContext = null; }
+							finally { self._trainingDamageContext = null; self._combatDamageContext = previousCombatContext; }
 						}
 					});
 				}
@@ -1391,6 +1396,17 @@ var Unit = IgeEntityPhysics.extend({
 
 	remove: function () {
 		var self = this;
+		if (self._stats && self._stats.type === 'morrowRouteCartographer' && self._morrowMarkerId) {
+			var morrowMarker = ige.$(self._morrowMarkerId);
+			if (morrowMarker) {
+				if (morrowMarker._morrowMarkerTimer) {
+					if (ige.training?.cancelSandboxAction) ige.training.cancelSandboxAction(morrowMarker._morrowMarkerTimer);
+					else clearTimeout(morrowMarker._morrowMarkerTimer);
+				}
+				morrowMarker.remove();
+			}
+			self._morrowMarkerId = undefined;
+		}
 
 		clearInterval(self.contactLoop);
 
@@ -1437,6 +1453,20 @@ var Unit = IgeEntityPhysics.extend({
 	// update unit's stats in the server side first, then update client side as well.
 	streamUpdateData: function (queuedData) {
 		var self = this;
+		// The base class processes the whole batch before Unit applies type.
+		// A custom form must load its definition before retained cap/value updates.
+		if (ige.isClient && typeof window !== 'undefined' && window.isCustomSandbox && self._stats.customUnit &&
+			queuedData.some(function (data) { return data.type; }) &&
+			(queuedData.length > 1 || Object.keys(queuedData[0]).length > 1)) {
+			for (var update of queuedData) {
+				if (update.type && Object.keys(update).length > 1) {
+					self.streamUpdateData([{ type: update.type }]);
+					var remainder = Object.assign({}, update); delete remainder.type;
+					self.streamUpdateData([remainder]);
+				} else self.streamUpdateData([update]);
+			}
+			return;
+		}
 		// Unit.prototype.log("unit streamUpdateData", data)
 		IgeEntity.prototype.streamUpdateData.call(this, queuedData);
 
@@ -1982,7 +2012,7 @@ var Unit = IgeEntityPhysics.extend({
 			'fg6GvDXnkW', // Grand Artificer Spatial Collapse Marker 1
 			't6eGlgZJZd', // Grand Artificer Spatial Collapse Marker 2
 			'0UN2VxudQK', // Orlette Clone
-			'fBm2V1iqSv', // Corkmaster's Clone
+			'fBm2V1iqSv', // Cork's Clone
 			'tPW4ck2QvI', // Overlord Minion
 			'ZvCJrakO2E', // Dual Assassin Clone
 			'FLBECLt1vt', // Hunter Bear Trap Marker
@@ -2009,6 +2039,9 @@ var Unit = IgeEntityPhysics.extend({
 					for (var i = 0; i < list.length; i++) {
 						var p = list[i];
 						if (p && !p._isBeingRemoved && !p._cleaningUpProjectiles && p._alive !== false && p._stats) {
+							// Accepted custom shots retain their source snapshot after death
+							// or a form change. Arena reset destroys them explicitly.
+							if (p._stats.customWeapon && ige.training && ige.training.isCustomSandbox) continue;
 							if (p._stats.sourceUnitId === unitId || (ownerPlayerId && p._stats.sourcePlayerId === ownerPlayerId)) {
 								p._isBeingRemoved = true;
 								p.destroy();

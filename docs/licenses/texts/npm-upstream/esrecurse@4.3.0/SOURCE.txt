@@ -1,0 +1,4 @@
+Upstream license text for esrecurse@4.3.0
+Fetched: 2026-10-20
+URL: https://raw.githubusercontent.com/estools/esrecurse/HEAD/LICENSE.md
+Note: taken from the repository's default branch, which may be newer than the installed version; the installed package itself ships no license file.

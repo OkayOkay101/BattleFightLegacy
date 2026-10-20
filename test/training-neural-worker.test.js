@@ -4,6 +4,46 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { fork } = require('node:child_process');
 
+test('v2 worker completes combat and returns canonical episode and execution metadata', async () => {
+	const { getSchema } = require('../server/training/NeuralSchema');
+	const { rosterHash } = require('../server/training/NeuralObservation');
+	const layer = (rows, cols) => ({ rows, cols, weights: Array(rows * cols).fill(0), bias: Array(rows).fill(0) });
+	const weights = { schemaVersion: 2, schemaHash: getSchema(2).schemaHash, rosterHash,
+		environmentHash: 'e'.repeat(64), trainingProtocolVersion: 2,
+		actor: [layer(64, 167), layer(64, 64), layer(1, 64)], critic: [layer(64, 149), layer(1, 64)] };
+	const child = fork(path.resolve(__dirname, '../server/training/MatchWorker.js'), [], { stdio: ['ignore', 'ignore', 'pipe', 'ipc'], windowsHide: true });
+	let stderr = '';
+	child.stderr.on('data', chunk => { stderr += chunk; });
+	const report = await new Promise((resolve, reject) => {
+		const timer = setTimeout(() => { child.kill(); reject(new Error('v2 worker timed out ' + stderr)); }, 20000);
+		child.once('error', error => { clearTimeout(timer); reject(error); });
+		child.once('exit', code => { if (code) { clearTimeout(timer); reject(new Error(`v2 worker exited ${code}: ${stderr}`)); } });
+		child.on('message', message => { if (message.type === 'result') { clearTimeout(timer); resolve(message.report); } });
+		child.send({ type: 'run', matchId: 'neural-v2-ipc', seed: 7, maxDurationMs: 1000,
+			split: 'train', phase: 'train', schemaVersion: 2, schemaHash: weights.schemaHash,
+			environmentHash: weights.environmentHash, trainingProtocolVersion: 2, candidateVersion: 'n-v2-worker',
+			speedMode: 'max', parityStatus: 'passed',
+			bluePolicy: { kind: 'neural', version: 'n-v2-worker', weights },
+			redPolicy: { kind: 'heuristic', version: 'baseline', params: { rangeScale: 1, dodgeScale: 1, switchScale: 1 } } });
+	});
+	assert.equal(report.result.status, 'complete');
+	assert.equal(report.schemaVersion, 2);
+	assert.equal(report.environmentHash, weights.environmentHash);
+	assert.equal(report.trainingProtocolVersion, 2);
+	assert.equal(report.schemaHash, weights.schemaHash);
+	assert.equal(report.phase, 'train');
+	assert.equal(report.neuralError, null);
+	assert.ok(report.trajectory.length > 0);
+	for (const row of report.trajectory) {
+		assert.equal(row.matchId, 'neural-v2-ipc');
+		assert.equal(row.teamId, 'blue');
+		assert.equal(row.observation.length, 149);
+		assert.ok(row.options.every(option => option.length === 18));
+		assert.ok(row.lifeId && row.executedAction && Number.isFinite(row.potential));
+		assert.ok(row.nextSimulatedAt >= row.simulatedAt);
+	}
+});
+
 test('live training bots emit neural decisions from fixed-step combat', () => {
 	const script = `
 		let randomState = 0x51a7e;

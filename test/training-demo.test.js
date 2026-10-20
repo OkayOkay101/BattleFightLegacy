@@ -25,19 +25,50 @@ test('new exhibition spectator keeps spectator state when player is created', ()
 	}
 });
 
-test('demo chooses the newest valid trained policy without changing active champion', () => {
+test('demo aliases choose approved champion and never the newest unapproved candidate', () => {
 	const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'battlefight-demo-'));
 	try {
 		const registry = new PolicyRegistry(directory);
 		registry.savePolicy({ version: 'n-000002', params: { rangeScale: 1, dodgeScale: 1, switchScale: 1 } });
 		registry.savePolicy({ version: 'n-000010', params: { rangeScale: 1, dodgeScale: 1, switchScale: 1 } });
+		registry.promote('n-000002');
 		fs.writeFileSync(path.join(directory, 'policies', 'n-000011.json'), 'corrupt');
 		const policy = resolveDemoPolicy(registry, 'latest');
-		assert.equal(policy.version, 'n-000010');
+		assert.equal(policy.version, 'n-000002');
+		assert.equal(resolveDemoPolicy(registry, 'champion').version, 'n-000002');
+		assert.equal(resolveDemoPolicy(registry, 'n-000010').version, 'n-000010');
 		assert.equal(registry.status().activeVersion, 'baseline');
-		assert.equal(registry.status().championVersion, 'baseline');
+		assert.equal(registry.status().championVersion, 'n-000002');
 		assert.throws(() => resolveDemoPolicy(registry, '../secret'), /Unknown demo policy/);
 	} finally { fs.rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('champion follows only at round boundary while fixed team remains pinned', () => {
+	const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'battlefight-round-'));
+	const realNow = Date.now;
+	let now = 1000;
+	Date.now = () => now;
+	try {
+		const registry = new PolicyRegistry(directory);
+		for (const version of ['n-000001', 'n-000002']) registry.savePolicy({ version, params: { rangeScale: 1, dodgeScale: 1, switchScale: 1 } });
+		registry.promote('n-000001');
+		const ige = { $$: () => [], $: () => null };
+		const demo = installDemo(ige, registry.policy('n-000001'), { registry, selections: { blue: 'champion', red: 'n-000001' } });
+		new PolicyRegistry(directory).promote('n-000002');
+		now += 299999;
+		assert.deepEqual(demo.status().models, { blue: 'n-000001', red: 'n-000001' });
+		now++;
+		assert.equal(demo.policyForPlayer({ _stats: { trainingTeamId: 'blue' } }).version, 'n-000002');
+		const status = demo.status();
+		assert.deepEqual(status.models, { blue: 'n-000002', red: 'n-000001' });
+		assert.deepEqual(status.requestedModels, { blue: 'champion', red: 'n-000001' });
+		assert.deepEqual(status.resolvedModels, status.models);
+		assert.equal(status.round.number, 2);
+		assert.equal(demo.match.startedAt, 301000);
+		demo.recordExecution({ id: () => 'blue-player' }, { fire: false }, ['wall']);
+		assert.deepEqual(demo.status().executionTelemetry, { decisions: 1, overriddenDecisions: 1, overrideReasons: { wall: 1 } });
+		assert.equal(demo.trajectory, undefined);
+	} finally { Date.now = realNow; fs.rmSync(directory, { recursive: true, force: true }); }
 });
 
 test('demo opposition includes fight players but excludes spectators and allies', () => {
@@ -51,16 +82,22 @@ test('demo opposition includes fight players but excludes spectators and allies'
 	assert.equal(demoIsOpponent(red, spectator), false);
 });
 
-test('demo spawns six combatants with the full training roster and does not collect training samples', () => {
+test('demo spawns six combatants and collects exhibition stats without training samples', () => {
 	const created = [], spawned = [];
 	const game = {
 		battleBotRoster: [],
 		createPlayer(data) {
 			created.push(data);
-			return { _stats: { ...data }, updatePlayerType() {} };
+			const botId = `bot-${created.length}`;
+			return { _stats: { ...data }, id: () => botId,
+				getSelectedUnit() { return this.selectedUnit; }, updatePlayerType() {} };
 		},
 		_pickBattleBotSpawn(leftSide) { return { x: leftSide ? 100 : 900, y: 200 }; },
-		_spawnBattleBotUnit(player) { spawned.push(player); }
+		_spawnBattleBotUnit(player) {
+			spawned.push(player);
+			player._battleBot.previousCharacter = ROSTER_IDS[0];
+			player.selectedUnit = { id: () => `unit-${spawned.length}` };
+		}
 	};
 	const ige = { game: { data: require('../src/game.json').data,
 		getAsset: () => ({ attributes: {}, variables: {} }) } };
@@ -71,5 +108,6 @@ test('demo spawns six combatants with the full training roster and does not coll
 	assert.equal(spawned.length, 6);
 	assert.equal(game.battleBotRoster.length, ROSTER_IDS.length);
 	assert.equal(demo.trajectory, undefined);
-	assert.equal(demo.stats, undefined);
+	assert.equal(Object.keys(demo.stats.finish().players).length, 6);
+	assert.equal(Object.keys(demo.stats.finish().characters).length, 6);
 });

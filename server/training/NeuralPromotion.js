@@ -7,12 +7,13 @@ function pairScores(pairs) {
 	return pairs.map(pair => (pair[0] + pair[1]) / 2);
 }
 
-function canPromoteNeural({ championPairs, archivedPairs = null, parityPassed } = {}) {
+function canPromoteNeural({ championPairs, archivedPairs = null, heuristicPairs = null, parityPassed } = {}) {
 	if (!parityPassed) return false;
 	const championScores = pairScores(championPairs);
 	if (!championScores || pairedLowerBound(championScores) <= 0.5) return false;
-	if (archivedPairs !== null) {
-		const archivedScores = pairScores(archivedPairs);
+	for (const opponentPairs of [archivedPairs, heuristicPairs]) {
+		if (opponentPairs === null) continue;
+		const archivedScores = pairScores(opponentPairs);
 		if (!archivedScores || pairedLowerBound(archivedScores.map(score => 1 - score)) > 0.5) return false;
 	}
 	return true;

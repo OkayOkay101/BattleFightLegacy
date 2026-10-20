@@ -270,7 +270,8 @@ var MenuUiComponent = IgeEntity.extend({
 			return;
 		}
 
-		var html = '<i class="fa fa-sync mr-2 py-3 fa-spin" aria-hidden="true"></i>Connecting.....';
+		var label = ige.client.i18n ? ige.client.i18n.t('menu.connecting') : 'Connecting...';
+		var html = '<i class="fa fa-sync mr-2 py-3 fa-spin" aria-hidden="true"></i>' + label;
 		$('#play-game-button .content').html(html);
 	},
 	playGame: function (wasGamePaused) {
@@ -662,7 +663,7 @@ var MenuUiComponent = IgeEntity.extend({
 
 		if (ige.isMobile) return;
 
-		var defaultContent = 'Lost connection to the game server. Please refresh this page or visit our homepage.';
+		var defaultContent = ige.client.i18n ? ige.client.i18n.t('error.connectionLost') : 'Lost connection to the game server. Please refresh this page or visit our homepage.';
 		ige.client.disconnected = true;
 
 		$('#server-disconnect-modal .modal-body').html(message || defaultContent);
