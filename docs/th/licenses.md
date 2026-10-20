@@ -48,6 +48,8 @@ Phaser ถูกประกาศใน dependencies แต่การปร�
 
 npm ทั้ง 31 ตัวที่ไม่มีไฟล์ license มีข้อความแล้ว: 16 ตัวจาก repository ต้นทาง, 6 ตัวจากหัวข้อ License ใน README และ 9 ตัวเป็นข้อความมาตรฐานของ license ที่ประกาศใน `package.json` (ต้นทางไม่มีไฟล์) ดู [index](../licenses/texts/npm-upstream/index.json)
 
-ยังค้างอยู่: ช่องทางเผยแพร่ fan content ของ Touhou (แนวปฏิบัติไม่ได้ระบุ GitHub), ข้อมูลเครดิตของ Sukune และ Tenkai (CC BY-SA 4.0), การเปลี่ยนชื่อ Morphling, Orchid Malevolence และชื่อสกิลของ Corkmaster, การขออนุญาตผู้ร่วมสร้าง Dual Assassin และที่มาของ `verdana_12pt.png`
+แก้แล้วเมื่อ 2026-10-21: Sukune และ Tenkai เป็นแฟนเวิร์กของ Len'en Project ตามแนวปฏิบัติของ JynX (CC BY-SA 4.0 ที่เจอก่อนหน้าเป็น license ของข้อความในวิกิ Len'en ไม่ใช่ของตัวละคร), เปลี่ยนชื่อ Morphling, Malevolent Orchid และชื่อของ Corkmaster เป็น Morph, Orchid และ Cork (สกิล Shot, Blow, Bait, Block) แล้ว, Dual Assassin ได้รับอนุญาตจากผู้ร่วมสร้างให้ใช้เฉพาะในเกมนี้
+
+ยังค้างอยู่: ช่องทางเผยแพร่ fan content ของ Touhou (แนวปฏิบัติไม่ได้ระบุ GitHub) และที่มาของ `verdana_12pt.png`
 
 การพบพาธเดียวกันใน asset inventory ไม่ครอบคลุมไฟล์ที่เปลี่ยนชื่อ/แปลง `packagedNodeModule` ตรวจตำแหน่งตาม lock ใน app.asar ไม่ใช่ทุก hoisted path หรือ binary dependency ของ Chromium การตรวจ notice ครบต้องใช้ต้นฉบับ vendor mapping และ notice runtime ร่วมกัน

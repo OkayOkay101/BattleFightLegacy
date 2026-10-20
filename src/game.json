@@ -23120,7 +23120,7 @@
       },
       "YoXgkTte0c": {
         "inventoryImage": "",
-        "name": "Corkmaster Come Shot Bullet",
+        "name": "Cork Shot Bullet",
         "attributes": {},
         "variables": {},
         "states": {
@@ -23872,7 +23872,7 @@
       },
       "0bMojlc8NR": {
         "inventoryImage": "",
-        "name": "Corkmaster Come Shot Bullet 2",
+        "name": "Cork Shot Bullet 2",
         "attributes": {},
         "variables": {},
         "states": {
@@ -24282,7 +24282,7 @@
         },
         "variables": {},
         "attributes": {},
-        "name": "Corkmaster Come Shot Effect",
+        "name": "Cork Shot Effect",
         "destroyOnContactWith": {
           "units": false,
           "items": false,
@@ -24410,7 +24410,7 @@
         },
         "variables": {},
         "attributes": {},
-        "name": "Corkmaster Come Shot Effect 2",
+        "name": "Cork Shot Effect 2",
         "destroyOnContactWith": {
           "units": false,
           "items": false,
@@ -24424,7 +24424,7 @@
       },
       "fBJel9jyvz": {
         "inventoryImage": "",
-        "name": "Corkmaster Come Shot Return Bullet",
+        "name": "Cork Shot Return Bullet",
         "attributes": {},
         "variables": {
           "(Global Projectile) Projectile Damage": {
@@ -24565,7 +24565,7 @@
       },
       "X1MDYedDjw": {
         "inventoryImage": "",
-        "name": "Corkmaster Come Shot Return Bullet 2",
+        "name": "Cork Shot Return Bullet 2",
         "attributes": {},
         "variables": {
           "(Global Projectile) Projectile Damage": {
@@ -24706,7 +24706,7 @@
       },
       "x277tOK4aL": {
         "inventoryImage": "",
-        "name": "Corkmaster Blow Job Bullet One",
+        "name": "Cork Blow Bullet One",
         "attributes": {},
         "variables": {
           "(Global Projectile) Projectile Damage": {
@@ -24946,7 +24946,7 @@
       },
       "TMwPsC496P": {
         "inventoryImage": "",
-        "name": "Corkmaster Blow Job Bullet Two",
+        "name": "Cork Blow Bullet Two",
         "attributes": {},
         "variables": {
           "(Global Projectile) Projectile Damage": {
@@ -25213,7 +25213,7 @@
       },
       "9UkKZi2xZk": {
         "inventoryImage": "",
-        "name": "Corkmaster Master Bait Bullet",
+        "name": "Cork Bait Bullet",
         "attributes": {},
         "variables": {
           "(Global Projectile) Projectile Slow": {
@@ -25701,7 +25701,7 @@
         },
         "variables": {},
         "attributes": {},
-        "name": "Corkmaster Cock Block Effect",
+        "name": "Cork Block Effect",
         "destroyOnContactWith": {
           "units": false,
           "items": false,
@@ -32024,7 +32024,7 @@
         },
         "variables": {},
         "attributes": {},
-        "name": "Corkmaster Blow Job Effect",
+        "name": "Cork Blow Effect",
         "destroyOnContactWith": {
           "units": false,
           "items": false,
@@ -44913,7 +44913,7 @@
       },
       "KhwqX1ipnq": {
         "inventoryImage": "",
-        "name": "Potent Propeller Morphling Bullet",
+        "name": "Potent Propeller Morph Bullet",
         "attributes": {},
         "variables": {
           "(Global Projectile) Projectile Damage": {
@@ -45062,7 +45062,7 @@
       },
       "NsiOlcxyy0": {
         "inventoryImage": "",
-        "name": "Potent Propeller Morphling Bullet 2",
+        "name": "Potent Propeller Morph Bullet 2",
         "attributes": {},
         "variables": {},
         "states": {
@@ -148352,7 +148352,7 @@
           "y": 45,
           "x": 0
         },
-        "name": "Come Shot!",
+        "name": "Shot!",
         "handle": "",
         "attributes": {},
         "variables": {},
@@ -149138,7 +149138,7 @@
           "y": 45,
           "x": 0
         },
-        "name": "Blow Job!",
+        "name": "Blow!",
         "handle": "",
         "attributes": {},
         "variables": {},
@@ -150211,7 +150211,7 @@
           "y": 45,
           "x": 0
         },
-        "name": "Master Bait!",
+        "name": "Bait!",
         "handle": "",
         "attributes": {},
         "variables": {},
@@ -151162,7 +151162,7 @@
           "y": 45,
           "x": 0
         },
-        "name": "Cock Block!",
+        "name": "Block!",
         "handle": "",
         "attributes": {},
         "variables": {},
@@ -151318,7 +151318,7 @@
             "projectileType": "",
             "sound": {
               "toM7uxIqqa": {
-                "name": "Cock Block Sound",
+                "name": "Block Sound",
                 "file": "/assets/cache.modd.io/asset/sound/1660905952236_316920__rudmer-rotteveel__chicken-single-alarm-call.mp3",
                 "volume": 100
               }
@@ -161693,7 +161693,7 @@
         "variables": {},
         "attributes": {},
         "handle": "",
-        "name": "Malevolent Orchid",
+        "name": "Orchid",
         "bulletStartPosition": {
           "x": 0,
           "y": 20,
@@ -172371,7 +172371,7 @@
           "y": -12,
           "x": 0
         },
-        "name": "Morphling",
+        "name": "Morph",
         "handle": "",
         "attributes": {},
         "variables": {},
@@ -279271,37 +279271,37 @@
         "volume": 100
       },
       "YWb9qr7Acm": {
-        "name": "Corkzarker Blow Job SFX 1",
+        "name": "Corkzarker Blow SFX 1",
         "file": "/assets/cache.modd.io/asset/sound/1670055028689_shot1.mp3",
         "volume": 100
       },
       "EiY4WwigbO": {
-        "name": "Corkzarker Blow Job SFX 2",
+        "name": "Corkzarker Blow SFX 2",
         "file": "/assets/cache.modd.io/asset/sound/1670055036619_shot2.mp3",
         "volume": 100
       },
       "OSVy3Nif2E": {
-        "name": "Corkzarker Blow Job SFX 3",
+        "name": "Corkzarker Blow SFX 3",
         "file": "/assets/cache.modd.io/asset/sound/1670055044304_shot3.mp3",
         "volume": 100
       },
       "bPTS6u6N0k": {
-        "name": "Corkzarker Master Bait SFX 1",
+        "name": "Corkzarker Bait SFX 1",
         "file": "/assets/cache.modd.io/asset/sound/1670056491933_shot1.mp3",
         "volume": 100
       },
       "qCHo2wsjcu": {
-        "name": "Corkzarker Master Bait SFX 2",
+        "name": "Corkzarker Bait SFX 2",
         "file": "/assets/cache.modd.io/asset/sound/1670056500149_shot2.mp3",
         "volume": 100
       },
       "a4kwpDMyXX": {
-        "name": "Corkzarker Master Bait SFX 3",
+        "name": "Corkzarker Bait SFX 3",
         "file": "/assets/cache.modd.io/asset/sound/1670056507507_shot3.mp3",
         "volume": 100
       },
       "1MbfSBaRFC": {
-        "name": "Corkzarker Master Baited VO 1",
+        "name": "Corkzarker Baited VO 1",
         "file": "/assets/cache.modd.io/asset/sound/1675059867489_masterbaited.m4a",
         "volume": 100
       },
@@ -280071,17 +280071,17 @@
         "volume": 100
       },
       "IUYSNpAdvd": {
-        "name": "Potent Propeller Morphling SFX 1",
+        "name": "Potent Propeller Morph SFX 1",
         "file": "/assets/cache.modd.io/asset/sound/1683607526944_asohniasddas.mp3",
         "volume": 100
       },
       "wpDoy5kRqk": {
-        "name": "Potent Propeller Morphling SFX 2",
+        "name": "Potent Propeller Morph SFX 2",
         "file": "/assets/cache.modd.io/asset/sound/1683614836127_asohniasddas2.mp3",
         "volume": 100
       },
       "1bIuEySH6U": {
-        "name": "Potent Propeller Morphling SFX 3",
+        "name": "Potent Propeller Morph SFX 3",
         "file": "/assets/cache.modd.io/asset/sound/1683614846197_asohniasddas3.mp3",
         "volume": 100
       },
@@ -284081,7 +284081,7 @@
             "comment": ""
           }
         ],
-        "name": "Create Corkmaster",
+        "name": "Create Cork",
         "parent": "XgegaJuaQj",
         "key": "UeDPs2DcaL",
         "order": 6
@@ -313429,7 +313429,7 @@
         "skin": "/assets/s3-us-west-1.amazonaws.com/modd/halloween-0.18/spritesheet/man.png",
         "canBuyItem": true,
         "handle": "human",
-        "name": "Corkmaster",
+        "name": "Cork",
         "inventorySize": 4,
         "cellSheet": {
           "columnCount": 1,
@@ -313589,23 +313589,23 @@
         "defaultItems": [
           {
             "key": "DUmSmPBSsI",
-            "value": "Come Shot!",
-            "name": "Come Shot!"
+            "value": "Shot!",
+            "name": "Shot!"
           },
           {
             "key": "3o5TH17DGb",
-            "value": "Blow Job!",
-            "name": "Blow Job!"
+            "value": "Blow!",
+            "name": "Blow!"
           },
           {
             "key": "Ven5UB4yTZ",
-            "value": "Master Bait!",
-            "name": "Master Bait!"
+            "value": "Bait!",
+            "name": "Bait!"
           },
           {
             "key": "0eJa1Y14FP",
-            "value": "Cock Block!",
-            "name": "Cock Block!"
+            "value": "Block!",
+            "name": "Block!"
           }
         ],
         "scripts": {
@@ -316346,7 +316346,7 @@
         "skin": "/assets/s3-us-west-1.amazonaws.com/modd/halloween-0.18/spritesheet/man.png",
         "canBuyItem": true,
         "handle": "human",
-        "name": "Corkmaster's Clone",
+        "name": "Cork's Clone",
         "inventorySize": 5,
         "cellSheet": {
           "columnCount": 1,
@@ -316755,7 +316755,7 @@
           "columnCount": 1
         },
         "inventorySize": 5,
-        "name": "Corkmaster's Cock Block",
+        "name": "Cork's Block",
         "handle": "human",
         "canBuyItem": true,
         "skin": "/assets/s3-us-west-1.amazonaws.com/modd/halloween-0.18/spritesheet/man.png",
@@ -318394,8 +318394,8 @@
           },
           {
             "key": "ikZHCxfb1G",
-            "value": "Orchid Malevolence",
-            "name": "Orchid Malevolence"
+            "value": "Orchid",
+            "name": "Orchid"
           },
           {
             "key": "MbkMZOjhKj",
@@ -323097,8 +323097,8 @@
           },
           {
             "key": "wCXKI67eIn",
-            "value": "Morphling",
-            "name": "Morphling"
+            "value": "Morph",
+            "name": "Morph"
           },
           {
             "key": "cEBAipO59j",
@@ -388332,7 +388332,7 @@
             "scriptName": "6mUAok1jTq"
           },
           {
-            "name": "Harry Peanuts,<br>the Corkmaster<br>🤬🕹️",
+            "name": "Harry Peanuts,<br>the Cork<br>🤬🕹️",
             "scriptName": "UeDPs2DcaL",
             "followUpDialogue": ""
           },

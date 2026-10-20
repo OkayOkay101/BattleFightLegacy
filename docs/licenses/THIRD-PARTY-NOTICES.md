@@ -11,9 +11,10 @@ The sprites, tilesets and UI images used by the game are in the public domain, a
 ## Fan content and contributed characters
 
 - **Reimu & Marisa** — fan content based on Touhou Project. Touhou Project is the work of ZUN / Team Shanghai Alice. BattleFight is an unofficial fan work and is not affiliated with or endorsed by Team Shanghai Alice. No content extracted from official Touhou Project games is included.
-- **Sukune** and **Tenkai** — used under the Creative Commons Attribution-ShareAlike 4.0 International license (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0/. Attribution: see `CHARACTER-CREDITS.md`.
+- **Sukune** (Sukune Katano) and **Tenkai** (Tenkai Zuifeng) — fan content based on the Len'en Project by JynX / Trick Nostalgie (http://mugentrick.tubakurame.com/index_en.xhtml), made under the circle's derivative works guidelines (http://mugentrick.tubakurame.com/Guide_en.xhtml). BattleFight is not affiliated with Trick Nostalgie. See `CHARACTER-CREDITS.md`.
 - **Manish, the Potent Propeller** — sprite by BH_YT, used with permission.
 - **Visor, the Overlord** — by dol_awp, used with permission.
+- **Dual Assassin** — created with another player, who granted permission to use it in BattleFight only.
 
 ## Engine
 

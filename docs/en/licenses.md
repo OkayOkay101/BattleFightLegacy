@@ -48,6 +48,8 @@ From 2026-10-20 the desktop preparer writes a `licenses/` folder into `desktop-d
 
 All 31 npm packages that ship no license file now have a collected text: 16 from the upstream repository, 6 from the package README license section and 9 as the standard text of the license declared in `package.json` (no upstream file exists). See [the index](../licenses/texts/npm-upstream/index.json).
 
-Still open: Touhou fan-content distribution channel (the guidelines do not list GitHub), attribution details for Sukune and Tenkai (CC BY-SA 4.0), renaming Morphling, Orchid Malevolence and the Corkmaster skill names, the Dual Assassin co-creator permission, and `verdana_12pt.png` provenance.
+Resolved on 2026-10-21: Sukune and Tenkai are Len'en Project fan content made under JynX's derivative works guidelines (the CC BY-SA 4.0 notice found earlier is the Len'en Wiki text license, not the characters'); Morphling, Malevolent Orchid and the Corkmaster names were renamed to Morph, Orchid and Cork (skills Shot, Blow, Bait, Block); Dual Assassin is used with its co-creator's permission for this game only.
+
+Still open: Touhou fan-content distribution channel (the guidelines do not list GitHub) and `verdana_12pt.png` provenance.
 
 Same-path presence in the asset inventory does not detect every renamed/transformed asset. `packagedNodeModule` checks each locked location in app.asar, not every possible hoisted path or Chromium binary dependency. Full notice coverage needs the original texts, vendor mapping and runtime notice file together.

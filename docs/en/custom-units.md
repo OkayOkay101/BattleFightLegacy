@@ -81,7 +81,7 @@ Web source and the portable build rebuilt on 2026-10-09 include this editor and 
 
 ## Skill guidance
 
-The isolated heuristic retains native targeting, aiming and movement and checks skill resource/state prerequisites before selecting equipment. Script-only skills receive their own cast opportunities. Corkmaster holds position for its stationary skill unless an imminent projectile requires a dodge; Tenkai uses its native projectile, barrier and summon scripts. The editor identifies resource, form, summon and stationary requirements. This guidance is for the sandbox and does not change production bot decisions.
+The isolated heuristic retains native targeting, aiming and movement and checks skill resource/state prerequisites before selecting equipment. Script-only skills receive their own cast opportunities. Cork holds position for its stationary skill unless an imminent projectile requires a dodge; Tenkai uses its native projectile, barrier and summon scripts. The editor identifies resource, form, summon and stationary requirements. This guidance is for the sandbox and does not change production bot decisions.
 
 Selected generic projectile weapons use ranged spacing; selecting a native weapon restores the prototype's spacing. SubLazer keeps the first form's native 1 HP floor so lethal damage can trigger the automatic secondary form. That form retains 1 HP, receives no transformation heal and has a zero health floor so the next lethal hit can kill it. A respawn returns to the saved root custom unit. Active buffs and debuffs carry across forms and their values reach the client after its type update.
 
@@ -96,7 +96,7 @@ All rows support player and heuristic control. Slot numbers start at 1. A dash m
 | Nadia | 1 | — |
 | The Elements | 1 | — |
 | Commander | — | Summons / secondary units |
-| Corkmaster | — | Summons / secondary units, Stationary skill |
+| Cork | — | Summons / secondary units, Stationary skill |
 | Reimu & Marisa | — | Resources, Summons / secondary units |
 | Razor's Edge | — | Resources |
 | Toxic Brillance | 1 | — |

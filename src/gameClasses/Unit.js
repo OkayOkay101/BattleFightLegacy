@@ -2012,7 +2012,7 @@ var Unit = IgeEntityPhysics.extend({
 			'fg6GvDXnkW', // Grand Artificer Spatial Collapse Marker 1
 			't6eGlgZJZd', // Grand Artificer Spatial Collapse Marker 2
 			'0UN2VxudQK', // Orlette Clone
-			'fBm2V1iqSv', // Corkmaster's Clone
+			'fBm2V1iqSv', // Cork's Clone
 			'tPW4ck2QvI', // Overlord Minion
 			'ZvCJrakO2E', // Dual Assassin Clone
 			'FLBECLt1vt', // Hunter Bear Trap Marker

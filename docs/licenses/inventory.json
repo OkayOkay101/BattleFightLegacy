@@ -1,7 +1,7 @@
 {
   "snapshot": {
-    "date": "2026-10-20",
-    "sourceCommit": "a10b33d4b3e7e7af892fa7c3cca665e2bd6335ce",
+    "date": "2026-10-21",
+    "sourceCommit": "e83b8ae77cc70e4371bb5947ead31b1794abdfed",
     "counts": {
       "npm": 769,
       "python": 12,
@@ -17407,9 +17407,9 @@
       "reason": "Touhou fan creator guidelines require a clear fan-work note (added to THIRD-PARTY-NOTICES.md) and limit distribution to platforms where official content is found or that ZUN permits; GitHub is not listed."
     },
     {
-      "component": "Sukune and Tenkai (CC BY-SA 4.0)",
-      "status": "Open: attribution details needed",
-      "reason": "Project owner stated they are CC BY-SA 4.0. Creator name and source link are required for attribution in CHARACTER-CREDITS.md."
+      "component": "Sukune and Tenkai (Len'en Project fan content)",
+      "status": "Resolved: fan work under the circle derivative works guidelines",
+      "reason": "Sukune Katano and Tenkai Zuifeng are Len'en Project characters by JynX / Trick Nostalgie, whose guidelines (http://mugentrick.tubakurame.com/Guide_en.xhtml) allow typical fan games without prior permission. CC BY-SA 4.0 is only the Len'en Wiki text license. Credited in CHARACTER-CREDITS.md."
     },
     {
       "component": "Manish and Visor",
@@ -17418,13 +17418,13 @@
     },
     {
       "component": "Morphling, Orchid Malevolence and Corkmaster skill names",
-      "status": "Open: to be renamed",
-      "reason": "Names overlap Dota 2 or conflict with the 13+ rating; the project owner will rename them."
+      "status": "Resolved: renamed on 2026-10-21",
+      "reason": "Morphling is now Morph, Malevolent Orchid is now Orchid, and Corkmaster is now Cork with skills Shot, Blow, Bait and Block. Internal variable keys are unchanged."
     },
     {
       "component": "Dual Assassin",
-      "status": "Open: awaiting the co-creator permission",
-      "reason": "Created with another player; the project owner will ask them."
+      "status": "Resolved: permission for BattleFight only",
+      "reason": "Created with another player, who granted permission to use it in this game only (project owner statement, 2026-10-21)."
     },
     {
       "component": "Gemini Flash / ChatGPT Sol credit",
