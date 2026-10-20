@@ -35,8 +35,8 @@ var ActionComponent = IgeEntity.extend({
 		[-12, 0, 12].forEach(function (offset) {
 			var from = { x: (start.x + nx * offset) / scale, y: (start.y + ny * offset) / scale };
 			var to = { x: (end.x + nx * offset) / scale, y: (end.y + ny * offset) / scale };
-			world.rayCast(function (fixture, point, normal, fraction) {
-				var body = fixture && fixture.m_body;
+			var report = function (fixture, point, normal, fraction) {
+				var body = fixture && (fixture.m_body || (fixture.getBody && fixture.getBody()));
 				var entity = body && body._entity;
 				if (!entity) return 1;
 				if (entity._category === 'wall' || entity._category === undefined) {
@@ -45,7 +45,10 @@ var ActionComponent = IgeEntity.extend({
 					if (!hits.has(entity.id()) || fraction < hits.get(entity.id()).fraction) hits.set(entity.id(), { entity: entity, fraction: fraction });
 				}
 				return 1;
-			}, from, to);
+			};
+			// Planck takes (point1, point2, callback); the Box2D ports take (callback, point1, point2).
+			if (ige.physics.engine === 'PLANCK') world.rayCast(from, to, report);
+			else world.rayCast(report, from, to);
 		});
 		var clippedEnd = { x: start.x + dx * wallFraction, y: start.y + dy * wallFraction };
 		var units = Array.from(hits.values()).filter(function (hit) { return hit.fraction <= wallFraction; });

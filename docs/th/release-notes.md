@@ -12,7 +12,13 @@ Commit `39afe69` บน `codex/battlefight-bots`
 - **Sixth Diva และ Emo & Sky:** ทั้ง 8 สกิลยิงออก มีภาพกระสุน และทำดาเมจได้ใน client เบราว์เซอร์จริง การเสียเลือดของ Sixth Diva เป็นต้นทุนที่ออกแบบไว้ (10 HP ต่อใบมีด/นัด; Hexa-Shift แลกเลือดกับความเร็วหรือฮีลชั่วคราว) สกิล 3 และ Brillant Catastrophe ของ Emo & Sky มีดีเลย์ในตัวสูงสุดราว 6.5 วินาที ไฟล์ export ต้นฉบับยังเป็นเวอร์ชันเก่า (สคริปต์ใช้ตำแหน่งไอเทม, URL ภาพภายนอก, ตัวสร้างกระสุนหายเมื่อชน) ส่วน source นี้แก้แล้ว
 - **Repository:** คืนค่า `.gitignore` เดิมที่ถูกเขียนทับ และไม่รวมไฟล์ผลลัพธ์ในเครื่อง (backups, reports, dist, video, cache, JSON ผลลัพธ์)
 
-**การตรวจ:** ชุดทดสอบ Solo/Morrow/กระสุนผ่าน 17/17 เมื่อ 2026-10-20 (รอบ QA 2026-10-12 ผ่าน 45/45 ดู [QA ของ Solo Test](../qa/2026-10-12-solo-test.md)) ยังไม่ได้รันชุดเต็มซ้ำ และยังไม่ได้ rebuild EXE ดังนั้น `dist/portable` ยังไม่มี Solo Test และ Morrow ต้องรัน `npm run desktop:build` เพื่อรวม
+**การตรวจ:** ชุดทดสอบ Solo/Morrow/กระสุนผ่าน 17/17 เมื่อ 2026-10-20 (รอบ QA 2026-10-12 ผ่าน 45/45 ดู [QA ของ Solo Test](../qa/2026-10-12-solo-test.md)) ยังไม่ได้รันชุดเต็มซ้ำ
+
+**แก้ Atlas:** Atlas Unfolded แสดงเส้นเตือนแต่ไม่เคยทำดาเมจ เพราะเกมใช้ physics Planck ซึ่ง `rayCast` รับ `(point1, point2, callback)` แต่ Atlas ส่ง callback เป็นตัวแรก raycast จึงไม่เจอยูนิตและกำแพงไม่ตัดเส้น ตอนนี้ใช้ลำดับของ Planck แล้ว (engine อื่นยังใช้ลำดับ Box2D) และทำดาเมจ 30 ตามที่ตั้งไว้ มี regression test ครอบคลุมลำดับพารามิเตอร์ของ Planck
+
+**Build EXE ใหม่แล้ว:** `dist/portable/BattleFight-Portable-1.0.0.exe` ขนาด 129,138,987 bytes SHA256 `e83138e2f93a95ab1970e219dcc85e3c2dbe0accdcd1db136cbbb720d6c0b8fc` Windows x64 ยังไม่เซ็นดิจิทัล มี Solo Test, Morrow และการแก้ Atlas สคริปต์แพ็กเกจแก้ให้นำภาพ `/assets/morrow` จาก `src/assets/morrow` เหมือนเซิร์ฟเวอร์ source ผล build ไม่มีภาพหาย และไม่มียูนิตที่ใช้ภาพสำรอง ทดสอบ desktop ผ่าน 19/19 และ smoke test ของ Electron ผ่าน 1/1
+
+**ทดลองเล่น EXE:** เล่นผ่านเบราว์เซอร์ที่ต่อกับเซิร์ฟเวอร์ใน EXE โดยส่ง input ผ่านเครือข่ายของเกม โหมด Play Game สู้กับ AI ได้ มี kill feed สด สกิลของ Sixth Diva ยิงออกและเห็นกระสุนครบ ใน Solo Test สกิลทั้ง 4 ของ Emo & Sky มีภาพและทำดาเมจหุ่นเป้า Morrow ทำดาเมจ 12 (Compass Bolt), 22 (Banked Delivery) และ 30 (Atlas) ไม่มี script error ส่วนหน้าต่าง Electron ตรวจด้วย smoke test ไม่ได้เล่นด้วยมือ
 
 ## 2026-10-09 — Custom Units และ Custom Weapons
 

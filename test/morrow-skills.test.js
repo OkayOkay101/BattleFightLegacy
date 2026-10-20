@@ -53,3 +53,16 @@ test('Atlas raycast clips to nearest wall and retains earliest hit across rays',
  const result=h.action._morrowLine({x:0,y:0},{x:100,y:0});
  assert.equal(result.end.x,50);assert.equal(result.units.length,1);assert.equal(result.units[0].id(),'before');
 });
+test('Atlas raycast uses the Planck argument order (point1, point2, callback)',()=>{
+ const h=harness();
+ const target={_category:'unit',_alive:true,_stats:{attributes:{health:{value:100}}},id:()=>'target'};
+ const calls=[];
+ h.ige.physics={engine:'PLANCK',scaleRatio:()=>1,world:()=>({rayCast(point1,point2,callback){
+  calls.push([point1,point2]);
+  assert.equal(typeof callback,'function','Planck expects the callback last');
+  callback({getBody:()=>({_entity:target})},null,null,0.4);
+ }})};
+ const result=h.action._morrowLine({x:0,y:0},{x:100,y:0});
+ assert.equal(calls.length,3);assert.equal(calls[1][0].x,0);assert.equal(calls[1][1].x,100);
+ assert.equal(result.units.length,1);assert.equal(result.units[0].id(),'target');
+});

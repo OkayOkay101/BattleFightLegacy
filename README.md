@@ -1,8 +1,19 @@
 # BattleFight
 
-BattleFight is a local web game and offline Windows portable game built on the Taro engine, with team AI model selection, spectator cameras, a live kill feed, English/Thai UI, and a Custom Unit/Weapon test arena.
+BattleFight is a top-down team arena game built on the Taro engine. It runs as a local web game or as an offline Windows portable app. You can join the Blue team against AI, or watch heuristic and Neural bots fight each other. The UI is available in English and Thai.
 
-Current source documentation: **2026-10-09**. The local portable artifact is a separate build snapshot; see [release and validation notes](docs/en/release-notes.md).
+Current source documentation: **2026-10-20**. See the [release and validation notes](docs/en/release-notes.md) for what changed and what was tested.
+
+## Features
+
+- **Play or spectate:** join the Blue team, or watch the bots fight with spectator cameras, a live kill feed and match statistics.
+- **Team AI selection:** choose the AI model separately for Blue and Red.
+- **Solo Test:** an isolated arena with no bots. Choose any of the 45 playable characters, add stationary target dummies, test death and respawn, and reset at any time.
+- **Custom Units:** create a variant of any of the 44 supported characters and test it with player or heuristic control.
+- **Custom Weapons:** build single, spread or burst weapons and equip them in any slot.
+- **New character, Morrow:** Compass Bolt, a Banked shot that turns at a route marker, and Atlas, a line attack with a warning.
+
+Custom content is saved locally and never enters Neural training.
 
 ## Play from source
 
@@ -11,9 +22,22 @@ npm ci
 npm run demo
 ```
 
-Open [http://127.0.0.1/](http://127.0.0.1/). Use **Custom Units** to create a variant of any of the 44 playable characters, or **Custom Weapons** to build single, spread or burst weapons. Test them in a separate arena with player or heuristic control. Custom content is saved locally and stays outside Neural training.
+Open [http://127.0.0.1/](http://127.0.0.1/). From the main page, join a fight, spectate, or open **Solo Test**, **Custom Units** or **Custom Weapons**.
 
-For offline Windows play, open `BattleFight-Portable-1.0.0.exe`. It includes local visuals and AI inference, has no audio, and does not require Node or Python. Packaging instructions and prerequisites are in the development guide.
+Controls: **WASD** to move, the mouse to aim, left click to fire, **1–4** to switch equipment.
+
+## Windows portable app
+
+Run `dist/portable/BattleFight-Portable-1.0.0.exe`. It runs the game and its server on your computer, includes local visuals and AI inference, has no audio, and needs no Node.js, Python or internet connection. Your settings and custom content are kept in your per-user data folder, so they survive replacing the EXE.
+
+To rebuild it:
+
+```powershell
+npm install
+npm run desktop:build
+```
+
+See the [development guide](docs/en/development.md) for prerequisites and details.
 
 ## Documentation — English first
 
@@ -36,13 +60,34 @@ This development credit is separate from the heuristic and Neural bots that run 
 
 ## เอกสารภาษาไทย
 
-BattleFight เป็นเกมเว็บในเครื่องและเกม Windows แบบ portable ออฟไลน์ที่พัฒนาบน Taro มีระบบเลือกโมเดล AI แยกทีม กล้องผู้ชม kill feed สด UI อังกฤษ–ไทย และสนามทดลองยูนิต/อาวุธสร้างเอง
+BattleFight เป็นเกมต่อสู้เป็นทีมมุมมองจากด้านบน พัฒนาบนเอนจิน Taro เล่นได้ทั้งแบบเกมเว็บในเครื่องและแอป Windows แบบ portable ที่ไม่ต้องใช้อินเทอร์เน็ต ลงเล่นในทีมฟ้าสู้กับ AI หรือดูบอท heuristic และ Neural สู้กันเองก็ได้ UI มีทั้งภาษาอังกฤษและไทย
 
-เอกสาร source ปัจจุบันอัปเดต **2026-10-09** ส่วน portable เป็นข้อมูลตามรอบ build ของไฟล์นั้น ดู [บันทึกรุ่นและการตรวจรับ](docs/th/release-notes.md)
+เอกสาร source ปัจจุบันอัปเดต **2026-10-20** ดูสิ่งที่เปลี่ยนและผลการทดสอบได้ที่ [บันทึกรุ่นและการตรวจรับ](docs/th/release-notes.md)
 
-รัน `npm ci` และ `npm run demo` จากโฟลเดอร์นี้ แล้วเปิด [http://127.0.0.1/](http://127.0.0.1/) เมนู **ยูนิตสร้างเอง** สร้างตัวแปรจาก 44 ตัวละคร และ **อาวุธสร้างเอง** สร้างการยิงเดี่ยว กระจาย หรือเป็นชุด ทดลองในสนามแยกโดยเลือกผู้เล่นหรือ heuristic ข้อมูล custom บันทึกในเครื่องและไม่เข้าการฝึก Neural
+### ฟีเจอร์
 
-เล่นออฟไลน์บน Windows ด้วย `BattleFight-Portable-1.0.0.exe` ซึ่งมีภาพและ AI inference ในเครื่อง ไม่มีเสียง และไม่ต้องติดตั้ง Node/Python ดูวิธี build และ prerequisites ในคู่มือพัฒนา
+- **เล่นหรือดู:** ลงเล่นทีมฟ้า หรือดูบอทสู้กันพร้อมกล้องผู้ชม kill feed สด และสถิติแมตช์
+- **เลือก AI แยกทีม:** เลือกโมเดล AI แยกกันระหว่างทีมฟ้าและทีมแดง
+- **Solo Test:** สนามแยกที่ไม่มีบอท เลือกได้ทุกตัวละครที่เล่นได้ทั้ง 45 ตัว เพิ่มหุ่นเป้านิ่ง ทดสอบการตายและเกิดใหม่ และเริ่มใหม่ได้ทุกเมื่อ
+- **ยูนิตสร้างเอง:** สร้างตัวแปรจาก 44 ตัวละครที่รองรับ แล้วทดลองด้วยผู้เล่นหรือ heuristic
+- **อาวุธสร้างเอง:** สร้างอาวุธยิงเดี่ยว กระจาย หรือเป็นชุด แล้วใส่ช่องไหนก็ได้
+- **ตัวละครใหม่ Morrow:** Compass Bolt, Banked ที่เลี้ยวที่หมุดเส้นทาง และ Atlas ท่าโจมตีเป็นแนวที่มีเส้นเตือนก่อน
+
+ข้อมูล custom บันทึกในเครื่องและไม่เข้าการฝึก Neural
+
+### เล่นจาก source
+
+รัน `npm ci` และ `npm run demo` จากโฟลเดอร์นี้ แล้วเปิด [http://127.0.0.1/](http://127.0.0.1/) จากหน้าหลักเลือกลงเล่น ดูบอทสู้กัน หรือเปิด **Solo Test**, **ยูนิตสร้างเอง** หรือ **อาวุธสร้างเอง**
+
+การควบคุม: **WASD** เดิน, เมาส์เล็ง, คลิกซ้ายยิง, **1–4** เปลี่ยนอุปกรณ์
+
+### แอป Windows แบบ portable
+
+เปิด `dist/portable/BattleFight-Portable-1.0.0.exe` แอปรันทั้งเกมและเซิร์ฟเวอร์ในเครื่อง มีภาพและ AI inference ในตัว ไม่มีเสียง ไม่ต้องติดตั้ง Node.js หรือ Python และไม่ต้องต่ออินเทอร์เน็ต การตั้งค่าและข้อมูล custom เก็บไว้ในโฟลเดอร์ข้อมูลของผู้ใช้ จึงยังอยู่แม้เปลี่ยนไฟล์ EXE
+
+build ใหม่ด้วย `npm install` และ `npm run desktop:build` ดู prerequisites และรายละเอียดใน [คู่มือพัฒนา](docs/th/development.md)
+
+### เอกสาร
 
 - [สารบัญเอกสาร](docs/th/index.md)
 - [คู่มือผู้เล่น](docs/th/player-guide.md)

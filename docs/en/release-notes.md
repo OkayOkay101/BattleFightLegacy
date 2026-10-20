@@ -12,7 +12,13 @@ Commit `39afe69` on `codex/battlefight-bots`.
 - **Sixth Diva and Emo & Sky:** all eight skills fire, render with valid textures and damage a target in the real browser client. Sixth Diva's self-damage is a designed health cost (10 HP per blade/shot; Hexa-Shift trades health for speed or a temporary heal). Emo & Sky's skill 3 and Brillant Catastrophe have built-in delays of up to about 6.5 seconds. The original export file still contains the older item-position scripts, remote image URLs and bullet makers that are destroyed on contact; this source has those fixes.
 - **Repository:** the original `.gitignore` was restored after being overwritten, and local outputs (backups, reports, dist, video, caches, result JSON) are ignored.
 
-**Validation:** the Solo/Morrow/projectile selection passed 17/17 on 2026-10-20 (45/45 in the 2026-10-12 QA run, see [Solo Test QA](../qa/2026-10-12-solo-test.md)). The full suite was not rerun. No EXE was rebuilt, so `dist/portable` still predates Solo Test and Morrow. Run `npm run desktop:build` to include them.
+**Validation:** the Solo/Morrow/projectile selection passed 17/17 on 2026-10-20 (45/45 in the 2026-10-12 QA run, see [Solo Test QA](../qa/2026-10-12-solo-test.md)). The full suite was not rerun.
+
+**Atlas fix:** Atlas Unfolded showed its warning but never dealt damage. The game runs on Planck physics, whose `rayCast` takes `(point1, point2, callback)`, but Atlas passed the callback first, so the ray found no units and walls never clipped the line. Atlas now uses the Planck order (the Box2D order is kept for other engines) and deals its 30 damage. A regression test covers the Planck argument order.
+
+**Portable EXE rebuilt:** `dist/portable/BattleFight-Portable-1.0.0.exe`, 129,138,987 bytes, SHA256 `e83138e2f93a95ab1970e219dcc85e3c2dbe0accdcd1db136cbbb720d6c0b8fc`, Windows x64, unsigned. It includes Solo Test, Morrow and the Atlas fix. The packager now stages `/assets/morrow` images from `src/assets/morrow`, matching the source server; the build reported 0 missing visuals and 0 fallback units. Desktop tests passed 19/19 and the Electron smoke test passed 1/1.
+
+**EXE play test:** the packaged server was played through the browser with input sent over the game network. A Play Game match against AI ran with a live kill feed; all Sixth Diva skills fired with visible bullets. In Solo Test, all four Emo & Sky skills rendered and damaged the dummy, and Morrow dealt 12 (Compass Bolt), 22 (Banked Delivery) and 30 (Atlas) with no script errors. The Electron window itself was covered by the smoke test, not played by hand.
 
 ## 2026-10-09 — Custom Units and Custom Weapons
 

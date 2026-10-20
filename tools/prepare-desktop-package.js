@@ -183,6 +183,16 @@ function resolveImage(value, context) {
 			const relative = path.relative(context.repoRoot, source);
 			return { source, relative, key: 'local:' + relative };
 		}
+		// server.js serves /assets/morrow from src/assets/morrow; stage it at the same path.
+		if (host === 'morrow') {
+			const srcRoot = path.resolve(context.repoRoot, 'src', 'assets', 'morrow');
+			const candidate = path.resolve(srcRoot, decodedPath.split('/').filter(Boolean).join(path.sep));
+			if (inside(srcRoot, candidate) && fs.existsSync(candidate) && fs.lstatSync(candidate).isFile()
+				&& validImage(fs.readFileSync(candidate), path.extname(candidate).toLowerCase())) {
+				const relative = path.relative(context.repoRoot, candidate);
+				return { source: candidate, relative, key: 'local:' + relative };
+			}
+		}
 	}
 	const ref = normalizeUrl(value);
 	if (!ref) {
