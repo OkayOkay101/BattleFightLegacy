@@ -616,6 +616,110 @@ function assertNoAudio(stageRoot, game) {
 	scan(game, '');
 }
 
+// Build variants. "github" leaves out Touhou Project fan content, whose guidelines do not
+// list GitHub as a distribution channel. Each removal starts from a character's unit type
+// and its create script, then follows every unit/item/projectile/script ID they reference.
+const VARIANTS = {
+	full: { removeCharacters: [] },
+	github: {
+		removeCharacters: [{ name: 'Reimu & Marisa', unitType: 'SIIVFpgz7Y', createScript: 'YSjll70YvX' }],
+		// Kept entities that may still name a removed unit type: Hidden Hand's Reflection only
+		// compares the copied unit's type with it, so that branch simply never runs.
+		allowedReferences: { 'projectileTypes.XaQh8cYalD': ['unitTypes.SIIVFpgz7Y'] },
+		// Leftover entries with these names that nothing else uses (dead data carrying Touhou art).
+		removeUnusedNamed: /\b(Touhou|Reimu|Marisa)\b/,
+		dialogueTextRemovals: { u7aAZAycQc: [/\n\nReimu Ult<br>[\s\S]*?(?=\n\nMarisa Ult<br>)/, /\n\nMarisa Ult<br>[\s\S]*?(?=\n\n\n)/] },
+		dropNoticeLines: [/^- \*\*Reimu & Marisa\*\*.*$/m]
+	}
+};
+const ENTITY_GROUPS = ['unitTypes', 'itemTypes', 'projectileTypes', 'scripts', 'animationTypes'];
+
+function entityReferences(value, lookup, found = new Set()) {
+	if (typeof value === 'string') { const key = lookup.get(value); if (key) found.add(key); }
+	else if (Array.isArray(value)) for (const item of value) entityReferences(item, lookup, found);
+	else if (value && typeof value === 'object') for (const item of Object.values(value)) entityReferences(item, lookup, found);
+	return found;
+}
+
+function removeCharacters(game, variant) {
+	const data = game.data || game;
+	const lookup = new Map();
+	for (const group of ENTITY_GROUPS) for (const id of Object.keys(data[group] || {})) lookup.set(id, group + '.' + id);
+	const entity = key => { const [group, id] = key.split('.'); return data[group][id]; };
+	const removed = new Set(); const roots = new Set();
+	for (const character of variant.removeCharacters) {
+		for (const key of ['unitTypes.' + character.unitType, 'scripts.' + character.createScript]) {
+			if (!lookup.has(key.split('.')[1])) throw new Error('Variant character missing from game data: ' + key);
+			roots.add(key); removed.add(key);
+		}
+	}
+	for (let queue = [...removed]; queue.length;) {
+		for (const ref of entityReferences(entity(queue.pop()), lookup)) if (!removed.has(ref)) { removed.add(ref); queue.push(ref); }
+	}
+	// Anything a kept entity still uses is shared, so keep it (and whatever it references).
+	const allowed = variant.allowedReferences || {};
+	for (let changed = true; changed;) {
+		changed = false;
+		for (const key of lookup.values()) {
+			if (removed.has(key)) continue;
+			for (const ref of entityReferences(entity(key), lookup)) {
+				if (!removed.has(ref) || (allowed[key] || []).includes(ref)) continue;
+				if (roots.has(ref)) throw new Error(`${key} still uses removed character entry ${ref}`);
+				removed.delete(ref); changed = true;
+			}
+		}
+	}
+	if (variant.removeUnusedNamed) {
+		const named = new Set([...lookup.values()].filter(key => !removed.has(key) && variant.removeUnusedNamed.test(entity(key).name || '')));
+		// Unreferenced projectiles/items that only exist to fire named ones are dead data too.
+		const incoming = new Set();
+		for (const key of lookup.values()) if (!removed.has(key)) for (const ref of entityReferences(entity(key), lookup)) if (ref !== key) incoming.add(ref);
+		for (const key of lookup.values()) {
+			if (removed.has(key) || named.has(key) || incoming.has(key) || !/^(projectileTypes|itemTypes)\./.test(key)) continue;
+			if ([...entityReferences(entity(key), lookup)].some(ref => named.has(ref))) named.add(key);
+		}
+		for (let changed = true; changed;) {
+			changed = false;
+			for (const key of lookup.values()) {
+				if (removed.has(key) || named.has(key)) continue;
+				for (const ref of entityReferences(entity(key), lookup)) if (named.delete(ref)) changed = true;
+			}
+		}
+		for (const key of named) removed.add(key);
+	}
+	let variables = 0;
+	if (variant.removeUnusedNamed && data.entityTypeVariables) {
+		for (const name of Object.keys(data.entityTypeVariables)) {
+			if (!variant.removeUnusedNamed.test(name)) continue;
+			const rest = { ...data, entityTypeVariables: undefined };
+			for (const key of removed) { const [group, id] = key.split('.'); rest[group] = { ...rest[group], [id]: undefined }; }
+			if (!JSON.stringify(rest).includes(JSON.stringify(name))) { delete data.entityTypeVariables[name]; variables++; }
+		}
+	}
+	const counts = {};
+	for (const key of removed) { const [group, id] = key.split('.'); delete data[group][id]; counts[group] = (counts[group] || 0) + 1; }
+	// The editor folder tree lists entities by ID; drop the removed ones there too.
+	for (const key of removed) { const id = key.split('.')[1]; if (data.folders && data.folders[id]) delete data.folders[id]; }
+	const scripts = new Set([...removed].filter(key => key.startsWith('scripts.')).map(key => key.slice(8)));
+	let options = 0;
+	for (const dialogue of Object.values(data.dialogues || {})) {
+		if (!Array.isArray(dialogue.options)) continue;
+		const before = dialogue.options.length;
+		dialogue.options = dialogue.options.filter(option => !scripts.has(option.scriptName));
+		options += before - dialogue.options.length;
+	}
+	let textRemovals = 0;
+	for (const [id, patterns] of Object.entries(variant.dialogueTextRemovals || {})) {
+		const dialogue = data.dialogues && data.dialogues[id];
+		if (!dialogue) throw new Error('Variant dialogue missing: ' + id);
+		for (const pattern of patterns) {
+			if (!pattern.test(dialogue.message)) throw new Error(`Variant text not found in dialogue ${id}: ${pattern}`);
+			dialogue.message = dialogue.message.replace(pattern, ''); textRemovals++;
+		}
+	}
+	return { characters: variant.removeCharacters.map(c => c.name), removedEntities: counts, removedMenuOptions: options, removedTextBlocks: textRemovals, removedVariables: variables };
+}
+
 function prepareDesktopPackage(options = {}) {
 	const repoRoot = path.resolve(options.repoRoot || path.resolve(__dirname, '..'));
 	const expected = path.resolve(repoRoot, 'build', 'desktop-resources');
@@ -627,6 +731,9 @@ function prepareDesktopPackage(options = {}) {
 		if (fs.lstatSync(stageRoot).isSymbolicLink() || !inside(buildRoot, stageRoot)) throw new Error('Refusing to clear unsafe stage path: ' + stageRoot);
 		fs.rmSync(stageRoot, { recursive: true, force: true });
 	}
+	const variantName = options.variant || process.env.BATTLEFIGHT_BUILD_VARIANT || 'full';
+	const variant = VARIANTS[variantName];
+	if (!variant) throw new Error('Unknown build variant: ' + variantName);
 	fs.mkdirSync(stageRoot, { recursive: true });
 	const stats = { files: [], sourceBytes: 0, stagedBytes: 0, pngBytesSaved: 0, missingVisuals: [], fallbackUnitCount: 0, noticeFiles: [] };
 	copyRuntime(repoRoot, stageRoot);
@@ -637,6 +744,15 @@ function prepareDesktopPackage(options = {}) {
 		resolvedAssets: new Map(), missingAssets: new Map()
 	};
 	const sourceGame = JSON.parse(fs.readFileSync(path.join(repoRoot, 'src/game.json'), 'utf8'));
+	stats.variant = variantName;
+	if (variant.removeCharacters.length) {
+		// Neural policies hash the character roster, so freeze the source roster before
+		// removing characters; their feature slots simply stay unused.
+		const { ROSTER_IDS } = require(path.join(repoRoot, 'server/training/NeuralObservation'));
+		stats.variantRemoval = removeCharacters(sourceGame, variant);
+		const rosterPath = path.join(stageRoot, 'server/training/neural-roster.json');
+		fs.writeFileSync(rosterPath, JSON.stringify({ note: 'Frozen Neural feature roster; build variant ' + variantName, ids: ROSTER_IDS }, null, 2) + '\n');
+	}
 	const game = rewriteGameAssets(removeAudioData(sourceGame), context, stats);
 	for (const relative of ['assets/images/favicon.png', 'assets/fonts/arcade.ttf']) {
 		const source = path.join(repoRoot, relative);
@@ -649,6 +765,12 @@ function prepareDesktopPackage(options = {}) {
 	createFallbackAssets(stageRoot, context.missingUnits, stats);
 	copyVendor(repoRoot, stageRoot, stats);
 	copyNotices(repoRoot, stageRoot, stats);
+	if (variant.dropNoticeLines) {
+		const noticePath = path.join(stageRoot, 'licenses', 'THIRD-PARTY-NOTICES.md');
+		let notice = fs.readFileSync(noticePath, 'utf8');
+		for (const line of variant.dropNoticeLines) notice = notice.replace(line, '').replace(/\n{3,}/g, '\n\n');
+		fs.writeFileSync(noticePath, notice);
+	}
 	copyPolicies(repoRoot, stageRoot, stats);
 
 	const gamePath = path.join(stageRoot, 'src/game.json');
@@ -688,7 +810,9 @@ if (require.main === module) {
 			policyFileCount: result.policyFileCount,
 			policyBytes: result.policyBytes,
 			fallbackUnitCount: result.missingUnitCount,
-			missingSourceVisualCount: result.missingVisuals.length
+			missingSourceVisualCount: result.missingVisuals.length,
+			variant: result.variant,
+			variantRemoval: result.variantRemoval || null
 		}, null, 2));
 	} catch (error) {
 		console.error(error.stack || error.message);
@@ -696,4 +820,4 @@ if (require.main === module) {
 	}
 }
 
-module.exports = { prepareDesktopPackage, optimizePng, crc32, copyRuntime, copyPolicies, sourceByUrl, rewriteGameAssets };
+module.exports = { prepareDesktopPackage, removeCharacters, VARIANTS, optimizePng, crc32, copyRuntime, copyPolicies, sourceByUrl, rewriteGameAssets };

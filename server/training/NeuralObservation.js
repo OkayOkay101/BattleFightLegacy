@@ -2,7 +2,12 @@ const crypto = require('node:crypto');
 const { buildTrainingRoster, EXCLUDED_UNITS } = require('./TrainingRoster');
 const { getSchema } = require('./NeuralSchema');
 
-const ROSTER_IDS = Object.freeze(buildTrainingRoster(require('../../src/game.json').data).eligible.map(entry => entry.id));
+// Builds that remove characters ship the source roster frozen in neural-roster.json, so the
+// feature layout and rosterHash still match the trained policies.
+const FROZEN_ROSTER = require('node:path').join(__dirname, 'neural-roster.json');
+const ROSTER_IDS = Object.freeze(require('node:fs').existsSync(FROZEN_ROSTER)
+	? require(FROZEN_ROSTER).ids
+	: buildTrainingRoster(require('../../src/game.json').data).eligible.map(entry => entry.id));
 // Exactly 40 eligible characters (excluded characters completely removed)
 const FEATURE_ROSTER_IDS = ROSTER_IDS;
 const FEATURE_COUNT = 86; // self (5) + allies (6) + enemies (15) + projectiles 4*4 (16) + weaponReady (4) + roster (40)

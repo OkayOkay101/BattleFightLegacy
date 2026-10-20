@@ -53,6 +53,8 @@ node tools/stop-training-after-evaluation.js
 
 `desktop:build` เตรียม local resources แล้วใช้ electron-builder สร้าง Windows x64 portable ที่ `dist/portable/BattleFight-Portable-1.0.0.exe` ขั้นเตรียม rewrite URL ที่รองรับเป็นพาธท้องถิ่น optimize PNG และลบทั้งไฟล์/อ้างอิงเสียง ฝัง metadata ของ pointers ที่อนุมัติและ policies หมายเลขที่มีให้เลือกเอง ไม่ฝัง Python, optimizer/checkpoint/match data หรือเครื่องมือเปลี่ยนการฝึก Seed เริ่มต้นตาม champion ที่อนุมัติ ไม่ใช่ candidate หมายเลขสูงสุด
 
+`desktop:build:github` สร้างรุ่นสำหรับ GitHub คือ `dist/portable/BattleFight-Portable-1.0.0-no-touhou.exe` ที่ไม่มี Reimu & Marisa (แฟนเวิร์ก Touhou Project ซึ่งแนวปฏิบัติไม่ได้ระบุ GitHub เป็นช่องทางเผยแพร่) ลบตัวละคร อาวุธ กระสุน animation สคริปต์สร้างตัว ตัวเลือกในเมนู และเครดิตเพลง แต่เก็บส่วนที่ตัวละครอื่นใช้ร่วม และแช่รายชื่อตัวละครของ Neural จาก source ไว้ใน `server/training/neural-roster.json` เพื่อให้ policy ที่ฝึกแล้วยังโหลดได้ `test/desktop-variant.test.js` ตรวจการลบนี้
+
 ภาพหายหรือ origin ที่ไม่รองรับอาจทำให้ preparation ล้มเหลว ไม่ควรเปลี่ยน error ให้พึ่งอินเทอร์เน็ตแบบเงียบ Browser vendor และ Font Awesome webfonts ถูกคัดลอกในเครื่อง แต่ README/license ต้นทางไม่ได้ถูกฝังอัตโนมัติเพียงเพราะอยู่ในรีโป ดู [ช่องว่าง notice](licenses.md)
 
 ## พัฒนา editor Custom

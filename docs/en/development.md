@@ -53,6 +53,8 @@ For a running evaluation it waits for the current candidate evaluation result, t
 
 `desktop:build` prepares local resources then uses electron-builder for a Windows x64 portable EXE at `dist/portable/BattleFight-Portable-1.0.0.exe`. Preparation rewrites supported asset URLs to local paths, optimizes PNG data and removes audio references/files. It bundles approved-pointer metadata and available numbered policies for manual selection, while excluding Python, optimizer/checkpoint/match data and training mutation tools. The default seed follows the approved champion, not the largest candidate number.
 
+`desktop:build:github` builds the GitHub edition, `dist/portable/BattleFight-Portable-1.0.0-no-touhou.exe`, without Reimu & Marisa (Touhou Project fan content, whose guidelines do not list GitHub as a distribution channel). It removes the character, its items, projectiles, animations, create script, menu option and music credits, keeps anything other characters share, and ships the source Neural roster frozen in `server/training/neural-roster.json` so the trained policies still load. `test/desktop-variant.test.js` checks the removal.
+
 Missing visuals or unsupported asset origins can cause preparation failure; do not replace these errors with a silent network dependency. Browser vendor code and Font Awesome webfonts are copied locally. Source readme/licenses are not automatically shipped merely because they exist in the repository; see [notice gaps](licenses.md).
 
 ## Custom editor development

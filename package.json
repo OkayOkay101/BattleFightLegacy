@@ -29,7 +29,8 @@
     "build:git": "cross-env TEST=true node server/ige.js -deploy ./src -to ./build",
     "debug": "cross-env ENV=standalone node --inspect server/ige.js -g ./src",
     "dev:lint": "eslint . --fix",
-    "desktop:build": "node tools/prepare-desktop-package.js && electron-builder --win portable --x64"
+    "desktop:build": "node tools/prepare-desktop-package.js && electron-builder --win portable --x64",
+    "desktop:build:github": "cross-env BATTLEFIGHT_BUILD_VARIANT=github node tools/prepare-desktop-package.js && electron-builder --win portable --x64 -c.artifactName=BattleFight-Portable-${version}-no-touhou.${ext}"
   },
   "repository": {
     "type": "git",
