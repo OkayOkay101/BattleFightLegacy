@@ -89,7 +89,7 @@
     "jquery-contextmenu": "2.9.2",
     "jquery-ui-dist": "1.12.1",
     "pixi.js-legacy": "6.2.2",
-    "rollbar": "^2.25.0",
+    "rollbar": "^4.1.0",
     "sweetalert2": "11.4.0",
     "typescript": "^4.7.4"
   }
