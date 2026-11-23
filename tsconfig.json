@@ -1,5 +1,8 @@
 {
     "compilerOptions": {
+        "ignoreDeprecations": "6.0",
+        "skipLibCheck": true,
+        "strict": false,
         "module": "None",
         "target": "es5",
         "sourceMap": true,

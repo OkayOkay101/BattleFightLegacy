@@ -58,7 +58,7 @@
     "phaser": "^3.55.2",
     "public-ip": "^2.5.0",
     "q": "^1.5.1",
-    "rate-limiter-flexible": "^2.3.7",
+    "rate-limiter-flexible": "^11.2.3",
     "request": "^2.88.2",
     "sanitizer": "^0.1.3",
     "validator": "^13.7.0",
@@ -68,15 +68,15 @@
     "lz-string": "1.4.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.9",
+    "@babel/core": "^8.0.7",
     "@babel/eslint-parser": "^7.18.9",
     "@fortawesome/fontawesome-free": "5.15.4",
-    "@popperjs/core": "2.11.2",
+    "@popperjs/core": "^2.11.8",
     "@types/node": "^18.0.6",
-    "@typescript-eslint/eslint-plugin": "^5.30.7",
-    "@typescript-eslint/parser": "^5.30.7",
+    "@typescript-eslint/eslint-plugin": "^8.72.0",
+    "@typescript-eslint/parser": "^8.72.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
-    "bootstrap": "5.1.3",
+    "bootstrap": "5.3.8",
     "cross-env": "^7.0.3",
     "electron": "44.3.0",
     "electron-builder": "26.17.0",
@@ -89,8 +89,8 @@
     "jquery-contextmenu": "2.9.2",
     "jquery-ui-dist": "1.12.1",
     "pixi.js-legacy": "6.2.2",
-    "rollbar": "^2.25.0",
-    "sweetalert2": "11.4.0",
-    "typescript": "^4.7.4"
+    "rollbar": "^4.1.0",
+    "sweetalert2": "11.26.25",
+    "typescript": "^6.0.3"
   }
 }
