@@ -447,7 +447,8 @@ var IgeNode = IgeClass.extend({
 		source = source.replace(/\/\* CEXCLUDE \*\/[\s\S.]*?\* CEXCLUDE \*\//g, '');
 
 		// Return final code.
-		return babel.transform(source, {
+		// Babel 8 removed the synchronous transform(); transformSync exists in 7 and 8.
+		return babel.transformSync(source, {
 			ast: true,
 			compact: true,
 			minified: true,

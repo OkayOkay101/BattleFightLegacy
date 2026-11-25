@@ -134,67 +134,69 @@
 </section>
 
 <style>
-#training-live-badge { color: #14263e; background: #dce6f0; border: 1px solid #a9bfd5; }
-#training-live-badge.badge-success { color: #fff; background: #177b5e; }
-#training-live-badge.badge-warning { color: #14263e; background: #f7d273; }
-#training-live-badge.badge-danger { color: #fff; background: #c93853; }
-#play-game-button-wrapper:has(#training-demo-settings) { flex-direction: column; gap: 1.2rem; background: linear-gradient(145deg,rgba(10,20,38,.88),rgba(6,12,24,.75)); z-index: 100; }
-#training-demo-settings { width: min(94vw,700px); padding: 24px 26px; border: 1px solid #7eaed4; border-radius: 20px; background: #f8fbff; color: #14263e; box-shadow: 0 20px 60px rgba(4,12,24,0.6); }
-#training-demo-settings h2 { font-size: clamp(1.4rem,3.5vw,1.9rem); margin: .2rem 0; font-weight: 800; color: #0c2340; }
-#training-demo-settings p { margin: .2rem 0 .9rem; color: #475a75; font-size: 0.92rem; }
-#training-demo-settings .demo-kicker { font-size: .75rem; letter-spacing: .15em; color: #176bb3; font-weight: 800; }
+#training-live-badge { color: #cbd5e1; background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(148, 163, 184, 0.25); }
+#training-live-badge.badge-success { color: #ecfdf5; background: rgba(16, 185, 129, 0.25); border-color: rgba(16, 185, 129, 0.55); }
+#training-live-badge.badge-warning { color: #fef3c7; background: rgba(245, 158, 11, 0.25); border-color: rgba(245, 158, 11, 0.55); }
+#training-live-badge.badge-danger { color: #ffe4e6; background: rgba(244, 63, 94, 0.25); border-color: rgba(244, 63, 94, 0.55); }
+#play-game-button-wrapper:has(#training-demo-settings) { flex-direction: column; gap: 1.1rem; background: radial-gradient(circle at 50% 35%, rgba(14, 165, 233, 0.14), rgba(2, 6, 23, 0.88) 70%); backdrop-filter: blur(8px); z-index: 100; }
+#training-demo-settings { width: min(94vw, 720px); padding: 24px 26px; border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 20px; background: rgba(8, 15, 29, 0.82); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #f1f5f9; box-shadow: 0 24px 72px rgba(2, 6, 23, 0.78); }
+#training-demo-settings h2 { font-size: clamp(1.35rem, 3.2vw, 1.85rem); margin: .2rem 0; font-weight: 800; color: #f8fafc; letter-spacing: -0.01em; }
+#training-demo-settings p { margin: .2rem 0 .9rem; color: #94a3b8; font-size: 0.9rem; }
+#training-demo-settings .demo-kicker { font-size: .72rem; letter-spacing: .16em; color: #38bdf8; font-weight: 800; }
 
-.train-dashboard { background: #eaf1fa; border: 1px solid #c2d8ed; border-radius: 12px; padding: 12px 14px; }
+.train-dashboard { background: rgba(15, 23, 42, 0.68); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 14px; padding: 12px 14px; }
 .train-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; }
-.stat-card { background: #ffffff; border: 1px solid #d2e2f2; border-radius: 8px; padding: 7px 10px; display: flex; flex-direction: column; }
-.stat-label { font-size: 0.72rem; color: #617792; font-weight: 600; margin-bottom: 2px; }
-.stat-value { font-size: 0.95rem; font-weight: 800; color: #1b314e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat-card { background: rgba(8, 15, 29, 0.72); border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 10px; padding: 8px 10px; display: flex; flex-direction: column; }
+.stat-label { font-size: 0.7rem; color: #94a3b8; font-weight: 600; margin-bottom: 2px; }
+.stat-value { font-size: 0.92rem; font-weight: 700; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-#training-demo-settings .demo-options { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: .9rem; }
+#training-demo-settings .demo-options { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .9rem; }
 #training-demo-settings .demo-options label { cursor: pointer; margin: 0; }
 #training-demo-settings .demo-options input { position: absolute; opacity: 0; }
-#training-demo-settings .demo-options span { display: flex; flex-direction: column; gap: .2rem; min-height: 75px; padding: .85rem 1rem; border: 2px solid #c6d7e9; border-radius: 12px; background: white; transition: all 0.15s ease-in-out; }
-#training-demo-settings .demo-options small { color: #55677e; font-size: 0.8rem; }
-#training-demo-settings .demo-options input:checked + span { border-color: #0869c2; background: #e8f3ff; box-shadow: inset 0 0 0 1px #0869c2; }
-#training-demo-settings .demo-options input:focus-visible + span, #training-demo-spectator button:focus-visible { outline: 3px solid #f3a428; outline-offset: 3px; }
+#training-demo-settings .demo-options span { display: flex; flex-direction: column; gap: .25rem; min-height: 74px; padding: .85rem 1rem; border: 1px solid rgba(148, 163, 184, 0.24); border-radius: 12px; background: rgba(15, 23, 42, 0.65); color: #e2e8f0; transition: all 0.15s ease-in-out; }
+#training-demo-settings .demo-options small { color: #94a3b8; font-size: 0.78rem; }
+#training-demo-settings .demo-options input:checked + span { border-color: #38bdf8; background: rgba(14, 165, 233, 0.16); box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.45), 0 8px 24px rgba(14, 165, 233, 0.15); }
+#training-demo-settings .demo-options input:focus-visible + span, #training-demo-spectator button:focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
+#play-game-button { border: 1px solid rgba(16, 185, 129, 0.55); border-radius: 14px; padding: 0; overflow: hidden; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25); }
+#play-game-button > div { padding: 12px 32px; font-weight: 700; letter-spacing: 0.02em; background: linear-gradient(135deg, #0ea5e9, #10b981) !important; }
 
-#training-demo-spectator { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: .65rem; max-width: 95vw; padding: .5rem .8rem; border-radius: 11px; background: #f5f8fdef; color: #14263e; box-shadow: 0 4px 22px rgba(7,19,36,0.5); }
+#training-demo-spectator { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: .65rem; max-width: 95vw; padding: .55rem .9rem; border-radius: 14px; border: 1px solid rgba(56, 189, 248, 0.35); background: rgba(8, 15, 29, 0.82); backdrop-filter: blur(12px); color: #f1f5f9; box-shadow: 0 8px 28px rgba(2, 6, 23, 0.65); }
 #training-demo-spectator[hidden] { display: none; }
-#training-demo-spectator button { border: 0; border-radius: 7px; background: #176bb3; color: white; padding: .45rem .65rem; }
+#training-demo-spectator button { border: 1px solid rgba(56, 189, 248, 0.45); border-radius: 8px; background: rgba(14, 165, 233, 0.2); color: #e0f2fe; padding: .42rem .7rem; font-size: 0.82rem; }
 #game-div:has(#training-demo-spectator:not([hidden])) #counter { top: 68px; }
 
-@media (max-width: 520px) { 
-    #training-demo-settings { padding: 16px; } 
-    #training-demo-settings .demo-options { grid-template-columns: 1fr; } 
-    #training-demo-spectator { flex-wrap: wrap; justify-content: center; width: 95vw; } 
-    #game-div:has(#training-demo-spectator:not([hidden])) #counter { top: 112px; } 
+@media (max-width: 520px) {
+    #training-demo-settings { padding: 16px; }
+    #training-demo-settings .demo-options { grid-template-columns: 1fr; }
+    #training-demo-spectator { flex-wrap: wrap; justify-content: center; width: 95vw; }
+    #game-div:has(#training-demo-spectator:not([hidden])) #counter { top: 112px; }
 }
 .demo-model-controls { display: grid; grid-template-columns: auto minmax(105px,1fr) auto minmax(105px,1fr) auto; align-items: center; gap: .5rem; margin-top: .5rem; }
-.demo-model-controls label { margin: 0; font-size: .8rem; font-weight: 700; color: #475a75; white-space: nowrap; }
+.demo-model-controls label { margin: 0; font-size: .8rem; font-weight: 700; color: #cbd5e1; white-space: nowrap; }
 .demo-model-controls select { min-width: 0; }
-#training-demo-settings select { border: 1px solid #c6d7e9; border-radius: 7px; padding: .42rem .5rem; background: #fff; color: #14263e; }
-#training-demo-spectator { flex-direction: column; width: min(96vw,1020px); max-width: none; }
+#training-demo-settings select { border: 1px solid rgba(148, 163, 184, 0.28); border-radius: 8px; padding: .42rem .55rem; background: rgba(15, 23, 42, 0.9); color: #f1f5f9; }
+#training-demo-spectator { flex-direction: column; width: min(96vw, 1020px); max-width: none; }
 #training-demo-spectator .demo-camera-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .45rem .6rem; width: 100%; }
-#training-demo-following { flex: 1; min-width: 150px; color: #475a75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#training-demo-following { flex: 1; min-width: 150px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #training-demo-spectator label, #training-demo-spectator button, #training-demo-spectator select { flex: none; white-space: nowrap; margin: 0; }
 #training-demo-spectator label[hidden] { display: none; }
-#training-demo-spectator select { border: 1px solid #c6d7e9; border-radius: 7px; padding: .4rem .5rem; background: #fff; color: #14263e; }
-#training-demo-camera-target { max-width: min(220px,48vw); }
-#training-demo-quick-score { color: #0c2340; font-size: 1rem; font-weight: 800; white-space: nowrap; }
-#training-demo-stats { position: absolute; top: 112px; right: 14px; z-index: 51; width: min(450px,95vw); max-height: min(70vh,580px); overflow: auto; padding: 15px; border: 1px solid #c2d8ed; border-radius: 12px; color: #14263e; background: #f8fbff; box-shadow: 0 8px 28px rgba(7,19,36,.3); }
+#training-demo-spectator select { border: 1px solid rgba(148, 163, 184, 0.28); border-radius: 8px; padding: .4rem .5rem; background: rgba(15, 23, 42, 0.9); color: #f1f5f9; }
+#training-demo-camera-target { max-width: min(220px, 48vw); }
+#training-demo-quick-score { color: #38bdf8; font-size: 1rem; font-weight: 800; white-space: nowrap; }
+#training-demo-stats { position: absolute; top: 112px; right: 14px; z-index: 51; width: min(450px, 95vw); max-height: min(70vh, 580px); overflow: auto; padding: 15px; border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 14px; color: #f1f5f9; background: rgba(8, 15, 29, 0.88); backdrop-filter: blur(14px); box-shadow: 0 12px 36px rgba(2, 6, 23, 0.7); }
 #training-demo-stats[hidden] { display: none; }
 .demo-stats-header, .demo-team-card { display: flex; justify-content: space-between; gap: .5rem; }
-.demo-stats-header { align-items: center; color: #176bb3; }
-.demo-stats-caption { font-size: .75rem; color: #55677e; margin: .4rem 0; }
+.demo-stats-header { align-items: center; color: #38bdf8; }
+.demo-stats-caption { font-size: .75rem; color: #94a3b8; margin: .4rem 0; }
 .demo-team-stats { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin: .65rem 0; }
-.demo-team-card { flex-direction: column; padding: .7rem; border-radius: 9px; border: 1px solid #d2e2f2; background: #fff; font-size: .78rem; }
-.demo-team-card.blue { border-top: 3px solid #0869c2; }
-.demo-team-card.red { border-top: 3px solid #c93853; }
-.demo-team-card > span { color: #475a75; white-space: pre-line; }
+.demo-team-card { flex-direction: column; padding: .7rem; border-radius: 10px; border: 1px solid rgba(148, 163, 184, 0.2); background: rgba(15, 23, 42, 0.75); font-size: .78rem; }
+.demo-team-card.blue { border-top: 3px solid #38bdf8; }
+.demo-team-card.red { border-top: 3px solid #f43f5e; }
+.demo-team-card > span { color: #cbd5e1; white-space: pre-line; }
 .demo-player-scroll { overflow-x: auto; }
-.demo-player-scroll table { width: 100%; color: #14263e; font-size: .75rem; }
-.demo-player-scroll th, .demo-player-scroll td { padding: .38rem; border-bottom: 1px solid #d2e2f2; white-space: nowrap; }
-.demo-player-scroll th { color: #617792; }
+.demo-player-scroll table { width: 100%; color: #e2e8f0; font-size: .75rem; }
+.demo-player-scroll th, .demo-player-scroll td { padding: .38rem; border-bottom: 1px solid rgba(148, 163, 184, 0.16); white-space: nowrap; }
+.demo-player-scroll th { color: #94a3b8; }
 #game-div:has(#training-demo-spectator:not([hidden])) #counter { top: 108px; }
 #game-div:has(#training-demo-spectator:not([hidden])) #toggle-dev-panels { top: auto !important; bottom: 10px; }
 @media (max-width: 600px) {

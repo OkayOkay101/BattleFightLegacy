@@ -2,6 +2,21 @@
 
 [ภาษาไทย](../th/release-notes.md) · [Documentation](index.md)
 
+## 2026-11-25 — Minimal Dark Glass UI Rework
+
+- **Design System (`assets/css/legacy-glass.css`):** Added a unified Minimal Dark Glass stylesheet (`rgba(8, 15, 29, 0.72)` with `backdrop-filter: blur(14px)` and `#38bdf8` cyan accents) across all menus, HUD panels, modals, and the Custom Units / Solo Test editors while preserving all existing DOM IDs.
+- **Unified Top-Left Tools Hub (`src/index.ejs`, `src/templates/dev-console.ejs`):** Consolidated the floating language selector and Dev Console toggle into `#bf-tools-hub` / `#bf-tools-drawer` (also toggleable via `F9`).
+- **Menu, Lobby & Spectator (`src/templates/menu.ejs`):** Restyled `#training-demo-settings`, `.train-dashboard`, `.demo-options`, `#training-demo-spectator`, and `#training-demo-stats` into dark glass cards.
+- **In-Game HUD, Chat & Kill Feed (`src/templates/gui.ejs`, `src/templates/chat.ejs`, `KillFeedUiComponent.js`, `UnitUiComponent.js`):**
+  - Chat auto-fades after 6s of inactivity (`.bf-chat-faded`) and wakes on new messages, hover, or `Enter`.
+  - Kill feed caps at 4 visible compact entries and auto-removes entries after 4.5s.
+  - Attribute bar labels updated to high-contrast `#f8fafc` text.
+- **Pixi In-World HUD (`PixiAttributeBar.js`, `IgePixiFloatingText.js`, `MinimapComponent.js`):** Slimmed overhead unit bars (`7px` height, `72px` width), refined floating combat text (`14px` sans-serif with `#080f1d` stroke), and moved the minimap to the top-right (`y = 44`) so it never overlaps bottom-left chat.
+
+**Validation:** HTTP `200 OK` on `/` and `/assets/css/legacy-glass.css`, `node --check` passed on all 5 edited JS files, `npm run test:desktop` passed 21/21, `npm run test:desktop:runtime` passed 1/1, and headless Chrome (`1440×900`) captures of Menu/Lobby, Tools Drawer, Custom Units, and Character Selection / In-Game HUD completed with 0 runtime errors.
+
+**Portable EXE built (GitHub edition):** `dist/portable/BattleFight-Portable-1.0.0-no-touhou.exe`, 128,792,636 bytes, SHA256 `3b1d5b1b83c644b24d71531a34ab47625eaca59c88a512ae2894eac86621df65`, Windows x64, unsigned (`fallbackUnitCount: 0`, `missingSourceVisualCount: 0`). Published as `standalone-2026-11-25`.
+
 ## 2026-10-20 — Solo Test and Morrow
 
 Commit `39afe69` on `codex/battlefight-bots`.

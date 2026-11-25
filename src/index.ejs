@@ -24,6 +24,7 @@
     <% } %>
     <link rel="stylesheet" href="/assets/css/custom.css">
     <link rel="stylesheet" href="/assets/css/common.css">
+    <link rel="stylesheet" href="/assets/css/legacy-glass.css">
 
     <!-- Localization is available before the engine client and UI components load. -->
     <script src="/src/localization/messages.js"></script>
@@ -125,12 +126,39 @@
 
 <body>
     <div id="game-div" style="overflow: hidden">
-        <label class="game-language-control" data-i18n="settings.language" for="game-language-selector">Language</label>
-        <select id="game-language-selector" data-language-selector data-i18n-aria-label="settings.language" aria-label="Language" class="game-language-control">
-            <option value="en">English</option>
-            <option value="th">ไทย</option>
-        </select>
-        <%- include('templates/dev-console'); -%>
+        <div id="bf-tools-hub">
+            <button type="button" id="bf-tools-toggle" aria-expanded="false" aria-controls="bf-tools-drawer">
+                <i class="fa fa-sliders-h" aria-hidden="true"></i>
+                <span>Tools</span>
+            </button>
+            <div id="bf-tools-drawer" hidden>
+                <div class="bf-tools-row">
+                    <label class="game-language-control" data-i18n="settings.language" for="game-language-selector">Language</label>
+                    <select id="game-language-selector" data-language-selector data-i18n-aria-label="settings.language" aria-label="Language" class="game-language-control">
+                        <option value="en">English</option>
+                        <option value="th">ไทย</option>
+                    </select>
+                </div>
+                <%- include('templates/dev-console'); -%>
+            </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var toggle = document.getElementById('bf-tools-toggle');
+                var drawer = document.getElementById('bf-tools-drawer');
+                if (!toggle || !drawer) return;
+                function setDrawerOpen(open) {
+                    drawer.hidden = !open;
+                    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                }
+                toggle.addEventListener('click', function () {
+                    setDrawerOpen(drawer.hidden);
+                });
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'F9') setDrawerOpen(drawer.hidden);
+                });
+            });
+        </script>
         <%- include('templates/menu'); -%>
         <%- include('templates/shop'); -%>
         <%- include('templates/gui'); -%>

@@ -19,15 +19,15 @@ var IgePixiFloatingText = IgeEntity.extend({
 		config.color = config && config.color || defaultColor;
 
 		var textStyleConfig = {
-			fontFamily: 'Verdana',
-			fontSize: 16,
+			fontFamily: 'Inter, Cabin, Segoe UI, sans-serif',
+			fontSize: 14,
 			fontWeight: 'bold' || config.shouldBeBold,
 			fill: config.color,
 			align: 'center'
 		};
 		if (ige.game.data.settings.addStrokeToNameAndAttributes === undefined || ige.game.data.settings.addStrokeToNameAndAttributes) {
-			textStyleConfig.stroke = 'black';
-			textStyleConfig.strokeThickness = 4;
+			textStyleConfig.stroke = '#080f1d';
+			textStyleConfig.strokeThickness = 3;
 		}
 
 		const style = new PIXI.TextStyle(textStyleConfig);
