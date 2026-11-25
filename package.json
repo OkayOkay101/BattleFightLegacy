@@ -1,7 +1,7 @@
 {
   "name": "taro-engine",
   "version": "1.0.0",
-  "description": "An HTML5 multiplayer game engine, enabling anyone to make games at modd.io.",
+  "description": "Top-down 2D team arena game on the Taro engine with heuristic and Neural bots, custom units and weapons, and an offline Windows portable build.",
   "main": "server/ige.js",
   "scripts": {
     "server": "cross-env ENV=standalone node server/ige.js -g ./src",

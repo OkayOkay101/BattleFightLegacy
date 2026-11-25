@@ -1,6 +1,6 @@
 # BattleFight
 
-BattleFight is a top-down team arena game built on the Taro engine. It runs as a local web game or as an offline Windows portable app. You can join the Blue team against AI, or watch heuristic and Neural bots fight each other. The UI is available in English and Thai.
+BattleFight is a top-down 2D team arena game built on the Taro engine, based on *Battle! Fight!* from Modd.io. You can join the Blue team against AI or spectate heuristic and Neural bots with a live kill feed and match stats. Solo Test lets you try all 45 characters on your own, and the editor supports custom units and weapons. The UI has English and Thai options, and the game runs in a local browser or as an offline Windows portable app.
 
 Current source documentation: **2026-10-20**. See the [release and validation notes](docs/en/release-notes.md) for what changed and what was tested.
 
@@ -69,7 +69,7 @@ This development credit is separate from the heuristic and Neural bots that run 
 
 ## เอกสารภาษาไทย
 
-BattleFight เป็นเกมต่อสู้เป็นทีมมุมมองจากด้านบน พัฒนาบนเอนจิน Taro เล่นได้ทั้งแบบเกมเว็บในเครื่องและแอป Windows แบบ portable ที่ไม่ต้องใช้อินเทอร์เน็ต ลงเล่นในทีมฟ้าสู้กับ AI หรือดูบอท heuristic และ Neural สู้กันเองก็ได้ UI มีทั้งภาษาอังกฤษและไทย
+BattleFight เป็นเกมต่อสู้เป็นทีม 2 มิติมุมมองจากด้านบนบนเอนจิน Taro โดยต่อยอดจาก *Battle! Fight!* ของ Modd.io เลือกเล่นทีมฟ้าสู้กับ AI หรือดูบอท heuristic กับ Neural สู้กันพร้อม kill feed และสถิติแมตช์ได้ มีโหมด Solo Test ให้ลองเล่นทั้ง 45 ตัวละคร รวมถึงสร้างยูนิตและอาวุธเองได้ ตัวเกมมี UI ภาษาอังกฤษและไทย เล่นผ่านเบราว์เซอร์ในเครื่องหรือเปิดจากไฟล์ portable บน Windows โดยไม่ต้องต่อเน็ต
 
 เอกสาร source ปัจจุบันอัปเดต **2026-10-20** ดูสิ่งที่เปลี่ยนและผลการทดสอบได้ที่ [บันทึกรุ่นและการตรวจรับ](docs/th/release-notes.md)
 
