@@ -13,7 +13,9 @@
   - ปรับข้อความบน `#attribute-bars` เป็นสีขาว `#f8fafc` เพื่อความคมชัด
 - **Pixi In-World HUD (`PixiAttributeBar.js`, `IgePixiFloatingText.js`, `MinimapComponent.js`):** ลดความหนาแถบเลือดบนหัวยูนิต (`7px` × `72px`), ปรับฟอนต์ตัวเลขดาเมจ (`14px` sans-serif ขอบ `#080f1d`), และย้าย Minimap ไปมุมบนขวา (`y = 44`) ไม่ทับ Chat มุมล่างซ้าย
 
-**การตรวจรับ:** ทดสอบ HTTP `200 OK` ที่ `/` และ `/assets/css/legacy-glass.css`, ผ่าน `node --check` ทั้ง 5 ไฟล์ JS ที่แก้ไข, และจับภาพหน้าจอจริงผ่าน headless Chrome (`1440×900`) ครบ 4 หน้าจอ (Menu, Tools Drawer, Custom Units, Character Select / HUD) โดยไม่พบ runtime error
+**การตรวจรับ:** ทดสอบ HTTP `200 OK` ที่ `/` และ `/assets/css/legacy-glass.css`, ผ่าน `node --check` ทั้ง 5 ไฟล์ JS ที่แก้ไข, `npm run test:desktop` ผ่าน 21/21, `npm run test:desktop:runtime` ผ่าน 1/1, และจับภาพหน้าจอจริงผ่าน headless Chrome (`1440×900`) ครบ 4 หน้าจอ (Menu, Tools Drawer, Custom Units, Character Select / HUD) โดยไม่พบ runtime error
+
+**Build EXE ใหม่แล้ว (รุ่น GitHub):** `dist/portable/BattleFight-Portable-1.0.0-no-touhou.exe` ขนาด 128,792,636 bytes SHA256 `3b1d5b1b83c644b24d71531a34ab47625eaca59c88a512ae2894eac86621df65` Windows x64 ยังไม่เซ็นดิจิทัล (`fallbackUnitCount: 0`, `missingSourceVisualCount: 0`) เผยแพร่ที่ release `standalone-2026-11-25`
 
 ## 2026-10-20 — Solo Test และ Morrow
 

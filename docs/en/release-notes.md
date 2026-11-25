@@ -13,7 +13,9 @@
   - Attribute bar labels updated to high-contrast `#f8fafc` text.
 - **Pixi In-World HUD (`PixiAttributeBar.js`, `IgePixiFloatingText.js`, `MinimapComponent.js`):** Slimmed overhead unit bars (`7px` height, `72px` width), refined floating combat text (`14px` sans-serif with `#080f1d` stroke), and moved the minimap to the top-right (`y = 44`) so it never overlaps bottom-left chat.
 
-**Validation:** HTTP `200 OK` on `/` and `/assets/css/legacy-glass.css`, `node --check` passed on all 5 edited JS files, and headless Chrome (`1440×900`) captures of Menu/Lobby, Tools Drawer, Custom Units, and Character Selection / In-Game HUD completed with 0 runtime errors.
+**Validation:** HTTP `200 OK` on `/` and `/assets/css/legacy-glass.css`, `node --check` passed on all 5 edited JS files, `npm run test:desktop` passed 21/21, `npm run test:desktop:runtime` passed 1/1, and headless Chrome (`1440×900`) captures of Menu/Lobby, Tools Drawer, Custom Units, and Character Selection / In-Game HUD completed with 0 runtime errors.
+
+**Portable EXE built (GitHub edition):** `dist/portable/BattleFight-Portable-1.0.0-no-touhou.exe`, 128,792,636 bytes, SHA256 `3b1d5b1b83c644b24d71531a34ab47625eaca59c88a512ae2894eac86621df65`, Windows x64, unsigned (`fallbackUnitCount: 0`, `missingSourceVisualCount: 0`). Published as `standalone-2026-11-25`.
 
 ## 2026-10-20 — Solo Test and Morrow
 
