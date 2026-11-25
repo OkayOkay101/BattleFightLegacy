@@ -6,14 +6,14 @@ Current source documentation: **2026-10-20**. See the [release and validation no
 
 ## Features
 
-- **Play or spectate:** join the Blue team, or watch the bots fight with spectator cameras, a live kill feed and match statistics.
-- **Team AI selection:** choose the AI model separately for Blue and Red.
-- **Solo Test:** an isolated arena with no bots. Choose any of the 45 playable characters, add stationary target dummies, test death and respawn, and reset at any time.
-- **Custom Units:** create a variant of any of the 44 supported characters and test it with player or heuristic control.
-- **Custom Weapons:** build single, spread or burst weapons and equip them in any slot.
-- **New character, Morrow:** Compass Bolt, a Banked shot that turns at a route marker, and Atlas, a line attack with a warning.
+- Play or spectate: join the Blue team, or watch bots fight with spectator cameras, a live kill feed, and match stats.
+- Team AI selection: pick the AI model separately for Blue and Red.
+- Solo Test: an isolated arena with no bots where you can pick any of the 45 playable characters, add stationary target dummies, test death and respawn, and reset anytime.
+- Custom Units: create a variant of any of the 44 supported characters and test it with player or heuristic control.
+- Custom Weapons: build single, spread, or burst weapons and equip them in any slot.
+- New character, Morrow: Compass Bolt, a Banked shot that turns at a route marker, and Atlas, a line attack with a warning.
 
-Custom content is saved locally and never enters Neural training.
+Custom content stays on your machine and never enters Neural training.
 
 ## Play from source
 
@@ -22,21 +22,21 @@ npm ci
 npm run demo
 ```
 
-Open [http://127.0.0.1/](http://127.0.0.1/). From the main page, join a fight, spectate, or open **Solo Test**, **Custom Units** or **Custom Weapons**.
+Open [http://127.0.0.1/](http://127.0.0.1/). From the main page, join a fight, spectate, or open Solo Test, Custom Units, or Custom Weapons.
 
-Controls: **WASD** to move, the mouse to aim, left click to fire, **1–4** to switch equipment.
+Controls: WASD to move, mouse to aim, left click to fire, 1–4 to switch equipment.
 
 ## Download
 
-Get the Windows game from [GitHub Releases](https://github.com/OkayOkay101/BattleFightLegacy/releases/latest). Download `BattleFight-Portable-1.0.0-no-touhou.exe` and run it; no install is needed.
+Get the Windows game from [GitHub Releases](https://github.com/OkayOkay101/BattleFightLegacy/releases/latest). Download `BattleFight-Portable-1.0.0-no-touhou.exe` and run it without installing.
 
-- Releases on GitHub are the **GitHub edition**: every character except Reimu & Marisa, whose Touhou Project fan-work guidelines do not list GitHub as a distribution channel. See [Releasing](docs/en/releasing.md#editions).
-- The EXE is not code-signed. If Windows shows "Windows protected your PC", check the file's SHA256 against the release page, then choose **More info → Run anyway**.
-- Credits and licenses ship inside the app in `licenses/`; see [Third-party notices](docs/licenses/THIRD-PARTY-NOTICES.md) and [Character credits](docs/licenses/CHARACTER-CREDITS.md).
+- Releases on GitHub use the GitHub edition, which includes every character except Reimu and Marisa because Touhou Project fan-work guidelines do not list GitHub as a distribution channel. See [Releasing](docs/en/releasing.md#editions).
+- The EXE is not code-signed. If Windows shows "Windows protected your PC", check the file's SHA256 against the release page, then choose More info → Run anyway.
+- Credits and licenses ship inside the app in `licenses/`. See [Third-party notices](docs/licenses/THIRD-PARTY-NOTICES.md) and [Character credits](docs/licenses/CHARACTER-CREDITS.md).
 
 ## Windows portable app
 
-Run `dist/portable/BattleFight-Portable-1.0.0.exe`. It runs the game and its server on your computer, includes local visuals and AI inference, has no audio, and needs no Node.js, Python or internet connection. Your settings and custom content are kept in your per-user data folder, so they survive replacing the EXE.
+Run `dist/portable/BattleFight-Portable-1.0.0.exe`. It runs the game and its server locally with built-in visuals and AI inference, has no audio, and needs no Node.js, Python, or internet connection. Your settings and custom content stay in your per-user data folder, so they survive replacing the EXE.
 
 To rebuild it:
 
@@ -47,7 +47,7 @@ npm run desktop:build
 
 For the GitHub edition use `npm run desktop:build:github`. See the [development guide](docs/en/development.md) for prerequisites and [Releasing](docs/en/releasing.md) for publishing a release.
 
-## Documentation — English first
+## Documentation (English)
 
 - [Documentation index](docs/en/index.md)
 - [Player guide](docs/en/player-guide.md)
@@ -63,44 +63,44 @@ For the GitHub edition use `npm run desktop:build:github`. See the [development 
 
 ### AI-Assisted Development
 
-BattleFight was developed with assistance from Gemini Flash and ChatGPT Sol.
+BattleFight was developed with help from Gemini Flash and ChatGPT Sol.
 
-This development credit is separate from the heuristic and Neural bots that run inside the game. It does not imply provider endorsement or assign ownership. Upstream engine credit and third-party licenses remain separate; see the license guide before assuming the game assets share the engine license.
+This development credit is separate from the heuristic and Neural bots inside the game. It does not imply provider endorsement or assign ownership. Upstream engine credit and third-party licenses remain separate; check the license guide before assuming the game assets share the engine license.
 
 ## เอกสารภาษาไทย
 
 BattleFight เป็นเกมต่อสู้เป็นทีม 2 มิติมุมมองจากด้านบนบนเอนจิน Taro โดยต่อยอดจาก *Battle! Fight!* ของ Modd.io เลือกเล่นทีมฟ้าสู้กับ AI หรือดูบอท heuristic กับ Neural สู้กันพร้อม kill feed และสถิติแมตช์ได้ มีโหมด Solo Test ให้ลองเล่นทั้ง 45 ตัวละคร รวมถึงสร้างยูนิตและอาวุธเองได้ ตัวเกมมี UI ภาษาอังกฤษและไทย เล่นผ่านเบราว์เซอร์ในเครื่องหรือเปิดจากไฟล์ portable บน Windows โดยไม่ต้องต่อเน็ต
 
-เอกสาร source ปัจจุบันอัปเดต **2026-10-20** ดูสิ่งที่เปลี่ยนและผลการทดสอบได้ที่ [บันทึกรุ่นและการตรวจรับ](docs/th/release-notes.md)
+เอกสารชุดนี้อัปเดตถึง 2026-10-20 ดูรายการเปลี่ยนแปลงและผลทดสอบได้ที่ [บันทึกรุ่นและการตรวจรับ](docs/th/release-notes.md)
 
 ### ฟีเจอร์
 
-- **เล่นหรือดู:** ลงเล่นทีมฟ้า หรือดูบอทสู้กันพร้อมกล้องผู้ชม kill feed สด และสถิติแมตช์
-- **เลือก AI แยกทีม:** เลือกโมเดล AI แยกกันระหว่างทีมฟ้าและทีมแดง
-- **Solo Test:** สนามแยกที่ไม่มีบอท เลือกได้ทุกตัวละครที่เล่นได้ทั้ง 45 ตัว เพิ่มหุ่นเป้านิ่ง ทดสอบการตายและเกิดใหม่ และเริ่มใหม่ได้ทุกเมื่อ
-- **ยูนิตสร้างเอง:** สร้างตัวแปรจาก 44 ตัวละครที่รองรับ แล้วทดลองด้วยผู้เล่นหรือ heuristic
-- **อาวุธสร้างเอง:** สร้างอาวุธยิงเดี่ยว กระจาย หรือเป็นชุด แล้วใส่ช่องไหนก็ได้
-- **ตัวละครใหม่ Morrow:** Compass Bolt, Banked ที่เลี้ยวที่หมุดเส้นทาง และ Atlas ท่าโจมตีเป็นแนวที่มีเส้นเตือนก่อน
+- เล่นหรือดู: ลงเล่นทีมฟ้า หรือดูบอทสู้กันพร้อมกล้องผู้ชม kill feed สด และสถิติแมตช์
+- เลือก AI แยกทีม: เลือกโมเดล AI แยกกันระหว่างทีมฟ้าและทีมแดง
+- Solo Test: สนามแยกที่ไม่มีบอท เลือกได้ทุกตัวละครทั้ง 45 ตัว เพิ่มหุ่นเป้านิ่ง ทดสอบการตายและเกิดใหม่ และรีเซ็ตได้ทุกเมื่อ
+- ยูนิตสร้างเอง: สร้างตัวละครปรับแต่งจาก 44 ตัวที่รองรับ แล้วทดลองด้วยผู้เล่นหรือ heuristic
+- อาวุธสร้างเอง: สร้างอาวุธยิงเดี่ยว กระจาย หรือยิงเป็นชุด แล้วใส่ช่องไหนก็ได้
+- ตัวละครใหม่ Morrow: ท่า Compass Bolt แบบ Banked ที่หักเลี้ยวตรงหมุดเส้นทาง และท่า Atlas ที่โจมตีเป็นแนวพร้อมเส้นเตือนล่วงหน้า
 
 ข้อมูล custom บันทึกในเครื่องและไม่เข้าการฝึก Neural
 
 ### เล่นจาก source
 
-รัน `npm ci` และ `npm run demo` จากโฟลเดอร์นี้ แล้วเปิด [http://127.0.0.1/](http://127.0.0.1/) จากหน้าหลักเลือกลงเล่น ดูบอทสู้กัน หรือเปิด **Solo Test**, **ยูนิตสร้างเอง** หรือ **อาวุธสร้างเอง**
+รัน `npm ci` และ `npm run demo` จากโฟลเดอร์นี้ แล้วเปิด [http://127.0.0.1/](http://127.0.0.1/) จากหน้าหลักเลือกลงเล่น ดูบอทสู้กัน หรือเปิด Solo Test, ยูนิตสร้างเอง หรืออาวุธสร้างเอง
 
-การควบคุม: **WASD** เดิน, เมาส์เล็ง, คลิกซ้ายยิง, **1–4** เปลี่ยนอุปกรณ์
+การควบคุม: WASD เดิน, เมาส์เล็ง, คลิกซ้ายยิง, 1–4 เปลี่ยนอุปกรณ์
 
 ### ดาวน์โหลด
 
 ดาวน์โหลดเกม Windows ได้ที่ [GitHub Releases](https://github.com/OkayOkay101/BattleFightLegacy/releases/latest) เลือกไฟล์ `BattleFight-Portable-1.0.0-no-touhou.exe` แล้วเปิดได้เลย ไม่ต้องติดตั้ง
 
-- release บน GitHub เป็น**รุ่น GitHub** ที่มีตัวละครครบทุกตัว ยกเว้น Reimu & Marisa เพราะแนวปฏิบัติแฟนเวิร์กของ Touhou Project ไม่ได้ระบุ GitHub เป็นช่องทางเผยแพร่ ดู[การปล่อยเกม](docs/th/releasing.md#รุ่นของเกม)
-- EXE ยังไม่ได้เซ็นดิจิทัล ถ้า Windows ขึ้นหน้าต่าง "Windows protected your PC" ให้ตรวจ SHA256 กับหน้า release ก่อน แล้วกด **More info (ข้อมูลเพิ่มเติม) → Run anyway (เรียกใช้ต่อไป)**
+- release บน GitHub เป็นรุ่น GitHub ที่มีตัวละครครบทุกตัว ยกเว้น Reimu กับ Marisa เพราะแนวปฏิบัติแฟนเวิร์กของ Touhou Project ไม่ได้ระบุ GitHub เป็นช่องทางเผยแพร่ ดู[การปล่อยเกม](docs/th/releasing.md#รุ่นของเกม)
+- EXE ยังไม่ได้เซ็นดิจิทัล ถ้า Windows ขึ้นหน้าต่าง "Windows protected your PC" ให้ตรวจ SHA256 กับหน้า release ก่อน แล้วกด More info → Run anyway
 - เครดิตและ license อยู่ในแอปที่โฟลเดอร์ `licenses/` ดู [Third-party notices](docs/licenses/THIRD-PARTY-NOTICES.md) และ [เครดิตตัวละคร](docs/licenses/CHARACTER-CREDITS.md)
 
 ### แอป Windows แบบ portable
 
-เปิด `dist/portable/BattleFight-Portable-1.0.0.exe` แอปรันทั้งเกมและเซิร์ฟเวอร์ในเครื่อง มีภาพและ AI inference ในตัว ไม่มีเสียง ไม่ต้องติดตั้ง Node.js หรือ Python และไม่ต้องต่ออินเทอร์เน็ต การตั้งค่าและข้อมูล custom เก็บไว้ในโฟลเดอร์ข้อมูลของผู้ใช้ จึงยังอยู่แม้เปลี่ยนไฟล์ EXE
+เปิด `dist/portable/BattleFight-Portable-1.0.0.exe` แอปรันทั้งเกมและเซิร์ฟเวอร์ในเครื่อง มีภาพและ AI inference ในตัว ไม่มีเสียง ไม่ต้องติดตั้ง Node.js หรือ Python และไม่ต้องต่อเน็ต การตั้งค่าและข้อมูล custom เก็บไว้ในโฟลเดอร์ข้อมูลของผู้ใช้ จึงยังอยู่แม้เปลี่ยนไฟล์ EXE
 
 build ใหม่ด้วย `npm install` และ `npm run desktop:build` ส่วนรุ่น GitHub ใช้ `npm run desktop:build:github` ดู prerequisites ใน [คู่มือพัฒนา](docs/th/development.md) และวิธีปล่อย release ใน[การปล่อยเกม](docs/th/releasing.md)
 
@@ -122,7 +122,7 @@ build ใหม่ด้วย `npm install` และ `npm run desktop:build` �
 
 BattleFight พัฒนาโดยใช้ Gemini Flash และ ChatGPT Sol ช่วยในการพัฒนา
 
-เครดิตการพัฒนานี้แยกจากบอท heuristic และ Neural ในเกม ไม่สื่อถึงการรับรองจากผู้ให้บริการหรือกำหนดความเป็นเจ้าของ เครดิตเอนจินและ license ของส่วนประกอบอื่นยังคงแยกกัน โปรดอ่านคู่มือ license ก่อนตีความว่าภาพในเกมใช้สิทธิ์เดียวกับเอนจิน
+เครดิตนี้แยกจากบอท heuristic และ Neural ในเกม ไม่ได้หมายความว่าผู้ให้บริการรับรองหรือเป็นเจ้าของโปรเจกต์ ส่วนเครดิตเอนจินและ license ของส่วนประกอบอื่นยังแยกกันตามคู่มือ license
 
 ---
 
