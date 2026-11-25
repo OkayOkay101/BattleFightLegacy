@@ -37,13 +37,13 @@ test('renders credited and unattributed eliminations newest first with translate
   assert.equal(container.children[1].textContent, 'Blue (Blue · Ranger) eliminated Red (Red)');
 });
 
-test('keeps player names as literal text and caps the display at twelve rows', () => {
+test('keeps player names as literal text and caps the display at four rows', () => {
   const { ui, container } = setup();
   ui.add({ eventId: 'html', killer: { id: 'blue', name: '<img src=x>', teamId: 'blue' }, victim: { id: 'victim', name: 'Victim' } });
   assert.equal(container.children[0].textContent, '<img src=x> (Blue) eliminated Victim');
   assert.equal(container.children[0].children.length, 0);
   for (let i = 1; i <= 14; i++) ui.add({ eventId: `event-${i}`, killer: null, victim: { id: `p-${i}`, name: `P${i}` } });
-  assert.equal(container.children.length, 12);
+  assert.equal(container.children.length, 4);
   assert.equal(container.children[0].textContent, 'P14 was eliminated');
 });
 
