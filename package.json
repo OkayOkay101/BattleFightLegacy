@@ -56,7 +56,7 @@
     "msgpack-lite": "^0.1.26",
     "node-arguments": "0.0.1",
     "phaser": "^3.55.2",
-    "public-ip": "^2.5.0",
+    "public-ip": "^8.0.0",
     "q": "^1.5.1",
     "rate-limiter-flexible": "^11.2.3",
     "request": "^2.88.2",
