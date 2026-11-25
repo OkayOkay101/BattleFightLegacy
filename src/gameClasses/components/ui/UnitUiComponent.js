@@ -47,7 +47,7 @@ var UnitUiComponent = IgeEntity.extend({
 						}).append(
 							$('<div/>', {
 								class: `label progress-label player-${attributeTypeId}`,
-								style: 'position: absolute; margin-top: 3px; width: 100%; color: black; font-size: 14px'
+								style: 'position: absolute; margin-top: 0; width: 100%; color: #f8fafc; font-size: 12px'
 							})
 						).append(
 							$('<div/>', {

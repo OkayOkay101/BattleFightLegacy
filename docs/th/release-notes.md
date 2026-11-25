@@ -2,6 +2,19 @@
 
 [English](../en/release-notes.md) · [สารบัญ](index.md)
 
+## 2026-11-25 — ปรับปรุง UI เป็น Minimal Dark Glass
+
+- **ระบบธีมกลาง (`assets/css/legacy-glass.css`):** เพิ่ม stylesheet กลางสไตล์ Minimal Dark Glass (`rgba(8, 15, 29, 0.72)` พร้อม `backdrop-filter: blur(14px)` และสีเน้น Cyan `#38bdf8`) ครอบคลุมหน้าเมนู, HUD, modals, และ Custom Units / Solo Test โดยคง DOM ID เดิมไว้ครบ
+- **Top-Left Tools Hub (`src/index.ejs`, `src/templates/dev-console.ejs`):** รวมตัวเลือกภาษาและปุ่ม Dev Console ไว้ใน `#bf-tools-hub` / `#bf-tools-drawer` มุมบนซ้าย (เปิด-ปิดได้ด้วยปุ่มลัด `F9`)
+- **Menu, Lobby & Spectator (`src/templates/menu.ejs`):** ปรับ `#training-demo-settings`, `.train-dashboard`, `.demo-options`, `#training-demo-spectator`, และ `#training-demo-stats` เป็นการ์ด Dark Glass
+- **In-Game HUD, Chat & Kill Feed (`src/templates/gui.ejs`, `src/templates/chat.ejs`, `KillFeedUiComponent.js`, `UnitUiComponent.js`):**
+  - Chat จางอัตโนมัติหลังไม่มีข้อความ 6 วินาที (`.bf-chat-faded`) และกลับมาสว่างเมื่อมีข้อความใหม่, hover หรือกด `Enter`
+  - Kill feed จำกัดสูงสุด 4 แถวแบบกระชับและจางหายหลัง 4.5 วินาที
+  - ปรับข้อความบน `#attribute-bars` เป็นสีขาว `#f8fafc` เพื่อความคมชัด
+- **Pixi In-World HUD (`PixiAttributeBar.js`, `IgePixiFloatingText.js`, `MinimapComponent.js`):** ลดความหนาแถบเลือดบนหัวยูนิต (`7px` × `72px`), ปรับฟอนต์ตัวเลขดาเมจ (`14px` sans-serif ขอบ `#080f1d`), และย้าย Minimap ไปมุมบนขวา (`y = 44`) ไม่ทับ Chat มุมล่างซ้าย
+
+**การตรวจรับ:** ทดสอบ HTTP `200 OK` ที่ `/` และ `/assets/css/legacy-glass.css`, ผ่าน `node --check` ทั้ง 5 ไฟล์ JS ที่แก้ไข, และจับภาพหน้าจอจริงผ่าน headless Chrome (`1440×900`) ครบ 4 หน้าจอ (Menu, Tools Drawer, Custom Units, Character Select / HUD) โดยไม่พบ runtime error
+
 ## 2026-10-20 — Solo Test และ Morrow
 
 Commit `39afe69` บน `codex/battlefight-bots`

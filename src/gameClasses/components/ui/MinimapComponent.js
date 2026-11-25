@@ -58,8 +58,8 @@ var MiniMapComponent = IgeEntity.extend({
 				self.miniMap.height = worldHeight * self.mapScale.y;
 				self.miniMap.pivot.x = self.miniMap.width / 2;
 				self.miniMap.pivot.y = self.miniMap.height / 2;
-				self.miniMap.x = 5;
-				self.miniMap.y = window.innerHeight - self.miniMap.height;
+				self.miniMap.x = Math.max(12, window.innerWidth - self.miniMap.width - 14);
+				self.miniMap.y = 44;
 			}
 		}
 	},

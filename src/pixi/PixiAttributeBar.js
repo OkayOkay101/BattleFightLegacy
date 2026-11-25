@@ -24,7 +24,7 @@ var PixiAttributeBar = IgeEntity.extend({
 		var container = new PIXI.Container();
 		var entity = ige.$(self._stats.parentId);
 		self.index = attributeData.index;
-		self.borderThickness = 2;
+		self.borderThickness = 1.5;
 
 		self.pixiBarBorder = new PIXI.Graphics();
 		self.pixiBarMask = new PIXI.Graphics();
@@ -106,24 +106,26 @@ var PixiAttributeBar = IgeEntity.extend({
 	 * returns valid height of attribute bar based on current zoom level
 	 */
 	barHeight: function () {
-		return 11;
+		return 7;
 	},
 
 	barWidth: function () {
-		return 80;
+		return 72;
 	},
 
 	borderRadius: function () {
 		var self = this;
-		return self.barHeight() / 2 - 1;
+		return self.barHeight() / 2;
 	},
 
 	getTextStyle: function () {
 		return {
-			fontFamily: 'Arial',
-			fill: '#000000',
-			fontSize: 11,
-			fontWeight: 'bold'
+			fontFamily: 'Inter, Cabin, Arial, sans-serif',
+			fill: '#f8fafc',
+			fontSize: 10,
+			fontWeight: 'bold',
+			stroke: '#080f1d',
+			strokeThickness: 2
 		};
 	},
 

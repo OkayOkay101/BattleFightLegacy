@@ -20,10 +20,16 @@ var KillFeedUiComponent = IgeEntity.extend({
       eventId: eventId,
       killer: event.killer ? { ...event.killer } : null,
       victim: { ...event.victim },
-      at: event.at
+      at: event.at,
+      createdAt: Date.now()
     });
-    if (this.events.length > 12) this.events.length = 12;
+    if (this.events.length > 4) this.events.length = 4;
     this.render();
+    var self = this;
+    setTimeout(function () {
+      self.events = self.events.filter(function (e) { return e.eventId !== eventId; });
+      self.render();
+    }, 4500);
     return true;
   },
 

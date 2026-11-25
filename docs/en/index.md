@@ -4,7 +4,7 @@
 
 English is the default documentation language. Every guide has a corresponding Thai page. These guides describe the current local implementation; historical evaluation reports are dated snapshots, not live training status.
 
-Updated **2026-10-21**. Start with the player guide for normal play, Custom Units for the local experiment editor, Development for server/training/build commands, or Releasing to publish a build.
+Updated **2026-11-25**. Start with the player guide for normal play, Custom Units for the local experiment editor, Development for server/training/build commands, or Releasing to publish a build.
 
 Download the Windows game from [GitHub Releases](https://github.com/OkayOkay101/BattleFightLegacy/releases/latest). Releases on GitHub are the **GitHub edition**, without Reimu & Marisa; see [Releasing](releasing.md#editions).
 
