@@ -77,7 +77,7 @@
     "@typescript-eslint/parser": "^8.72.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "bootstrap": "5.3.8",
-    "cross-env": "^7.0.3",
+    "cross-env": "^10.1.0",
     "electron": "44.3.0",
     "electron-builder": "26.17.0",
     "eslint": "^8.20.0",
